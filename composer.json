@@ -2,7 +2,7 @@
     "name": "paneedesign/storage-bundle",
     "type": "symfony-bundle",
     "description": "Storage management for Symfony3 projects.",
-    "keywords": ["storage", "aws", "filesistem", "gaufrette", "knp", "s3", "amazonwebservices", "php"],
+    "keywords": ["storage", "aws", "filesystem", "gaufrette", "knp", "s3", "php"],
     "homepage": "http://www.paneedesign.com/",
     "license": "proprietary",
     "authors": [{
