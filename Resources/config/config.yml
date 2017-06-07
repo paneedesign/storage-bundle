@@ -1,0 +1,19 @@
+ped_storage:
+    amazon_s3:
+        aws_key:        %amazon_aws_key%
+        aws_secret_key: %amazon_aws_secret_key%
+        base_url:       %amazon_s3_base_url%
+
+knp_gaufrette:
+    adapters:
+        photo_storage:
+            amazon_s3:
+                amazon_s3_id: ped_storage.amazon_s3
+                bucket_name:  %amazon_s3_bucket_name%
+                create:       false
+                options:
+                    create: true
+    filesystems:
+        photo_storage:
+            adapter:    photo_storage
+            alias:      photo_storage_filesystem

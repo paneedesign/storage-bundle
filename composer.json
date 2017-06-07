@@ -1,0 +1,45 @@
+{
+    "name": "paneedesign/storage-bundle",
+    "type": "symfony-bundle",
+    "description": "Storage management for Symfony3 projects.",
+    "keywords": ["storage", "aws", "filesistem", "gaufrette", "knp", "s3", "amazonwebservices", "php"],
+    "homepage": "http://www.paneedesign.com/",
+    "license": "proprietary",
+    "authors": [{
+        "name": "Fabiano Roberto",
+        "email": "fabiano@paneedesign.com"
+    }],
+    "require": {
+        "php": "^5.6|^7.0",
+        "symfony/framework-bundle": "^3.2",
+        "knplabs/gaufrette": "^0.3.1",
+        "knplabs/knp-gaufrette-bundle": "^0.4.0",
+        "aws/aws-sdk-php": "^3.28"
+    },
+    "require-dev": {
+        "phpspec/phpspec": "^3.2",
+        "phpunit/phpunit": "^5.6",
+        "symfony/security-bundle": "^3.2",
+        "incenteev/composer-parameter-handler": "~2.0"
+    },
+    "config": {
+        "bin-dir": "bin"
+    },
+    "autoload": {
+        "psr-4": { "PaneeDesign\\StorageBundle\\": "" },
+        "exclude-from-classmap": ["/Tests/"]
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true,
+    "repositories": [
+        {
+            "type": "path",
+            "url": "../../*/*"
+        }
+    ],
+    "extra": {
+        "branch-alias": {
+            "dev-master": "1.0-dev"
+        }
+    }
+}
