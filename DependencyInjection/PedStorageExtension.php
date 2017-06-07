@@ -30,20 +30,16 @@ class PedStorageExtension extends Extension
             if(array_key_exists('amazon_s3', $config) === true) {
                 $amazonS3 = $config['amazon_s3'];
 
-                if(array_key_exists('key', $amazonS3) === false) {
-                    throw new \InvalidArgumentException('The option "ped_storage.amazon_s3.key" must be set.');
-                }
-
                 if(array_key_exists('secret', $amazonS3) === false) {
-                    throw new \InvalidArgumentException('The option "ped_storage.amazon_s3.secret" must be set.');
+                    $this->printException('ped_storage.amazon_s3.secret', ($amazonS3['key']));
                 }
 
                 if(array_key_exists('base_url', $amazonS3) === false) {
-                    throw new \InvalidArgumentException('The option "ped_storage.amazon_s3.base_url" must be set.');
+                    $this->printException('ped_storage.amazon_s3.base_url', ($amazonS3['key']));
                 }
 
                 if(array_key_exists('bucket_name', $amazonS3) === false) {
-                    throw new \InvalidArgumentException('The option "ped_storage.amazon_s3.bucket_name" must be set.');
+                    $this->printException('ped_storage.amazon_s3.bucket_name', ($amazonS3['key']));
                 }
 
                 $container->setParameter('ped_storage.amazon_s3.key', $amazonS3['key']);
@@ -58,7 +54,7 @@ class PedStorageExtension extends Extension
                 $local = $config['local'];
 
                 if(array_key_exists('directory', $local) === false) {
-                    throw new \InvalidArgumentException('The option "ped_storage.local.directory" must be set.');
+                    $this->printException('ped_storage.local.directory');
                 }
 
                 $container->setParameter('ped_storage.local.directory', $local['directory']);
@@ -72,5 +68,12 @@ class PedStorageExtension extends Extension
     public function getAlias()
     {
         return 'ped_storage';
+    }
+
+    private function printException($name, $toPrint = true)
+    {
+        if($toPrint) {
+            throw new \InvalidArgumentException(sprintf('The option "%s" must be set.', $name));
+        }
     }
 }

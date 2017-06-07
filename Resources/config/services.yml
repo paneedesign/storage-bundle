@@ -8,8 +8,8 @@ services:
         factory: ["%ped_storage.aws_s3.client.class%", "factory"]
         arguments:
             -
-                version: latest
-                region: "%ped_storage.amazon_s3.region%"
+                version:    latest
+                region:     "%ped_storage.amazon_s3.region%"
                 credentials:
                     key:    "%ped_storage.amazon_s3.key%"
                     secret: "%ped_storage.amazon_s3.secret%"
