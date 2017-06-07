@@ -21,50 +21,49 @@ class PedStorageExtension extends Extension
     {
         $configuration = new Configuration();
         $config = $this->processConfiguration($configuration, $configs);
-        
-        if (!isset($config['amazon_s3']['key'])) {
-            throw new \InvalidArgumentException(
-                'The option "ped_storage.amazon_s3.key" must be set.'
-            );
-        }
-        
-        $container->setParameter(
-            'ped_storage.amazon_s3.key',
-            $config['amazon_s3']['key']
-        );
 
-        if (!isset($config['amazon_s3']['secret'])) {
+        if(array_key_exists('amazon_s3', $config) === false && array_key_exists('local', $config) === false) {
             throw new \InvalidArgumentException(
-                'The option "ped_storage.amazon_s3.secret" must be set.'
+                'At least one of the parameters "ped_storage.amazon_s3" or "ped_storage.local" must be set.'
             );
-        }
-        
-        $container->setParameter(
-            'ped_storage.amazon_s3.secret',
-            $config['amazon_s3']['secret']
-        );
+        } else {
+            if(array_key_exists('amazon_s3', $config) === true) {
+                $amazonS3 = $config['amazon_s3'];
 
-        if (!isset($config['amazon_s3']['region'])) {
-            throw new \InvalidArgumentException(
-                'The option "ped_storage.amazon_s3.region" must be set.'
-            );
-        }
+                if(array_key_exists('key', $amazonS3) === false) {
+                    throw new \InvalidArgumentException('The option "ped_storage.amazon_s3.key" must be set.');
+                }
 
-        $container->setParameter(
-            'ped_storage.amazon_s3.region',
-            $config['amazon_s3']['region']
-        );
+                if(array_key_exists('secret', $amazonS3) === false) {
+                    throw new \InvalidArgumentException('The option "ped_storage.amazon_s3.secret" must be set.');
+                }
 
-        if (!isset($config['amazon_s3']['base_url'])) {
-            throw new \InvalidArgumentException(
-                'The option "ped_storage.amazon_s3.base_url" must be set.'
-            );
+                if(array_key_exists('base_url', $amazonS3) === false) {
+                    throw new \InvalidArgumentException('The option "ped_storage.amazon_s3.base_url" must be set.');
+                }
+
+                if(array_key_exists('bucket_name', $amazonS3) === false) {
+                    throw new \InvalidArgumentException('The option "ped_storage.amazon_s3.bucket_name" must be set.');
+                }
+
+                $container->setParameter('ped_storage.amazon_s3.key', $amazonS3['key']);
+                $container->setParameter('ped_storage.amazon_s3.secret', $amazonS3['secret']);
+                $container->setParameter('ped_storage.amazon_s3.region', $amazonS3['region']);
+                $container->setParameter('ped_storage.amazon_s3.base_url', $amazonS3['base_url']);
+                $container->setParameter('ped_storage.amazon_s3.bucket_name', $amazonS3['bucket_name']);
+                $container->setParameter('ped_storage.amazon_s3.directory', $amazonS3['directory']);
+            }
+
+            if(array_key_exists('local', $config) === true) {
+                $local = $config['local'];
+
+                if(array_key_exists('directory', $local) === false) {
+                    throw new \InvalidArgumentException('The option "ped_storage.local.directory" must be set.');
+                }
+
+                $container->setParameter('ped_storage.local.directory', $local['directory']);
+            }
         }
-        
-        $container->setParameter(
-            'ped_storage.amazon_s3.base_url',
-            $config['amazon_s3']['base_url']
-        );
 
         $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
         $loader->load('services.yml');

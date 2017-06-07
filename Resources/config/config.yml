@@ -1,22 +1,26 @@
 ped_storage:
     amazon_s3:
-        key:      %amazon_s3_key%
-        secret:   %amazon_s3_secret%
-        region:   %amazon_s3_region%
-        base_url: %amazon_s3_base_url%
+        key:         "%storage_amazon_s3_key%"
+        secret:      "%storage_amazon_s3_secret%"
+        region:      "%storage_amazon_s3_region%"
+        base_url:    "%storage_amazon_s3_base_url%"
+        bucket_name: "%storage_amazon_s3_bucket_name%"
+        directory:   "%storage_amazon_s3_directory%"
+    local:
+        directory:   "%storage_local_directory%"
 
 knp_gaufrette:
     adapters:
         local_adapter:
             local:
-                directory: %kernel.root_dir%/../web/uploads
+                directory: "%ped_storage.local.directory%"
         amazon_s3_adapter:
             aws_s3:
-                service_id: 'ped_storage.aws_s3.client'
-                bucket_name: %amazon_s3_bucket_name%
+                service_id:  "ped_storage.aws_s3.client"
+                bucket_name: "%ped_storage.amazon_s3.bucket_name%"
                 options:
                     create:    true
-                    directory: 'uploads'
+                    directory: "%ped_storage.amazon_s3.directory%"
     filesystems:
         local_fs:
             adapter: local_adapter

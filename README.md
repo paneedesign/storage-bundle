@@ -38,7 +38,9 @@ class AppKernel extends Kernel
         $bundles = array(
             // ...
 
-            new PaneeDesign\StorageBundle\PedStorageBundle(),
+            new \Liip\ImagineBundle\LiipImagineBundle(),
+            new \Knp\Bundle\GaufretteBundle\KnpGaufretteBundle(),
+            new \PaneeDesign\StorageBundle\PedStorageBundle(),
         );
 
         // ...
@@ -48,12 +50,39 @@ class AppKernel extends Kernel
 }
 ```
 
-Step 3: Enable Liip
--------------------
+Step 3: Configurations
+----------------------
+
+Copy parameters
+
+```
+parameters:
+    ...
+    storage_amazon_s3_key:         ~
+    storage_amazon_s3_secret:      ~
+    storage_amazon_s3_region:      eu-west-1
+    storage_amazon_s3_base_url:    ~
+    storage_amazon_s3_bucket_name: ~
+    storage_amazon_s3_directory:   uploads
+    storage_local_directory:       "%kernel.root_dir%/../web/uploads"
+```
+
+Add configuration:
 
 ```yml
 // app/config/config.yml
-//..
+//...
+ped_storage:
+    amazon_s3:
+        key:         "%storage_amazon_s3_key%"
+        secret:      "%storage_amazon_s3_secret%"
+        region:      "%storage_amazon_s3_region%"
+        base_url:    "%storage_amazon_s3_base_url%"
+        bucket_name: "%storage_amazon_s3_bucket_name%"
+        directory:   "%storage_amazon_s3_directory%"
+    local:
+        directory:   "%storage_local_directory%"
+//...
 liip_imagine:
     data_loader: stream.amazon_fs
     //data_loader: stream.local_fs

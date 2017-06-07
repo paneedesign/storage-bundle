@@ -5,20 +5,22 @@ parameters:
 services:
     ped_storage.aws_s3.client:
         class: "%ped_storage.aws_s3.client.class%"
-        factory: ["%ped_storage.aws_s3.client.class%", 'factory']
+        factory: ["%ped_storage.aws_s3.client.class%", "factory"]
         arguments:
             -
                 version: latest
-                region: %amazon_s3_region%
+                region: "%ped_storage.amazon_s3.region%"
                 credentials:
-                    key: %amazon_s3_key%
-                    secret: %amazon_s3_secret%
+                    key:    "%ped_storage.amazon_s3.key%"
+                    secret: "%ped_storage.amazon_s3.secret%"
+
     ped_storage.amazon_photo_uploader:
         class: %ped_storage.photo_uploader.class%
-        arguments: ['@amazon_fs']
+        arguments: ['amazon_fs']
     ped_storage.local_photo_uploader:
         class: %ped_storage.photo_uploader.class%
-        arguments: ['@local_fs']
+        arguments: ['local_fs']
+
     ped_storage.liip_imagine.binary.loader.stream.amazon_fs:
         class: "%liip_imagine.binary.loader.stream.class%"
         arguments:
