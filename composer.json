@@ -2,7 +2,7 @@
     "name": "paneedesign/storage-bundle",
     "type": "symfony-bundle",
     "description": "Storage management for Symfony3 projects.",
-    "keywords": ["storage", "aws", "filesystem", "gaufrette", "knp", "s3", "php"],
+    "keywords": ["storage", "aws", "filesystem", "gaufrette", "knp", "s3", "liip", "php"],
     "homepage": "http://www.paneedesign.com/",
     "license": "proprietary",
     "authors": [{
@@ -14,7 +14,8 @@
         "symfony/framework-bundle": "^3.2",
         "knplabs/gaufrette": "^0.3.1",
         "knplabs/knp-gaufrette-bundle": "^0.4.0",
-        "aws/aws-sdk-php": "^3.28"
+        "aws/aws-sdk-php": "^3.28",
+        "liip/imagine-bundle": "^1.8"
     },
     "require-dev": {
         "phpspec/phpspec": "^3.2",

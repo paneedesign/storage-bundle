@@ -23,3 +23,12 @@ knp_gaufrette:
         amazon_fs:
             adapter: amazon_s3_adapter
             alias:   amazon_fs
+
+liip_imagine:
+    loaders:
+        stream.amazon_fs:
+            stream:
+                wrapper: gaufrette://amazon_fs
+        stream.local_fs:
+            stream:
+                wrapper: gaufrette://local_fs

@@ -15,3 +15,15 @@ services:
     ped_storage.local_photo_uploader:
         class: %ped_storage.photo_uploader.class%
         arguments: ['@local_fs']
+    ped_storage.liip_imagine.binary.loader.stream.amazon_fs:
+        class: "%liip_imagine.binary.loader.stream.class%"
+        arguments:
+            - 'gaufrette://amazon_fs/'
+        tags:
+            - { name: 'liip_imagine.binary.loader', loader: 'stream.amazon_fs' }
+    ped_storage.liip_imagine.binary.loader.stream.local_fs:
+        class: "%liip_imagine.binary.loader.stream.class%"
+        arguments:
+            - 'gaufrette://local_fs/'
+        tags:
+            - { name: 'liip_imagine.binary.loader', loader: 'stream.local_fs' }
