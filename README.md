@@ -47,3 +47,14 @@ class AppKernel extends Kernel
     // ...
 }
 ```
+
+Step 3: Enable Liip
+-------------------
+
+```yml
+// app/config/config.yml
+//..
+liip_imagine:
+    data_loader: stream.amazon_fs
+    //data_loader: stream.local_fs
+```
