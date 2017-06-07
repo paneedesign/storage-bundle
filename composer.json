@@ -39,11 +39,14 @@
         }
     ],
     "scripts": {
-        "post-install-cmd": [
+        "symfony-scripts": [
             "Incenteev\\ParameterHandler\\ScriptHandler::buildParameters"
         ],
+        "post-install-cmd": [
+            "@symfony-scripts"
+        ],
         "post-update-cmd": [
-            "Incenteev\\ParameterHandler\\ScriptHandler::buildParameters"
+            "@symfony-scripts"
         ]
     },
     "extra": {

@@ -21,27 +21,38 @@ class PedStorageExtension extends Extension
     {
         $configuration = new Configuration();
         $config = $this->processConfiguration($configuration, $configs);
-
-        if (!isset($config['amazon_s3']['aws_key'])) {
+        
+        if (!isset($config['amazon_s3']['key'])) {
             throw new \InvalidArgumentException(
-                'The option "ped_storage.amazon_s3.aws_key" must be set.'
+                'The option "ped_storage.amazon_s3.key" must be set.'
             );
         }
         
         $container->setParameter(
-            'ped_storage.amazon_s3.aws_key',
-            $config['amazon_s3']['aws_key']
+            'ped_storage.amazon_s3.key',
+            $config['amazon_s3']['key']
         );
 
-        if (!isset($config['amazon_s3']['aws_secret_key'])) {
+        if (!isset($config['amazon_s3']['secret'])) {
             throw new \InvalidArgumentException(
-                'The option "ped_storage.amazon_s3.aws_secret_key" must be set.'
+                'The option "ped_storage.amazon_s3.secret" must be set.'
             );
         }
         
         $container->setParameter(
-            'ped_storage.amazon_s3.aws_secret_key',
-            $config['amazon_s3']['aws_secret_key']
+            'ped_storage.amazon_s3.secret',
+            $config['amazon_s3']['secret']
+        );
+
+        if (!isset($config['amazon_s3']['region'])) {
+            throw new \InvalidArgumentException(
+                'The option "ped_storage.amazon_s3.region" must be set.'
+            );
+        }
+
+        $container->setParameter(
+            'ped_storage.amazon_s3.region',
+            $config['amazon_s3']['region']
         );
 
         if (!isset($config['amazon_s3']['base_url'])) {
@@ -57,5 +68,10 @@ class PedStorageExtension extends Extension
 
         $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
         $loader->load('services.yml');
+    }
+
+    public function getAlias()
+    {
+        return 'ped_storage';
     }
 }

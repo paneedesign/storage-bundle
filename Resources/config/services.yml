@@ -1,14 +1,18 @@
 parameters:
-    ped_storage.amazon_s3.class: AmazonS3
+    ped_storage.aws_s3.client.class:  Aws\S3\S3Client
     ped_storage.photo_uploader.class: PaneeDesign\StorageBundle\Upload\PhotoUploader
 
 services:
-    ped_storage.amazon_s3:
-        class: %ped_storage.amazon_s3.class%
+    ped_storage.aws_s3.client:
+        class: "%ped_storage.aws_s3.client.class%"
+        factory: ["%ped_storage.aws_s3.client.class%", 'factory']
         arguments:
-            options:
-                key:    '%ped_storage.amazon_s3.aws_key%'
-                secret: '%ped_storage.amazon_s3.aws_secret_key%'
+            -
+                version: latest
+                region: %amazon_s3_region%
+                credentials:
+                    key: %amazon_s3_key%
+                    secret: %amazon_s3_secret%
     ped_storage.amazon_photo_uploader:
         class: %ped_storage.photo_uploader.class%
         arguments: ['@amazon_fs']
