@@ -6,7 +6,10 @@ ped_storage:
 
 knp_gaufrette:
     adapters:
-        photo_storage:
+        local_adapter:
+            local:
+                directory: %kernel.root_dir%/../web/uploads
+        amazon_s3_adapter:
             amazon_s3:
                 amazon_s3_id: ped_storage.amazon_s3
                 bucket_name:  %amazon_s3_bucket_name%
@@ -14,6 +17,9 @@ knp_gaufrette:
                 options:
                     create: true
     filesystems:
-        photo_storage:
-            adapter:    photo_storage
-            alias:      photo_storage_filesystem
+        local_fs:
+            adapter: local_adapter
+            alias:   local_fs
+        amazon_fs:
+            adapter: amazon_s3_adapter
+            alias:   amazon_fs

@@ -39,7 +39,11 @@ class PhotoUploader
 
         /* @var AwsS3 $adapter */
         $adapter = $this->filesystem->getAdapter();
-        $adapter->setMetadata($filename, ['contentType' => $file->getClientMimeType()]);
+
+        if($adapter instanceof AwsS3) {
+            $adapter->setMetadata($filename, ['contentType' => $file->getClientMimeType()]);
+        }
+
         $adapter->write($filename, file_get_contents($file->getPathname()));
 
         return $filename;

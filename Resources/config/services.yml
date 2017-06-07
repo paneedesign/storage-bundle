@@ -5,7 +5,13 @@ parameters:
 services:
     ped_storage.amazon_s3:
         class: %ped_storage.amazon_s3.class%
-        arguments: [{ key: '%ped_storage.amazon_s3.aws_key%', secret: '%ped_storage.amazon_s3.aws_secret_key%' }]
-    ped_storage.photo_uploader:
+        arguments:
+            options:
+                key:    '%ped_storage.amazon_s3.aws_key%'
+                secret: '%ped_storage.amazon_s3.aws_secret_key%'
+    ped_storage.amazon_photo_uploader:
         class: %ped_storage.photo_uploader.class%
-        arguments: ['@photo_storage_filesystem']
+        arguments: ['@amazon_fs']
+    ped_storage.local_photo_uploader:
+        class: %ped_storage.photo_uploader.class%
+        arguments: ['@local_fs']
