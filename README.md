@@ -1,5 +1,5 @@
-Pane e Design - Media Bundle
-============================
+Pane e Design - Storage Bundle
+==============================
 
 Users management for Symfony3 projects.
 
