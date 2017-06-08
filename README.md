@@ -9,6 +9,23 @@ Installation
 Step 1: Download the Bundle
 ---------------------------
 
+Pane&Design repository is private so, add to `composer.json` this `vcs`
+
+```json
+    "repositories" : [
+        ...
+        {
+            "type" : "vcs",
+            "url" : "git@gitlab.com:paneedesign/symfony-bundles/storage-bundle.git"
+        }
+    ],
+    ...
+    "require": {
+        ...
+        "paneedesign/storage-bundle": "dev-master"   
+    }
+```
+
 Open a command console, enter your project directory and execute the
 following command to download the latest stable version of this bundle:
 
