@@ -65,11 +65,6 @@ class PedStorageExtension extends Extension
         $loader->load('services.yml');
     }
 
-    public function getAlias()
-    {
-        return 'ped_storage';
-    }
-
     private function printException($name, $toPrint = true)
     {
         if($toPrint) {
