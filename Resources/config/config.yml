@@ -13,14 +13,14 @@ knp_gaufrette:
     adapters:
         local_adapter:
             local:
-                directory: "%ped_storage.local.directory%"
+                directory: "%storage_local_directory%"
         amazon_s3_adapter:
             aws_s3:
                 service_id:  "ped_storage.aws_s3.client"
-                bucket_name: "%ped_storage.amazon_s3.bucket_name%"
+                bucket_name: "%storage_amazon_s3_bucket_name%"
                 options:
                     create:    true
-                    directory: "%ped_storage.amazon_s3.directory%"
+                    directory: "%storage_amazon_s3_directory%"
     filesystems:
         local_fs:
             adapter: local_adapter

@@ -10,6 +10,7 @@ namespace PaneeDesign\StorageBundle\Upload;
 
 use Gaufrette\Adapter\AwsS3;
 use Gaufrette\Filesystem;
+
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 class PhotoUploader
@@ -20,11 +21,54 @@ class PhotoUploader
         'image/gif'
     ];
 
+    /**
+     * @var Filesystem
+     */
     private $filesystem;
 
+    /**
+     * Entity Id
+     *
+     * @var integer
+     */
+    private $id;
+
+    /**
+     * Entity Id
+     *
+     * @var string
+     */
+    private $type;
+
+    /**
+     * PhotoUploader constructor.
+     * @param Filesystem $filesystem
+     */
     public function __construct(Filesystem $filesystem)
     {
         $this->filesystem = $filesystem;
+    }
+
+    /**
+     * @param $id
+     * @return $this
+     */
+    public function setId($id)
+    {
+        $this->id = $id;
+
+        return $this;
+    }
+
+    /**
+     * @param $type
+     * @return $this
+     */
+    public function setType($type)
+    {
+        $this->type = $type;
+
+        return $this;
     }
 
     public function upload(UploadedFile $file)
@@ -34,8 +78,7 @@ class PhotoUploader
             throw new \InvalidArgumentException(sprintf('Files of type %s are not allowed.', $file->getClientMimeType()));
         }
 
-        // Generate a unique filename based on the date and add file extension of the uploaded file
-        $filename = sprintf('%s/%s/%s/%s.%s', date('Y'), date('m'), date('d'), uniqid(), $file->getClientOriginalExtension());
+        $filename = $this->getFilename($file);
 
         /* @var AwsS3 $adapter */
         $adapter = $this->filesystem->getAdapter();
@@ -47,5 +90,40 @@ class PhotoUploader
         $adapter->write($filename, file_get_contents($file->getPathname()));
 
         return $filename;
+    }
+
+    public function getFullUrl($key) {
+        /* @var AwsS3 $adapter */
+        $adapter = $this->filesystem->getAdapter();
+
+        return $adapter->getUrl($key);
+    }
+
+    private function getFilename(UploadedFile $file)
+    {
+        $part = [];
+
+        if($this->type) {
+            $part[] = $this->type;
+        }
+
+        if($this->id) {
+            $part[] = $this->getSubPathById($this->id);
+        }
+
+        if(count($part) == 2) {
+            $filename = sprintf('%s/%s/%s.%s', $part[0], $part[1], uniqid(), $file->getClientOriginalExtension());
+        } else if(count($part) == 1) {
+            $filename = sprintf('%s/%s.%s', $part[0], uniqid(), $file->getClientOriginalExtension());
+        } else {
+            $filename = sprintf('%s/%s/%s/%s.%s', date('Y'), date('m'), date('d'), uniqid(), $file->getClientOriginalExtension());
+        }
+
+        return $filename;
+    }
+
+    private function getSubPathById($id)
+    {
+        return ceil($id / 100);
     }
 }

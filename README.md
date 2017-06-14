@@ -87,8 +87,11 @@ parameters:
 Add configuration:
 
 ```yml
-// app/config/config.yml
 //...
+imports:
+    - { resource: "@PedUserBundle/Resources/config/config.yml" }
+...
+  
 ped_storage:
     amazon_s3:
         key:         "%storage_amazon_s3_key%"
@@ -99,7 +102,7 @@ ped_storage:
         directory:   "%storage_amazon_s3_directory%"
     local:
         directory:   "%storage_local_directory%"
-//...
+    
 liip_imagine:
     data_loader: stream.amazon_fs
     //data_loader: stream.local_fs

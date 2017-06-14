@@ -10,16 +10,17 @@ services:
             -
                 version:    latest
                 region:     "%ped_storage.amazon_s3.region%"
+                endpoint:   "%ped_storage.amazon_s3.base_url%"
                 credentials:
                     key:    "%ped_storage.amazon_s3.key%"
                     secret: "%ped_storage.amazon_s3.secret%"
 
     ped_storage.amazon_photo_uploader:
         class: %ped_storage.photo_uploader.class%
-        arguments: ['amazon_fs']
+        arguments: ['@amazon_fs']
     ped_storage.local_photo_uploader:
         class: %ped_storage.photo_uploader.class%
-        arguments: ['local_fs']
+        arguments: ['@local_fs']
 
     ped_storage.liip_imagine.binary.loader.stream.amazon_fs:
         class: "%liip_imagine.binary.loader.stream.class%"
