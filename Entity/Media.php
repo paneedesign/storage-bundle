@@ -12,22 +12,13 @@ use Doctrine\ORM\Mapping as ORM;
 
 /**
  * Class Media
- * @package AppBundle\Entity
- *
- * @ORM\HasLifecycleCallbacks
- * @ORM\Entity(repositoryClass="PaneeDesign\StorageBundle\Entity\Repository\MediaRepository")
-
- */
-
-/**
- * Class Media
  * @package PaneeDesign\StorageBundle\Entity
  *
  * @ORM\HasLifecycleCallbacks
  * @ORM\Entity(repositoryClass="PaneeDesign\StorageBundle\Entity\Repository\MediaRepository")
  * @ORM\Table(name="media", uniqueConstraints={@ORM\UniqueConstraint(name="name_idx", columns={"path"})})
  * @ORM\InheritanceType("SINGLE_TABLE")
- * @ORM\DiscriminatorColumn(name="media_ext", type="string")
+ * @ORM\DiscriminatorColumn(name="discr", type="string")
  * @ORM\DiscriminatorMap({"media" = "Media"})
  */
 abstract class Media

@@ -15,7 +15,8 @@
         "knplabs/gaufrette": "^0.3.1",
         "knplabs/knp-gaufrette-bundle": "^0.4.0",
         "aws/aws-sdk-php": "^3.28",
-        "liip/imagine-bundle": "^1.8"
+        "liip/imagine-bundle": "^1.8",
+        "netpositive/discriminatormap-bundle": "dev-master"
     },
     "require-dev": {
         "phpspec/phpspec": "^3.2",

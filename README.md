@@ -57,6 +57,7 @@ class AppKernel extends Kernel
 
             new \Liip\ImagineBundle\LiipImagineBundle(),
             new \Knp\Bundle\GaufretteBundle\KnpGaufretteBundle(),
+            new \Netpositive\DiscriminatorMapBundle\NetpositiveDiscriminatorMapBundle(),
             new \PaneeDesign\StorageBundle\PedStorageBundle(),
         );
 
@@ -91,19 +92,110 @@ Add configuration:
 imports:
     - { resource: "@PedUserBundle/Resources/config/config.yml" }
 ...
-  
-ped_storage:
-    amazon_s3:
-        key:         "%storage_amazon_s3_key%"
-        secret:      "%storage_amazon_s3_secret%"
-        region:      "%storage_amazon_s3_region%"
-        base_url:    "%storage_amazon_s3_base_url%"
-        bucket_name: "%storage_amazon_s3_bucket_name%"
-        directory:   "%storage_amazon_s3_directory%"
-    local:
-        directory:   "%storage_local_directory%"
+
+netpositive_discriminator_map:
+    discriminator_map:
+        media:
+            entity: PaneeDesign\StorageBundle\Entity\Media
+            children:
+                app_media: AppBundle\Entity\Media
+        ...
     
 liip_imagine:
     data_loader: stream.amazon_fs
     //data_loader: stream.local_fs
+```
+
+
+Step 4: Use
+-----------
+
+You can upload a file using this snippets:
+
+* Amazon
+
+```php
+/**
+ * Upload Image to S3
+ *
+ * @param Request $request
+ * @param string $name Image field name
+ * @param int $id Entity ID
+ * @param string $type Entity Type
+ * @return string
+ */
+protected function amazonUploadImageAction(Request $request, $name, $id, $type)
+{
+    $image    = $request->files->get($name);
+    $uploader = $this->get('ped_storage.amazon_photo_uploader')
+        ->setId($id)
+        ->setType($type);
+
+    return $uploader->upload($image);
+}
+```
+
+* Local
+
+```php
+/**
+ * Upload Image to local
+ *
+ * @param Request $request
+ * @param string $name Image field name
+ * @param int $id Entity ID
+ * @param string $type Entity Type
+ * @return string
+ */
+protected function localUploadImage(Request $request, $name, $id, $type)
+{
+    $image    = $request->files->get($name);
+    $uploader = $this->get('ped_storage.local_photo_uploader')
+        ->setId($id)
+        ->setType($type);
+
+    return $uploader->upload($image);
+}
+```
+
+and retrive full url by using:
+
+* Amazon 
+
+```php
+/**
+ * Get full Image url from S3
+ *
+ * @param $path
+ * @param $type
+ * @return string
+ */
+protected function getAmazonImageUrl($path, $id, $type)
+{
+    $uploader = $this->get('ped_storage.amazon_photo_uploader')
+        ->setId($id)
+        ->setType($type);
+
+    return $uploader->getFullUrl($path);
+}
+```
+
+* Local
+
+```php
+/**
+ * Get full Image url from local
+ *
+ * @param $path
+ * @param $type
+ * @return string
+ */
+protected function getLocalImageUrl($path, $id, $type)
+{
+    $uploader = $this->get('ped_storage.local_photo_uploader')
+        ->setId($id)
+        ->setType($type);
+
+    return $uploader->getFullUrl($path);
+}
 ```
