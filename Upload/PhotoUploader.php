@@ -9,6 +9,7 @@
 namespace PaneeDesign\StorageBundle\Upload;
 
 use Gaufrette\Adapter\AwsS3;
+use Gaufrette\Adapter\Local;
 use Gaufrette\Filesystem;
 
 use Symfony\Component\HttpFoundation\File\UploadedFile;
@@ -80,7 +81,7 @@ class PhotoUploader
 
         $filename = $this->getFilename($file);
 
-        /* @var AwsS3 $adapter */
+        /* @var AwsS3|Local $adapter */
         $adapter = $this->filesystem->getAdapter();
 
         if($adapter instanceof AwsS3) {
@@ -93,10 +94,19 @@ class PhotoUploader
     }
 
     public function getFullUrl($key) {
-        /* @var AwsS3 $adapter */
+        /* @var AwsS3|Local $adapter */
         $adapter = $this->filesystem->getAdapter();
 
-        return $adapter->getUrl($key);
+        if($adapter instanceof Local) {
+            $content = $adapter->read($key);
+            $mtime   = $adapter->mtime($key);
+
+            $toReturn = "data: ".$mtime.";base64,".base64_encode($content);
+        } else {
+            $toReturn = $adapter->getUrl($key);
+        }
+
+        return $toReturn;
     }
 
     private function getFilename(UploadedFile $file)
