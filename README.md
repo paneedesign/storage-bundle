@@ -74,6 +74,7 @@ Step 3: Configurations
 Copy parameters
 
 ```
+// app/config/parameters.yml.dist
 parameters:
     ...
     storage_amazon_s3_key:         ~
