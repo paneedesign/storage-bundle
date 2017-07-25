@@ -13,6 +13,8 @@ use Gaufrette\Adapter\Local;
 use Gaufrette\Filesystem;
 
 use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Response;
 
 class PhotoUploader
 {
@@ -98,15 +100,35 @@ class PhotoUploader
         $adapter = $this->filesystem->getAdapter();
 
         if($adapter instanceof Local) {
-            $content = $adapter->read($key);
-            $mtime   = $adapter->mtime($key);
+            $content  = $adapter->read($key);
+            $mimeType = $adapter->mimeType($key);
 
-            $toReturn = "data: ".$mtime.";base64,".base64_encode($content);
+            $toReturn = "data:".$mimeType.";base64,".base64_encode($content);
         } else {
             $toReturn = $adapter->getUrl($key);
         }
 
         return $toReturn;
+    }
+
+    public function getResponse($key) {
+        /* @var AwsS3|Local $adapter */
+        $adapter = $this->filesystem->getAdapter();
+
+        if($adapter instanceof Local) {
+            $content  = $adapter->read($key);
+            $mimeType = $adapter->mimeType($key);
+
+            //$toReturn = "data:".$mimeType.";base64,".base64_encode($content);
+
+            $response = new Response($content, 200);
+            $response->headers->set('Content-Type', $mimeType);
+            $response->headers->set('Expires', gmdate('D, d M Y H:i:s \G\M\T', time() + (60 * 60 * 24 * 7))); // 1 week
+        } else {
+            $response = new RedirectResponse($adapter->getUrl($key));
+        }
+
+        return $response;
     }
 
     private function getFilename(UploadedFile $file)
