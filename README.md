@@ -16,13 +16,13 @@ Pane&Design repository is private so, add to `composer.json` this `vcs`
         ...
         {
             "type" : "vcs",
-            "url" : "git@gitlab.com:paneedesign/symfony-bundles/storage-bundle.git"
+            "url" : "git@bitbucket.org:pane-e-design/storage-bundle.git"
         }
     ],
     ...
     "require": {
         ...
-        "paneedesign/storage-bundle": "dev-master"   
+        "paneedesign/storage-bundle": "^1.0"   
     }
 ```
 
