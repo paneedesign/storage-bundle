@@ -1,3 +1,0 @@
-ped_storage_homepage:
-    path:     /
-    defaults: { _controller: PedStorageBundle:Default:index }
