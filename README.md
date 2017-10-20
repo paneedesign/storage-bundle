@@ -16,7 +16,7 @@ Pane&Design repository is private so, add to `composer.json` this `vcs`
         ...
         {
             "type" : "vcs",
-            "url" : "git@bitbucket.org:pane-e-design/storage-bundle.git"
+            "url" : "git@bitbucket.org:paneedesign/storage-bundle.git"
         }
     ],
     ...
