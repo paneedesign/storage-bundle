@@ -3,10 +3,11 @@ ped_storage:
         key:         "%storage_amazon_s3_key%"
         secret:      "%storage_amazon_s3_secret%"
         region:      "%storage_amazon_s3_region%"
-        base_url:    "%storage_amazon_s3_base_url%"
+        endpoint:    "%storage_amazon_s3_endpoint%"
         bucket_name: "%storage_amazon_s3_bucket_name%"
         directory:   "%storage_amazon_s3_directory%"
     local:
+        endpoint:    "%storage_local_endpoint%"
         directory:   "%storage_local_directory%"
 
 knp_gaufrette:

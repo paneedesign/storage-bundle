@@ -12,10 +12,11 @@
     "require": {
         "php": "^5.6|^7.0",
         "symfony/framework-bundle": "^3.2",
-        "knplabs/gaufrette": "^0.3.1",
+        "knplabs/gaufrette": "~0.4",
+        "gaufrette/extras": "~0.1",
         "knplabs/knp-gaufrette-bundle": "^0.4.0",
         "aws/aws-sdk-php": "^3.28",
-        "liip/imagine-bundle": "^1.8",
+        "liip/imagine-bundle": "^1.9",
         "netpositive/discriminatormap-bundle": "dev-master"
     },
     "require-dev": {

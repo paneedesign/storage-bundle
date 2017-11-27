@@ -9,6 +9,7 @@
 namespace PaneeDesign\StorageBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use PaneeDesign\StorageBundle\Entity\Media\MediaInfo;
 
 /**
  * Class Media
@@ -31,14 +32,9 @@ abstract class Media
     protected $id;
 
     /**
-     * @ORM\Column(name="created_at", type="datetime")
+     * @ORM\Column(name="filename", type="string", length=40, nullable=false)
      */
-    protected $createdAt;
-
-    /**
-     * @ORM\Column(type="string", length=255, nullable=true)
-     */
-    protected $name;
+    private $filename;
 
     /**
      * @var \SplFileInfo
@@ -46,15 +42,23 @@ abstract class Media
     protected $file;
 
     /**
-     * @ORM\Column(type="string", length=255, nullable=true)
+     * @ORM\Column(name="type", type="string", nullable=true)
      */
-    protected $path;
+    private $type;
 
     /**
-     * @ORM\Column(type="json_array", nullable=true)
+     * @ORM\Column(name="media_info", type="json_array", nullable=true)
      */
-    protected $crop;
+    private $mediaInfo = null;
 
+    /**
+     * @ORM\Column(name="created_at", type="datetime")
+     */
+    protected $createdAt;
+
+    /**
+     * Constructor
+     */
     public function __construct()
     {
         $this->createdAt = new \DateTime();
@@ -68,6 +72,78 @@ abstract class Media
     public function getId()
     {
         return $this->id;
+    }
+
+    /**
+     * Set filename
+     *
+     * @param string $filename
+     *
+     * @return Media
+     */
+    public function setFilename($filename)
+    {
+        $this->filename = $filename;
+
+        return $this;
+    }
+
+    /**
+     * Get filename
+     *
+     * @return string
+     */
+    public function getFilename()
+    {
+        return $this->filename;
+    }
+
+    /**
+     * Set type
+     *
+     * @param string $type
+     *
+     * @return Media
+     */
+    public function setType($type)
+    {
+        $this->type = $type;
+
+        return $this;
+    }
+
+    /**
+     * Get type
+     *
+     * @return string
+     */
+    public function getType()
+    {
+        return $this->type;
+    }
+
+    /**
+     * Set mediaInfo
+     *
+     * @param array|MediaInfo $mediaInfo
+     *
+     * @return Media
+     */
+    public function setMediaInfo($mediaInfo)
+    {
+        $this->mediaInfo = $mediaInfo;
+
+        return $this;
+    }
+
+    /**
+     * Get mediaInfo
+     *
+     * @return array
+     */
+    public function getMediaInfo()
+    {
+        return $this->mediaInfo;
     }
 
     /**
@@ -92,120 +168,5 @@ abstract class Media
     public function getCreatedAt()
     {
         return $this->createdAt;
-    }
-
-    /**
-     * Set name
-     *
-     * @param string $name
-     *
-     * @return Media
-     */
-    public function setName($name)
-    {
-        $this->name = $name;
-
-        return $this;
-    }
-
-    /**
-     * Get name
-     *
-     * @return string
-     */
-    public function getName()
-    {
-        return $this->name;
-    }
-
-    /**
-     * Get file
-     *
-     * @return \SplFileInfo
-     */
-    public function getFile()
-    {
-        return $this->file;
-    }
-
-    /**
-     * Set file
-     *
-     * @param \SplFileInfo $file
-     * @return Media
-     */
-    public function setFile(\SplFileInfo $file)
-    {
-        $this->file = $file;
-
-        return $this;
-    }
-
-    /**
-     * Has file
-     *
-     * @return bool
-     */
-    public function hasFile()
-    {
-        return null !== $this->file;
-    }
-
-    /**
-     * Set path
-     *
-     * @param string $path
-     *
-     * @return Media
-     */
-    public function setPath($path)
-    {
-        $this->path = $path;
-
-        return $this;
-    }
-
-    /**
-     * Get path
-     *
-     * @return string
-     */
-    public function getPath()
-    {
-        return $this->path;
-    }
-
-    /**
-     * Has path
-     *
-     * @return bool
-     */
-    public function hasPath()
-    {
-        return null !== $this->path;
-    }
-
-    /**
-     * Set crop
-     *
-     * @param array $crop
-     *
-     * @return Media
-     */
-    public function setCrop($crop)
-    {
-        $this->crop = $crop;
-
-        return $this;
-    }
-
-    /**
-     * Get crop
-     *
-     * @return array
-     */
-    public function getCrop()
-    {
-        return $this->crop;
     }
 }

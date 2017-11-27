@@ -34,8 +34,8 @@ class PedStorageExtension extends Extension
                     $this->printException('ped_storage.amazon_s3.secret', ($amazonS3['key']));
                 }
 
-                if(array_key_exists('base_url', $amazonS3) === false) {
-                    $this->printException('ped_storage.amazon_s3.base_url', ($amazonS3['key']));
+                if(array_key_exists('endpoint', $amazonS3) === false) {
+                    $this->printException('ped_storage.amazon_s3.endpoint', ($amazonS3['key']));
                 }
 
                 if(array_key_exists('bucket_name', $amazonS3) === false) {
@@ -45,7 +45,7 @@ class PedStorageExtension extends Extension
                 $container->setParameter('ped_storage.amazon_s3.key', $amazonS3['key']);
                 $container->setParameter('ped_storage.amazon_s3.secret', $amazonS3['secret']);
                 $container->setParameter('ped_storage.amazon_s3.region', $amazonS3['region']);
-                $container->setParameter('ped_storage.amazon_s3.base_url', $amazonS3['base_url']);
+                $container->setParameter('ped_storage.amazon_s3.endpoint', $amazonS3['endpoint']);
                 $container->setParameter('ped_storage.amazon_s3.bucket_name', $amazonS3['bucket_name']);
                 $container->setParameter('ped_storage.amazon_s3.directory', $amazonS3['directory']);
             }
@@ -58,6 +58,7 @@ class PedStorageExtension extends Extension
                 }
 
                 $container->setParameter('ped_storage.local.directory', $local['directory']);
+                $container->setParameter('ped_storage.local.endpoint', $local['endpoint']);
             }
         }
 

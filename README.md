@@ -80,10 +80,11 @@ parameters:
     storage_amazon_s3_key:         ~
     storage_amazon_s3_secret:      ~
     storage_amazon_s3_region:      eu-west-1
-    storage_amazon_s3_base_url:    ~
+    storage_amazon_s3_endpoint:    ~
     storage_amazon_s3_bucket_name: ~
     storage_amazon_s3_directory:   uploads
     storage_local_directory:       "%kernel.root_dir%/../web/uploads"
+    storage_local_endpoint:        uploads
 ```
 
 Add configuration:

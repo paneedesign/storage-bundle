@@ -29,7 +29,7 @@ class Configuration implements ConfigurationInterface
                         ->scalarNode('key')->defaultValue('')->end()
                         ->scalarNode('secret')->defaultValue('')->end()
                         ->scalarNode('region')->defaultValue('eu-west-1')->end()
-                        ->scalarNode('base_url')->defaultValue('')->end()
+                        ->scalarNode('endpoint')->defaultValue('')->end()
                         ->scalarNode('bucket_name')->defaultValue('')->end()
                         ->scalarNode('directory')->defaultValue('uploads')->end()
                     ->end()
@@ -39,6 +39,7 @@ class Configuration implements ConfigurationInterface
                     ->canBeUnset()
                     ->children()
                         ->scalarNode('directory')->defaultValue('%kernel.root_dir%/../web/uploads')->end()
+                        ->scalarNode('endpoint')->defaultValue('uploads')->end()
                     ->end()
                 ->end()
             ->end();
