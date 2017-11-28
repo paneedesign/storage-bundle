@@ -21,28 +21,9 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 class MediaHandler
 {
     const TYPE_IMAGE     = 'image';
+    const TYPE_VIDEO     = 'video';
     const TYPE_DOCUMENT  = 'document';
     const TYPE_THUMBNAIL = 'thumbnail';
-
-    private static $allowedMimeTypes = [
-        'image/jpeg',
-        'image/png',
-        'image/gif',
-        'application/pdf',
-        'application/msword',
-        'application/vnd.oasis.opendocument.text',
-    ];
-
-    public static $extension = [
-        'jpg'  => 'image/jpeg',
-        'jpeg' => 'image/jpeg',
-        'png'  => 'image/png',
-        'gif'  => 'image/gif',
-        'pdf'  => 'application/pdf',
-        'doc'  => 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-        'docx' => 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-        'odt'  => 'application/vnd.oasis.opendocument.text',
-    ];
 
     /**
      * @var Filesystem|ResolvableFilesystem
@@ -84,17 +65,25 @@ class MediaHandler
      */
     private $groupFolders = true;
 
-
+    /**
+     * @var string
+     */
     private $localEndpoint;
+
+    /**
+     * Allowed mime types
+     *
+     * @var array
+     */
+    private $allowedMimeTypes;
 
     /**
      * MediaHandler constructor.
      *
      * @param Filesystem $filesystem
-     * @param AwsS3PublicUrlResolver $resolver
-     * @param string $localEndpoint
+     * @param array $allowedMimeTypes
      */
-    public function __construct(Filesystem $filesystem, $resolver = null, $localEndpoint = null)
+    public function __construct(Filesystem $filesystem, array $allowedMimeTypes = [])
     {
         $adapter = $filesystem->getAdapter();
 
@@ -103,6 +92,12 @@ class MediaHandler
         }
 
         $this->filesystem = $filesystem;
+
+        $this->allowedMimeTypes = array_merge([
+            'image/jpeg',
+            'image/png',
+            'image/gif'
+        ], $allowedMimeTypes);
     }
 
     public function setAwsS3PublicUrlResolver(AwsS3PublicUrlResolver $resolver)
@@ -256,34 +251,59 @@ class MediaHandler
         return $this;
     }
 
+    public function setAllowedMimeTypes($allowedMimeTypes)
+    {
+        $this->allowedMimeTypes = $allowedMimeTypes;
+    }
+
+    public function addAllowedMimeType($allowedMimeType)
+    {
+        $this->allowedMimeTypes[] = $allowedMimeType;
+    }
+
+    public function removeAllowedMimeType($allowedMimeType)
+    {
+        if ($key = array_search($allowedMimeType, $this->allowedMimeTypes) === false) {
+            unset($this->allowedMimeTypes[$key]);
+        }
+    }
+
+    public function getAllowedMimeTypes()
+    {
+        return $this->allowedMimeTypes;
+    }
+
+    /**
+     * @param UploadedFile $file
+     * @param string $key
+     * @return MediaHandler
+     */
     public function save(UploadedFile $file, $key = null)
     {
         $mimeType = $file->getClientMimeType();
 
         // Check if the file's mime type is in the list of allowed mime types.
-        if (!in_array($mimeType, self::$allowedMimeTypes)) {
+        if (!in_array($mimeType, $this->getAllowedMimeTypes())) {
             throw new \InvalidArgumentException(sprintf('Files of type %s are not allowed.', $file->getClientMimeType()));
         }
 
-        $ext = array_search(
-            $mimeType,
-            self::$extension,
-            true
-        );
+        if ($key === null) {
+            $key = uniqid();
+        }
 
-        $fileInfo = $this->getFileInfo($ext, $key);
+        $name = sprintf('%s.%s', $key, $file->getExtension());
+        $path = $this->getFullKey($name);
 
         /* @var AwsS3Adapter|LocalAdapter $adapter */
         $adapter = $this->filesystem->getAdapter();
 
         if ($adapter instanceof AwsS3Adapter) {
-            $adapter->setMetadata($fileInfo['path'], ['contentType' => $mimeType]);
+            $adapter->setMetadata($path, ['contentType' => $mimeType]);
         }
 
-        $adapter->write($fileInfo['path'], file_get_contents($file->getPathname()));
+        $adapter->write($path, file_get_contents($file->getPathname()));
 
-        return $fileInfo;
-        //return $this->getMedia($fileInfo['name'], $fileType);
+        return $this;
     }
 
     public function remove($key)
@@ -336,141 +356,82 @@ class MediaHandler
         return $adapter->size($fullKey);
     }
 
-    private function getFileInfo($ext, $key = null)
-    {
-        if ($key === null) {
-            $key = uniqid();
-        }
-
-        $part = [];
-
-        if ($this->type) {
-            $part[] = $this->type;
-        }
-
-        if ($this->mediaType) {
-            $part[] = $this->mediaType;
-        }
-
-        if ($this->id) {
-            if ($this->groupFolders) {
-                $part[] = $this->getSubPathById($this->id);
-            } else {
-                $part[] = $this->id;
-            }
-        }
-
-        switch (count($part)) {
-            case 3:
-                $path = sprintf('%s/%s/%s/%s.%s', $part[0], $part[1], $part[2], $key, $ext);
-                break;
-            case 2:
-                $path = sprintf('%s/%s/%s.%s', $part[0], $part[1], $key, $ext);
-                break;
-            case 1:
-                $path = sprintf('%s/%s.%s', $part[0], $key, $ext);
-                break;
-            default:
-                $path = sprintf('%s/%s/%s/%s.%s', date('Y'), date('m'), date('d'), $key, $ext);
-                break;
-        }
-
-        return array(
-            'name' => sprintf('%s.%s', $key, $ext),
-            'path' => $path,
-        );
-    }
-
     private function getFullKey($key)
     {
-        $part = [];
+        $parts = [];
 
         if ($this->type) {
-            $part[] = $this->type;
+            $parts[] = $this->type;
         }
 
         if ($this->mediaType) {
-            $part[] = $this->mediaType;
+            $parts[] = $this->mediaType;
         }
 
         if ($this->id) {
             if ($this->groupFolders) {
-                $part[] = $this->getSubPathById($this->id);
+                $parts[] = $this->getSubPathById($this->id);
             } else {
-                $part[] = $this->id;
+                $parts[] = $this->id;
             }
         }
 
-        switch (count($part)) {
-            case 3:
-                $filename = sprintf('%s/%s/%s/%s', $part[0], $part[1], $part[2], $key);
-                break;
-            case 2:
-                $filename = sprintf('%s/%s/%s', $part[0], $part[1], $key);
-                break;
-            case 1:
-                $filename = sprintf('%s/%s', $part[0], $key);
-                break;
-            default:
-                $filename = sprintf('%s/%s/%s/%s', date('Y'), date('m'), date('d'), $key);
-                break;
-        }
-
-        return $filename;
+        return $this->computeParts($parts, $key);
     }
 
     private function getThumbnailFolder($key)
     {
         list($key) = explode('.', $key);
 
-        $part = [];
+        $parts = [];
 
         if ($this->type) {
-            $part[] = $this->type;
+            $parts[] = $this->type;
         }
 
         if ($this->mediaType) {
-            $part[] = self::TYPE_THUMBNAIL;
+            $parts[] = self::TYPE_THUMBNAIL;
         }
 
         if ($this->id) {
             if ($this->groupFolders) {
-                $part[] = $this->getSubPathById($this->id);
+                $parts[] = $this->getSubPathById($this->id);
             } else {
-                $part[] = $this->id;
+                $parts[] = $this->id;
             }
         }
 
-        switch (count($part)) {
+        return $this->computeParts($parts, $key);
+    }
+
+    private function computeParts($parts, $key = null, $ext = '')
+    {
+        if ($ext === '') {
+            $name = $key;
+        } else {
+            $name = sprintf('%s.%s', $key, $ext);
+        }
+
+        switch (count($parts)) {
             case 3:
-                $filename = sprintf('%s/%s/%s/%s', $part[0], $part[1], $part[2], $key);
+                $toReturn = sprintf('%s/%s/%s/%s', $parts[0], $parts[1], $parts[2], $name);
                 break;
             case 2:
-                $filename = sprintf('%s/%s/%s', $part[0], $part[1], $key);
+                $toReturn = sprintf('%s/%s/%s', $parts[0], $parts[1], $name);
                 break;
             case 1:
-                $filename = sprintf('%s/%s', $part[0], $key);
+                $toReturn = sprintf('%s/%s', $parts[0], $name);
                 break;
             default:
-                $filename = sprintf('%s/%s/%s/%s', date('Y'), date('m'), date('d'), $key);
+                $toReturn = sprintf('%s/%s/%s/%s', date('Y'), date('m'), date('d'), $name);
                 break;
         }
 
-        return $filename;
+        return $toReturn;
     }
 
     private function getSubPathById($id)
     {
         return ceil($id / 100);
     }
-
-    /*private function getMedia($fileName, $fileType)
-    {
-        $media = new Media();
-        $media->setFilename($fileName);
-        $media->setMediaInfo($this->mediaInfo);
-        $media->setType($fileType);
-
-        return $media;
-    }*/
 }

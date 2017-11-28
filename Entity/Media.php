@@ -17,7 +17,7 @@ use PaneeDesign\StorageBundle\Entity\Media\MediaInfo;
  *
  * @ORM\HasLifecycleCallbacks
  * @ORM\Entity(repositoryClass="PaneeDesign\StorageBundle\Entity\Repository\MediaRepository")
- * @ORM\Table(name="media", uniqueConstraints={@ORM\UniqueConstraint(name="name_idx", columns={"path"})})
+ * @ORM\Table(name="media", uniqueConstraints={@ORM\UniqueConstraint(name="name_idx", columns={"key"})})
  * @ORM\InheritanceType("SINGLE_TABLE")
  * @ORM\DiscriminatorColumn(name="discr", type="string")
  * @ORM\DiscriminatorMap({"media" = "Media"})
@@ -32,9 +32,9 @@ abstract class Media
     protected $id;
 
     /**
-     * @ORM\Column(name="filename", type="string", length=40, nullable=false)
+     * @ORM\Column(name="key", type="string", length=40, nullable=false)
      */
-    private $filename;
+    private $key;
 
     /**
      * @var \SplFileInfo
@@ -75,27 +75,27 @@ abstract class Media
     }
 
     /**
-     * Set filename
+     * Set key
      *
-     * @param string $filename
+     * @param string $key
      *
      * @return Media
      */
-    public function setFilename($filename)
+    public function setKey($key)
     {
-        $this->filename = $filename;
+        $this->key = $key;
 
         return $this;
     }
 
     /**
-     * Get filename
+     * Get key
      *
      * @return string
      */
-    public function getFilename()
+    public function getKey()
     {
-        return $this->filename;
+        return $this->key;
     }
 
     /**
