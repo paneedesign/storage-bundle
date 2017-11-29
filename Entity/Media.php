@@ -42,7 +42,7 @@ abstract class Media
     protected $file;
 
     /**
-     * @ORM\Column(name="type", type="string", nullable=true)
+     * @ORM\Column(name="type", type="enum_media_type", nullable=true)
      */
     private $type;
 

@@ -38,11 +38,18 @@ class MediaHandler
     private $id;
 
     /**
-     * Type name (es. hostess, steward, job)
+     * Entity type name (es. customer, admin, owner)
      *
      * @var string
      */
     private $type;
+
+    /**
+     * Key to retrive storage file
+     *
+     * @var string
+     */
+    private $key;
 
     /**
      * Media Type (es. profile, gallery, document, thumbnail)
@@ -132,6 +139,14 @@ class MediaHandler
     }
 
     /**
+     * @return int
+     */
+    public function getId()
+    {
+        return $this->id;
+    }
+
+    /**
      * @param $type
      * @return $this
      */
@@ -143,6 +158,33 @@ class MediaHandler
     }
 
     /**
+     * @return string
+     */
+    public function getType()
+    {
+        return $this->type;
+    }
+
+    /**
+     * @param $key
+     * @return $this
+     */
+    public function setKey($key)
+    {
+        $this->key = $key;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getKey()
+    {
+        return $this->key;
+    }
+
+    /**
      * @param $mediaType
      * @return $this
      */
@@ -151,6 +193,14 @@ class MediaHandler
         $this->mediaType = $mediaType;
 
         return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getMediaType()
+    {
+        return $this->mediaType;
     }
 
     public function setCropInfo($crop = null, $rotation = null, $priority = 0, $key = '', $ext = '', $size = 0)
@@ -241,6 +291,14 @@ class MediaHandler
     }
 
     /**
+     * @return Media\MediaInfo
+     */
+    public function getMediaInfo()
+    {
+        return $this->mediaInfo;
+    }
+
+    /**
      * @param $groupFolders
      * @return $this
      */
@@ -263,8 +321,8 @@ class MediaHandler
 
     public function removeAllowedMimeType($allowedMimeType)
     {
-        if ($key = array_search($allowedMimeType, $this->allowedMimeTypes) === false) {
-            unset($this->allowedMimeTypes[$key]);
+        if ($index = array_search($allowedMimeType, $this->allowedMimeTypes) === false) {
+            unset($this->allowedMimeTypes[$index]);
         }
     }
 
@@ -275,10 +333,9 @@ class MediaHandler
 
     /**
      * @param UploadedFile $file
-     * @param string $key
      * @return MediaHandler
      */
-    public function save(UploadedFile $file, $key = null)
+    public function save(UploadedFile $file)
     {
         $mimeType = $file->getClientMimeType();
 
@@ -287,10 +344,7 @@ class MediaHandler
             throw new \InvalidArgumentException(sprintf('Files of type %s are not allowed.', $file->getClientMimeType()));
         }
 
-        if ($key === null) {
-            $key = uniqid();
-        }
-
+        $key  = uniqid();
         $name = sprintf('%s.%s', $key, $file->getExtension());
         $path = $this->getFullKey($name);
 
@@ -358,6 +412,8 @@ class MediaHandler
 
     private function getFullKey($key)
     {
+        $this->setKey($key);
+
         $parts = [];
 
         if ($this->type) {

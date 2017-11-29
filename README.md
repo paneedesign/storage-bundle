@@ -93,7 +93,15 @@ Add configuration:
 //...
 imports:
     - { resource: "@PedUserBundle/Resources/config/config.yml" }
-...
+
+//...
+
+doctrine:
+    dbal:
+        types:
+            enum_media_type: PaneeDesign\StorageBundle\DBAL\EnumMediaType
+            
+//...
 
 netpositive_discriminator_map:
     discriminator_map:
@@ -129,7 +137,7 @@ You can upload a file using this snippets:
 protected function amazonUploadImageAction(Request $request, $name, $id, $type)
 {
     $image    = $request->files->get($name);
-    $uploader = $this->get('ped_storage.amazon_photo_uploader')
+    $uploader = $this->get('ped_storage.amazon_media_handler')
         ->setId($id)
         ->setType($type);
 
@@ -152,7 +160,7 @@ protected function amazonUploadImageAction(Request $request, $name, $id, $type)
 protected function localUploadImage(Request $request, $name, $id, $type)
 {
     $image    = $request->files->get($name);
-    $uploader = $this->get('ped_storage.local_photo_uploader')
+    $uploader = $this->get('ped_storage.local_media_handler')
         ->setId($id)
         ->setType($type);
 
@@ -174,7 +182,7 @@ and retrive full url by using:
  */
 protected function getAmazonImageUrl($path, $id, $type)
 {
-    $uploader = $this->get('ped_storage.amazon_photo_uploader')
+    $uploader = $this->get('ped_storage.amazon_media_handler')
         ->setId($id)
         ->setType($type);
 
@@ -194,7 +202,7 @@ protected function getAmazonImageUrl($path, $id, $type)
  */
 protected function getLocalImageUrl($path, $id, $type)
 {
-    $uploader = $this->get('ped_storage.local_photo_uploader')
+    $uploader = $this->get('ped_storage.local_media_handler')
         ->setId($id)
         ->setType($type);
 
