@@ -307,11 +307,11 @@ class MediaHandler
     }
 
     /**
-     * @return Media\MediaInfo
+     * @return array
      */
     public function getMediaInfo()
     {
-        return $this->mediaInfo;
+        return $this->mediaInfo->toJSON();
     }
 
     /**
