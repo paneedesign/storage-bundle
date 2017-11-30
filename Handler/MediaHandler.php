@@ -8,6 +8,8 @@
 
 namespace PaneeDesign\StorageBundle\Handler;
 
+use Gaufrette\Extras\Resolvable\Resolver\AwsS3PresignedUrlResolver;
+use Gaufrette\Extras\Resolvable\Resolver\StaticUrlResolver;
 use PaneeDesign\StorageBundle\Entity\Media;
 
 use Gaufrette\Adapter\AwsS3 as AwsS3Adapter;
@@ -107,7 +109,10 @@ class MediaHandler
         ], $allowedMimeTypes);
     }
 
-    public function setAwsS3PublicUrlResolver(AwsS3PublicUrlResolver $resolver)
+    /**
+     * @param AwsS3PublicUrlResolver|AwsS3PresignedUrlResolver|StaticUrlResolver $resolver
+     */
+    public function setAwsS3Resolver($resolver)
     {
         $adapter = $this->filesystem->getAdapter();
 

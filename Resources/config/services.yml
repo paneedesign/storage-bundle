@@ -1,7 +1,10 @@
 parameters:
     ped_storage.aws_s3.client.class:  Aws\S3\S3Client
     ped_storage.media_handler.class:  PaneeDesign\StorageBundle\Handler\MediaHandler
-    ped_storage.amazon_public_url_resolver.class: Gaufrette\Extras\Resolvable\Resolver\AwsS3PublicUrlResolver
+
+    ped_storage.amazon_public_url_resolver.class:    Gaufrette\Extras\Resolvable\Resolver\AwsS3PublicUrlResolver
+    ped_storage.amazon_presigned_url_resolver.class: Gaufrette\Extras\Resolvable\Resolver\AwsS3PresignedUrlResolver
+    ped_storage.amazon_static_url_resolver.class:    Gaufrette\Extras\Resolvable\Resolver\StaticUrlResolver
 
 services:
     ped_storage.aws_s3.client:
@@ -20,20 +23,37 @@ services:
         class: "%ped_storage.media_handler.class%"
         arguments: ['@amazon_fs']
         calls:
-            - method: setAwsS3PublicUrlResolver
+            - method: setAwsS3Resolver
               arguments:
                   - '@ped_storage.amazon_public_url_resolver'
+
     ped_storage.local_media_handler:
         class: "%ped_storage.media_handler.class%"
         arguments: ['@local_fs']
         calls:
             - method: setLocalEndpoint
               arguments:
-                  - '@ped_storage.amazon_public_url_resolver'
+                  - '%ped_storage.local.endpoint%'
 
     ped_storage.amazon_public_url_resolver:
         class: "%ped_storage.amazon_public_url_resolver.class%"
-        arguments: ['@ped_storage.aws_s3.client', "%ped_storage.amazon_s3.bucket_name%"]
+        arguments:
+            - '@ped_storage.aws_s3.client'
+            - "%ped_storage.amazon_s3.bucket_name%"
+            - "%ped_storage.amazon_s3.directory%"
+
+    ped_storage.amazon_presigned_url_resolver:
+        class: "%ped_storage.amazon_presigned_url_resolver.class%"
+        arguments:
+            - '@ped_storage.aws_s3.client'
+            - "%ped_storage.amazon_s3.bucket_name%"
+            - "%ped_storage.amazon_s3.directory%"
+            - "%ped_storage.amazon_s3.expire_at%"
+
+    ped_storage.amazon_static_url_resolver:
+        class: "%ped_storage.amazon_static_url_resolver.class%"
+        arguments:
+            - "%ped_storage.amazon_s3.directory%"
 
     ped_storage.liip_imagine.binary.loader.stream.amazon_fs:
         class: "%liip_imagine.binary.loader.stream.class%"

@@ -32,6 +32,7 @@ class Configuration implements ConfigurationInterface
                         ->scalarNode('endpoint')->defaultValue('')->end()
                         ->scalarNode('bucket_name')->defaultValue('')->end()
                         ->scalarNode('directory')->defaultValue('uploads')->end()
+                        ->scalarNode('expire_at')->defaultValue('+1 hour')->end()
                     ->end()
                 ->end()
                 ->arrayNode('local')

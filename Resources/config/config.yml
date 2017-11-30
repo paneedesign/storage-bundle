@@ -6,6 +6,7 @@ ped_storage:
         endpoint:    "%storage_amazon_s3_endpoint%"
         bucket_name: "%storage_amazon_s3_bucket_name%"
         directory:   "%storage_amazon_s3_directory%"
+        expire_at:   "%storage_amazon_s3_expire_at%"
     local:
         endpoint:    "%storage_local_endpoint%"
         directory:   "%storage_local_directory%"

@@ -17,7 +17,7 @@ use PaneeDesign\StorageBundle\Entity\Media\MediaInfo;
  *
  * @ORM\HasLifecycleCallbacks
  * @ORM\Entity(repositoryClass="PaneeDesign\StorageBundle\Entity\Repository\MediaRepository")
- * @ORM\Table(name="media", uniqueConstraints={@ORM\UniqueConstraint(name="name_idx", columns={"key"})})
+ * @ORM\Table(name="media", uniqueConstraints={@ORM\UniqueConstraint(name="name_idx", columns={"filename"})})
  * @ORM\InheritanceType("SINGLE_TABLE")
  * @ORM\DiscriminatorColumn(name="discr", type="string")
  * @ORM\DiscriminatorMap({"media" = "Media"})
@@ -32,7 +32,7 @@ abstract class Media
     protected $id;
 
     /**
-     * @ORM\Column(name="key", type="string", length=40, nullable=false)
+     * @ORM\Column(name="filename", type="string", length=40, nullable=false)
      */
     private $key;
 
