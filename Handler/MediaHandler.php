@@ -80,11 +80,6 @@ class MediaHandler
     private $localEndpoint;
 
     /**
-     * @var string
-     */
-    private $awsS3Directory = '';
-
-    /**
      * Allowed mime types
      *
      * @var array
@@ -116,9 +111,8 @@ class MediaHandler
 
     /**
      * @param AwsS3PublicUrlResolver|AwsS3PresignedUrlResolver|StaticUrlResolver $resolver
-     * @param string $baseDir
      */
-    public function setAwsS3Resolver($resolver, $baseDir = '')
+    public function setAwsS3Resolver($resolver)
     {
         $adapter = $this->filesystem->getAdapter();
 
@@ -130,10 +124,6 @@ class MediaHandler
             );
 
             $this->filesystem = $filesystem;
-        }
-
-        if ($baseDir !== '') {
-            $this->setAwsS3Directory($baseDir);
         }
     }
 
@@ -151,22 +141,6 @@ class MediaHandler
     public function getLocalEndpoint()
     {
         return $this->localEndpoint;
-    }
-
-    /**
-     * @param string $directory
-     */
-    public function setAwsS3Directory($directory)
-    {
-        $this->awsS3Directory = $directory;
-    }
-
-    /**
-     * @return string
-     */
-    public function getAwsS3Directory()
-    {
-        return $this->awsS3Directory;
     }
 
     /**
@@ -434,10 +408,6 @@ class MediaHandler
                 $toReturn = $this->localEndpoint.'/'.$fullKey;
             }
         } else {
-            if ($this->getAwsS3Directory() !== '') {
-               $fullKey = $this->getAwsS3Directory().'/'.$fullKey;
-            }
-
             if ($this->filesystem->has($fullKey)) {
                 $toReturn = $this->filesystem->resolve($fullKey);
             }

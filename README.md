@@ -213,6 +213,29 @@ protected function getAmazonImageUrl($key, $id, $type)
 }
 ```
 
+```php
+/**
+ * Get full Document private url from S3
+ *
+ * @param $path
+ * @param $type
+ * @return string
+ */
+protected function getAmazonDocumentUrl($key, $id, $type)
+{
+    $resolver = $this->get('ped_storage.amazon_presigned_url_resolver');
+    $uploader = $this->get('ped_storage.amazon_media_handler')
+        ->setAwsS3Resolver($resolver)
+        ->setId($id)
+        ->setType($type);
+
+    // optionally set a mediaType (es. image, video, thumbnail, document)
+    $uploader->setMediaType('document');
+      
+    return $uploader->getFullUrl($key);
+}
+```
+
 * Local
 
 ```php
