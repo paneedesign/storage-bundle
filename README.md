@@ -140,9 +140,18 @@ protected function amazonUploadImageAction(Request $request, $name, $id, $type)
 {
     $image    = $request->files->get($name);
     $uploader = $this->get('ped_storage.amazon_media_handler')
-        ->setId($id)
+        ->setId($id);
         ->setType($type);
-
+        
+    // optionally set a mediaType (es. image, video, thumbnail, document)
+    $uploader->setMediaType(MediaHandler::TYPE_IMAGE);
+    
+    // optionally set a name (base + extension)
+    $uploader->setName($image->getClientOriginalName(), $image->getExtension());
+    
+    // optionally set a size
+    $uploader->setSize($image->getSize());
+    
     return $uploader->save($image);
 }
 ```
@@ -163,9 +172,18 @@ protected function localUploadImage(Request $request, $name, $id, $type)
 {
     $image    = $request->files->get($name);
     $uploader = $this->get('ped_storage.local_media_handler')
-        ->setId($id)
+        ->setId($id);
         ->setType($type);
-
+        
+    // optionally set a mediaType (es. image, video, thumbnail, document)
+    $uploader->setMediaType(MediaHandler::TYPE_IMAGE);
+    
+    // optionally set a name (base + extension)
+    $uploader->setName($image->getClientOriginalName(), $image->getExtension());
+    
+    // optionally set a size
+    $uploader->setSize($image->getSize());
+    
     return $uploader->save($image);
 }
 ```
@@ -182,13 +200,16 @@ and retrive full url by using:
  * @param $type
  * @return string
  */
-protected function getAmazonImageUrl($path, $id, $type)
+protected function getAmazonImageUrl($key, $id, $type)
 {
     $uploader = $this->get('ped_storage.amazon_media_handler')
         ->setId($id)
         ->setType($type);
-
-    return $uploader->getFullUrl($path);
+        
+    // optionally set a mediaType (es. image, video, thumbnail, document)
+    $uploader->setMediaType('thumbnail');
+      
+    return $uploader->getFullUrl($key);
 }
 ```
 
@@ -206,8 +227,11 @@ protected function getLocalImageUrl($path, $id, $type)
 {
     $uploader = $this->get('ped_storage.local_media_handler')
         ->setId($id)
-        ->setType($type);
-
-    return $uploader->getFullUrl($path);
+                ->setType($type);
+                
+    // optionally set a mediaType (es. image, video, thumbnail, document)
+    $uploader->setMediaType('thumbnail');
+        
+    return $uploader->getFullUrl($key);
 }
 ```

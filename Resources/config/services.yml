@@ -26,6 +26,7 @@ services:
             - method: setAwsS3Resolver
               arguments:
                   - '@ped_storage.amazon_public_url_resolver'
+                  - '%ped_storage.amazon_s3.directory%'
 
     ped_storage.local_media_handler:
         class: "%ped_storage.media_handler.class%"
