@@ -361,7 +361,7 @@ class MediaHandler
         }
 
         $key  = uniqid();
-        $name = sprintf('%s.%s', $key, $file->getExtension());
+        $name = sprintf('%s.%s', $key, $file->guessClientExtension());
         $path = $this->getFullKey($name);
 
         /* @var AwsS3Adapter|LocalAdapter $adapter */
