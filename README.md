@@ -58,7 +58,7 @@ class AppKernel extends Kernel
             new \Fresh\DoctrineEnumBundle\FreshDoctrineEnumBundle(),
             new \Liip\ImagineBundle\LiipImagineBundle(),
             new \Knp\Bundle\GaufretteBundle\KnpGaufretteBundle(),
-            new \Netpositive\DiscriminatorMapBundle\NetpositiveDiscriminatorMapBundle(),
+            new \PaneeDesign\DiscriminatorMapBundle\PedDiscriminatorMapBundle(),
             new \PaneeDesign\StorageBundle\PedStorageBundle(),
         );
 
@@ -105,8 +105,8 @@ doctrine:
             
 //...
 
-netpositive_discriminator_map:
-    discriminator_map:
+ped_discriminator_map:
+    maps:
         media:
             entity: PaneeDesign\StorageBundle\Entity\Media
             children:
