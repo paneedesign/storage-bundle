@@ -32,6 +32,7 @@ knp_gaufrette:
             alias:   amazon_fs
 
 liip_imagine:
+    data_loader: "stream.%storage_adapter%_fs"
     loaders:
         stream.amazon_fs:
             stream:

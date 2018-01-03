@@ -86,7 +86,9 @@ parameters:
     storage_amazon_s3_directory:   uploads
     storage_amazon_s3_expire_at:   +1 hour
     storage_local_directory:       "%kernel.root_dir%/../web/uploads"
-    storage_local_endpoint:        uploads
+    storage_local_endpoint:        /uploads
+    storage_adapter:               local
+    #storage_adapter:              amazon
 ```
 
 Add configuration:
@@ -112,10 +114,6 @@ ped_discriminator_map:
             children:
                 app_media: AppBundle\Entity\Media
         ...
-    
-liip_imagine:
-    data_loader: stream.amazon_fs
-    //data_loader: stream.local_fs
 ```
 
 
@@ -138,9 +136,14 @@ You can upload a file using this snippets:
  */
 protected function amazonUploadImageAction(Request $request, $name, $id, $type)
 {
-    $image    = $request->files->get($name);
-    $uploader = $this->get('ped_storage.amazon_media_handler')
-        ->setId($id);
+    //parameters.yml
+    //storage_adapter: amazon
+    
+    $image   = $request->files->get($name);
+    $service = $this->getParameter('ped_storage.uploader');
+    
+    $uploader = $this->get($service)
+        ->setId($id)
         ->setType($type);
         
     // optionally set a mediaType (es. image, video, thumbnail, document)
@@ -170,9 +173,14 @@ protected function amazonUploadImageAction(Request $request, $name, $id, $type)
  */
 protected function localUploadImage(Request $request, $name, $id, $type)
 {
-    $image    = $request->files->get($name);
-    $uploader = $this->get('ped_storage.local_media_handler')
-        ->setId($id);
+    //parameters.yml
+    //storage_adapter: local
+    
+    $image   = $request->files->get($name);
+    $service = $this->getParameter('ped_storage.uploader');
+    
+    $uploader = $this->get($service)
+        ->setId($id)
         ->setType($type);
         
     // optionally set a mediaType (es. image, video, thumbnail, document)
@@ -202,7 +210,11 @@ and retrive full url by using:
  */
 protected function getAmazonImageUrl($key, $id, $type)
 {
-    $uploader = $this->get('ped_storage.amazon_media_handler')
+    //parameters.yml
+    //storage_adapter: amazon
+    
+    $service  = $this->getParameter('ped_storage.uploader');
+    $uploader = $this->get($service)
         ->setId($id)
         ->setType($type);
         
@@ -223,8 +235,12 @@ protected function getAmazonImageUrl($key, $id, $type)
  */
 protected function getAmazonDocumentUrl($key, $id, $type)
 {
+    //parameters.yml
+    //storage_adapter: amazon
+    
+    $service  = $this->getParameter('ped_storage.uploader');
     $resolver = $this->get('ped_storage.amazon_presigned_url_resolver');
-    $uploader = $this->get('ped_storage.amazon_media_handler')
+    $uploader = $this->get($service)
         ->setAwsS3Resolver($resolver)
         ->setId($id)
         ->setType($type);
@@ -248,9 +264,13 @@ protected function getAmazonDocumentUrl($key, $id, $type)
  */
 protected function getLocalImageUrl($path, $id, $type)
 {
-    $uploader = $this->get('ped_storage.local_media_handler')
+    //parameters.yml
+    //storage_adapter: local
+    
+    $service  = $this->getParameter('ped_storage.uploader');
+    $uploader = $this->get($service)
         ->setId($id)
-                ->setType($type);
+        ->setType($type);
                 
     // optionally set a mediaType (es. image, video, thumbnail, document)
     $uploader->setMediaType('thumbnail');
