@@ -219,6 +219,16 @@ class MediaHandler
         return $this->mediaType;
     }
 
+    /**
+     * @param object|string $crop
+     * @param int $rotation
+     * @param int $priority
+     * @param string $key
+     * @param string $ext
+     * @param int $size
+     *
+     * @return $this
+     */
     public function setCropInfo($crop = null, $rotation = null, $priority = 0, $key = '', $ext = '', $size = 0)
     {
         if ($crop !== null) {
@@ -252,6 +262,9 @@ class MediaHandler
         return $this;
     }
 
+    /**
+     * @param $rotation
+     */
     public function setRotation($rotation)
     {
         if ($this->mediaInfo instanceof Media\CropInfo === false) {
@@ -261,6 +274,10 @@ class MediaHandler
         $this->mediaInfo->setRotation($rotation);
     }
 
+    /**
+     * @param int $priority
+     * @return $this
+     */
     public function setPriority($priority)
     {
         if ($this->mediaInfo instanceof Media\CropInfo === false) {
@@ -272,6 +289,10 @@ class MediaHandler
         return $this;
     }
 
+    /**
+     * @param int $page
+     * @return $this
+     */
     public function setDocumentInfo($page = 0)
     {
         if ($this->mediaInfo instanceof Media\DocumentInfo) {
@@ -283,6 +304,12 @@ class MediaHandler
         return $this;
     }
 
+    /**
+     * @param string $key
+     * @param string $ext
+     *
+     * @return $this
+     */
     public function setName($key, $ext)
     {
         if ($this->mediaInfo instanceof Media\MediaInfo) {
@@ -295,6 +322,10 @@ class MediaHandler
         return $this;
     }
 
+    /**
+     * @param int $size
+     * @return $this
+     */
     public function setSize($size)
     {
         if ($this->mediaInfo instanceof Media\MediaInfo === false) {
@@ -325,16 +356,25 @@ class MediaHandler
         return $this;
     }
 
+    /**
+     * @param array $allowedMimeTypes
+     */
     public function setAllowedMimeTypes($allowedMimeTypes)
     {
         $this->allowedMimeTypes = $allowedMimeTypes;
     }
 
+    /**
+     * @param string $allowedMimeType
+     */
     public function addAllowedMimeType($allowedMimeType)
     {
         $this->allowedMimeTypes[] = $allowedMimeType;
     }
 
+    /**
+     * @param string $allowedMimeType
+     */
     public function removeAllowedMimeType($allowedMimeType)
     {
         if ($index = array_search($allowedMimeType, $this->allowedMimeTypes) === false) {
@@ -342,6 +382,9 @@ class MediaHandler
         }
     }
 
+    /**
+     * @return array
+     */
     public function getAllowedMimeTypes()
     {
         return $this->allowedMimeTypes;
@@ -376,6 +419,9 @@ class MediaHandler
         return $this;
     }
 
+    /**
+     * @param string $key
+     */
     public function remove($key)
     {
         $fullKey = $this->getFullKey($key);
@@ -385,6 +431,9 @@ class MediaHandler
         @$adapter->delete($fullKey);
     }
 
+    /**
+     * @param string $key
+     */
     public function removeThumbnails($key)
     {
         $fullKey = $this->getThumbnailFolder($key);
@@ -394,6 +443,11 @@ class MediaHandler
         @$adapter->delete($fullKey);
     }
 
+    /**
+     * @param string $key
+     * @return bool|string
+     * @throws \Gaufrette\Extras\Resolvable\UnresolvableObjectException
+     */
     public function getFullUrl($key)
     {
         $toReturn = false;
@@ -416,6 +470,10 @@ class MediaHandler
         return $toReturn;
     }
 
+    /**
+     * @param string $key
+     * @return int
+     */
     public function getSize($key)
     {
         $fullKey = $this->getFullKey($key);
@@ -426,7 +484,11 @@ class MediaHandler
         return $adapter->size($fullKey);
     }
 
-    private function getFullKey($key)
+    /**
+     * @param string $key
+     * @return string
+     */
+    public function getFullKey($key)
     {
         $this->setKey($key);
 
@@ -451,6 +513,10 @@ class MediaHandler
         return $this->computeParts($parts, $key);
     }
 
+    /**
+     * @param string $key
+     * @return string
+     */
     private function getThumbnailFolder($key)
     {
         list($key) = explode('.', $key);
@@ -476,6 +542,12 @@ class MediaHandler
         return $this->computeParts($parts, $key);
     }
 
+    /**
+     * @param array $parts
+     * @param string $key
+     * @param string $ext
+     * @return string
+     */
     private function computeParts($parts, $key = null, $ext = '')
     {
         if ($ext === '') {
@@ -502,6 +574,10 @@ class MediaHandler
         return $toReturn;
     }
 
+    /**
+     * @param int $id
+     * @return float
+     */
     private function getSubPathById($id)
     {
         return ceil($id / 100);

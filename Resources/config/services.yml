@@ -1,7 +1,7 @@
 parameters:
-    ped_storage.uploader:             "ped_storage.%storage_adapter%_media_handler"
-    ped_storage.aws_s3.client.class:  Aws\S3\S3Client
-    ped_storage.media_handler.class:  PaneeDesign\StorageBundle\Handler\MediaHandler
+    ped_storage.uploader:            "ped_storage.%storage_adapter%_media_handler"
+    ped_storage.aws_s3.client.class: Aws\S3\S3Client
+    ped_storage.media_handler.class: PaneeDesign\StorageBundle\Handler\MediaHandler
 
     ped_storage.amazon_public_url_resolver.class:    Gaufrette\Extras\Resolvable\Resolver\AwsS3PublicUrlResolver
     ped_storage.amazon_presigned_url_resolver.class: Gaufrette\Extras\Resolvable\Resolver\AwsS3PresignedUrlResolver
@@ -9,16 +9,16 @@ parameters:
 
 services:
     ped_storage.aws_s3.client:
-    class: "%ped_storage.aws_s3.client.class%"
-    factory: ["%ped_storage.aws_s3.client.class%", "factory"]
-    arguments:
-        -
-            version:    latest
-            region:     "%ped_storage.amazon_s3.region%"
-            endpoint:   "%ped_storage.amazon_s3.endpoint%"
-            credentials:
-                key:    "%ped_storage.amazon_s3.key%"
-                secret: "%ped_storage.amazon_s3.secret%"
+        class: "%ped_storage.aws_s3.client.class%"
+        factory: ["%ped_storage.aws_s3.client.class%", "factory"]
+        arguments:
+            -
+                version:    latest
+                region:     "%ped_storage.amazon_s3.region%"
+                endpoint:   "%ped_storage.amazon_s3.endpoint%"
+                credentials:
+                    key:    "%ped_storage.amazon_s3.key%"
+                    secret: "%ped_storage.amazon_s3.secret%"
 
     ped_storage.amazon_media_handler:
         class: "%ped_storage.media_handler.class%"
@@ -56,29 +56,22 @@ services:
         arguments:
             - "%ped_storage.amazon_s3.directory%"
 
-    ped_storage.liip_imagine.binary.loader.stream.amazon_fs:
-        class: "%liip_imagine.binary.loader.stream.class%"
-        arguments:
-            - 'gaufrette://amazon_fs/'
-        tags:
-            - { name: 'liip_imagine.binary.loader', loader: 'stream.amazon_fs' }
-
-    ped_storage.liip_imagine.binary.loader.stream.local_fs:
-        class: "%liip_imagine.binary.loader.stream.class%"
-        arguments:
-            - 'gaufrette://local_fs/'
-        tags:
-            - { name: 'liip_imagine.binary.loader', loader: 'stream.local_fs' }
-
     ped_storage.imagine.cache.resolver.local:
         class: "%liip_imagine.cache.resolver.web_path.class%"
         arguments:
             - '@filesystem'
             - '@router.request_context'
-            - '%ped_storage.local.directory%'
-            - 'cache'
+            - '%kernel.root_dir%/../web'
+            - '%ped_storage.local.endpoint%/cache'
         tags:
-            - { name: 'liip_imagine.cache.resolver', resolver: 'resolver.local_cache' }
+            - { name: 'liip_imagine.cache.resolver', resolver: local_fs }
+
+    ped_storage.imagine.binary.loader.local:
+        class: "%liip_imagine.binary.loader.stream.class%"
+        arguments:
+            - 'pedstorage://local_fs/'
+        tags:
+            - { name: 'liip_imagine.binary.loader', loader: loader_local_data }
 
     ped_storage.imagine.cache.resolver.aws_s3:
         class: "%liip_imagine.cache.resolver.aws_s3.class%"
@@ -86,4 +79,11 @@ services:
             - '@ped_storage.aws_s3.client'
             - "%ped_storage.amazon_s3.bucket_name%"
         tags:
-            - { name: 'liip_imagine.cache.resolver', resolver: 'resolver.amazon_cache' }
+            - { name: 'liip_imagine.cache.resolver', resolver: amazon_fs }
+
+    ped_storage.imagine.binary.loader.aws_s3:
+        class: "%liip_imagine.binary.loader.stream.class%"
+        arguments:
+            - 'pedstorage://amazon_fs/'
+        tags:
+            - { name: 'liip_imagine.binary.loader', loader: loader_amazon_data }

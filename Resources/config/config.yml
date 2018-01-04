@@ -12,6 +12,8 @@ ped_storage:
         directory:   "%storage_local_directory%"
 
 knp_gaufrette:
+    stream_wrapper:
+        protocol: pedstorage
     adapters:
         local_adapter:
             local:
@@ -32,11 +34,5 @@ knp_gaufrette:
             alias:   amazon_fs
 
 liip_imagine:
-    data_loader: "stream.%storage_adapter%_fs"
-    loaders:
-        stream.amazon_fs:
-            stream:
-                wrapper: gaufrette://amazon_fs
-        stream.local_fs:
-            stream:
-                wrapper: gaufrette://local_fs
+    data_loader: "loader_%storage_adapter%_data"
+    cache: "%storage_adapter%_fs"
