@@ -16,7 +16,7 @@
         "knplabs/gaufrette": "~0.5",
         "knplabs/knp-gaufrette-bundle": "~0.5",
         "aws/aws-sdk-php": "^3.28",
-        "liip/imagine-bundle": "^1.9",
+        "liip/imagine-bundle": "~2.0",
         "fresh/doctrine-enum-bundle": "^5.0"
     },
     "require-dev": {

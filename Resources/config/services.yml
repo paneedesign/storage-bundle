@@ -27,6 +27,7 @@ services:
             - method: setAwsS3Resolver
               arguments:
                   - '@ped_storage.amazon_public_url_resolver'
+        public: true
 
     ped_storage.local_media_handler:
         class: "%ped_storage.media_handler.class%"
@@ -35,6 +36,7 @@ services:
             - method: setLocalEndpoint
               arguments:
                   - '%ped_storage.local.endpoint%'
+        public: true
 
     ped_storage.amazon_public_url_resolver:
         class: "%ped_storage.amazon_public_url_resolver.class%"
