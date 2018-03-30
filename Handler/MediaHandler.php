@@ -414,6 +414,8 @@ class MediaHandler
             $adapter->setMetadata($path, ['contentType' => $mimeType]);
         }
 
+        $this->fixFileRotation($file);
+
         $adapter->write($path, file_get_contents($file->getPathname()));
 
         return $this;
@@ -581,5 +583,42 @@ class MediaHandler
     private function getSubPathById($id)
     {
         return ceil($id / 100);
+    }
+
+    /**
+     * Fix file rotation using exif data
+     * The file is modified only if needed
+     * @param UploadedFile $file
+     */
+    private function fixFileRotation(UploadedFile $file)
+    {
+        if ($file->guessExtension() == 'jpeg') {
+            $toRotate = 0;
+
+            $exif = @exif_read_data($file->getPathname());
+            if (!empty($exif['Orientation'])) {
+                switch ($exif['Orientation']) {
+                    case 8:
+                        $toRotate = 90;
+                        break;
+                    case 3:
+                        $toRotate = 180;
+                        break;
+                    case 6:
+                        $toRotate = -90;
+                        break;
+                }
+            }
+
+            if ($toRotate != 0) {
+                $image = @imagecreatefromjpeg($file->getPathname());
+
+                if (!empty($image)) {
+                    $image = imagerotate($image, $toRotate, 0);
+                    imagejpeg($image, $file->getPathname(), 95);
+                    imagedestroy($image);
+                }
+            }
+        }
     }
 }
