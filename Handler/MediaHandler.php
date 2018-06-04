@@ -496,12 +496,12 @@ class MediaHandler
 
         $parts = [];
 
-        if ($this->type) {
-            $parts[] = $this->type;
-        }
-
         if ($this->mediaType) {
             $parts[] = $this->mediaType;
+        }
+
+        if ($this->type) {
+            $parts[] = $this->type;
         }
 
         if ($this->id) {
