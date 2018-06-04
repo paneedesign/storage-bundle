@@ -49,6 +49,7 @@ class PedStorageExtension extends Extension
                 $container->setParameter('ped_storage.amazon_s3.bucket_name', $amazonS3['bucket_name']);
                 $container->setParameter('ped_storage.amazon_s3.directory', $amazonS3['directory']);
                 $container->setParameter('ped_storage.amazon_s3.expire_at', $amazonS3['expire_at']);
+                $container->setParameter('ped_storage.amazon_s3.thumbs_prefix', $amazonS3['thumbs_prefix']);
             }
 
             if(array_key_exists('local', $config) === true) {

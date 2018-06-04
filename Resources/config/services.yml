@@ -84,6 +84,10 @@ services:
         arguments:
             - '@ped_storage.aws_s3.client'
             - "%ped_storage.amazon_s3.bucket_name%"
+        calls:
+            - method: setCachePrefix
+              arguments:
+                  - '%ped_storage.amazon_s3.thumbs_prefix%'
         tags:
             - { name: 'liip_imagine.cache.resolver', resolver: amazon_fs }
 
