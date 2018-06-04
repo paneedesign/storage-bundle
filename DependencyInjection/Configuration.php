@@ -41,6 +41,7 @@ class Configuration implements ConfigurationInterface
                     ->children()
                         ->scalarNode('directory')->defaultValue('%kernel.root_dir%/../web/uploads')->end()
                         ->scalarNode('endpoint')->defaultValue('uploads')->end()
+                        ->scalarNode('thumbs_prefix')->defaultValue('thumbs')->end()
                     ->end()
                 ->end()
             ->end();

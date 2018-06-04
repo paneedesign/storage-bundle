@@ -8,4 +8,5 @@ parameters:
     storage_amazon_s3_expire_at:   ~
     storage_local_directory:       ~
     storage_local_endpoint:        ~
+    storage_local_thumbs_prefix:   ~
     storage_adapter:               local

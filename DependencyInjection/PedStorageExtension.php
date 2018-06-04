@@ -60,6 +60,7 @@ class PedStorageExtension extends Extension
 
                 $container->setParameter('ped_storage.local.directory', $local['directory']);
                 $container->setParameter('ped_storage.local.endpoint', $local['endpoint']);
+                $container->setParameter('ped_storage.local.thumbs_prefix', $local['thumbs_prefix']);
             }
         }
 

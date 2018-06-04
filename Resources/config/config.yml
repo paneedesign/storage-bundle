@@ -10,6 +10,7 @@ ped_storage:
     local:
         endpoint:    "%storage_local_endpoint%"
         directory:   "%storage_local_directory%"
+        thumbs_prefix: "%storage_local_thumbs_prefix%"
 
 knp_gaufrette:
     stream_wrapper:
