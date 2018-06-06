@@ -37,14 +37,20 @@ abstract class Media
     private $key;
 
     /**
-     * @var \SplFileInfo
+     * __var \SplFileInfo
+     * TODO: ma a cosa serve??
      */
-    protected $file;
+    // protected $file;
 
     /**
      * @ORM\Column(name="type", type="enum_media_type", nullable=true)
      */
     private $type;
+
+    /**
+     * @ORM\Column(name="size", type="integer", nullable=false)
+     */
+    private $size = 0;
 
     /**
      * @ORM\Column(name="media_info", type="json_array", nullable=true)
@@ -131,7 +137,19 @@ abstract class Media
      */
     public function setMediaInfo($mediaInfo)
     {
-        $this->mediaInfo = $mediaInfo;
+        if (!is_array($mediaInfo)) {
+            $mediaInfo = get_object_vars($mediaInfo);
+        }
+
+        $this->setsize($mediaInfo['size']);
+
+        unset($mediaInfo['size']);
+        unset($mediaInfo['key']);
+        unset($mediaInfo['ext']);
+
+        if (!empty($mediaInfo)) {
+            $this->mediaInfo = $mediaInfo;
+        }
 
         return $this;
     }
@@ -168,5 +186,29 @@ abstract class Media
     public function getCreatedAt()
     {
         return $this->createdAt;
+    }
+
+    /**
+     * Set size
+     *
+     * @param int $size
+     *
+     * @return Media
+     */
+    public function setsize($size)
+    {
+        $this->size = $size;
+
+        return $this;
+    }
+
+    /**
+     * Get size
+     *
+     * @return int
+     */
+    public function getsize()
+    {
+        return $this->size;
     }
 }
