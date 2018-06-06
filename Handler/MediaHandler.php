@@ -578,11 +578,17 @@ class MediaHandler
 
     /**
      * @param int $id
-     * @return float
+     * @return string
      */
     private function getSubPathById($id)
     {
-        return ceil($id / 100);
+        $numericPath = ceil($id / 100);
+        $stringPath = str_replace(
+            ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0'],
+            ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'l'],
+            strval($numericPath)
+        );
+        return $stringPath;
     }
 
     /**
