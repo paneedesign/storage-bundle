@@ -37,6 +37,11 @@ abstract class Media
     private $key;
 
     /**
+     * @ORM\Column(name="path", type="string", nullable=false)
+     */
+    private $path;
+
+    /**
      * __var \SplFileInfo
      * TODO: ma a cosa serve??
      */
@@ -61,6 +66,8 @@ abstract class Media
      * @ORM\Column(name="created_at", type="datetime")
      */
     protected $createdAt;
+
+    //TODO: add fileType: image, document, video
 
     /**
      * Constructor
@@ -141,7 +148,7 @@ abstract class Media
             $mediaInfo = get_object_vars($mediaInfo);
         }
 
-        $this->setsize($mediaInfo['size']);
+        $this->setSize($mediaInfo['size']);
 
         unset($mediaInfo['size']);
         unset($mediaInfo['key']);
@@ -195,7 +202,7 @@ abstract class Media
      *
      * @return Media
      */
-    public function setsize($size)
+    public function setSize($size)
     {
         $this->size = $size;
 
@@ -207,8 +214,42 @@ abstract class Media
      *
      * @return int
      */
-    public function getsize()
+    public function getSize()
     {
         return $this->size;
+    }
+
+    /**
+     * Set path
+     *
+     * @param int $path
+     *
+     * @return Media
+     */
+    public function setPath($path)
+    {
+        $this->path = $path;
+
+        return $this;
+    }
+
+    /**
+     * Get path
+     *
+     * @return string
+     */
+    public function getPath()
+    {
+        return $this->path;
+    }
+
+    /**
+     * Get FullKey
+     *
+     * @return string
+     */
+    public function getFullKey()
+    {
+        return $this->path . $this->key;
     }
 }
