@@ -446,22 +446,20 @@ class MediaHandler
     }
 
     /**
-     * @param string $key
+     * @param string $fullKey
      * @return bool|string
      * @throws \Gaufrette\Extras\Resolvable\UnresolvableObjectException
      */
-    public function getFullUrl($key)
+    public function getFullUrl($fullKey)
     {
         $toReturn = false;
 
         /* @var AwsS3Adapter|LocalAdapter $adapter */
         $adapter = $this->filesystem->getAdapter();
 
-        $fullKey = $this->getFullKey($key);
-
         if ($adapter instanceof LocalAdapter) {
             if ($adapter->exists($fullKey)) {
-                $toReturn = $this->localEndpoint.'/'.$fullKey;
+                $toReturn = $this->localEndpoint . '/' . $fullKey;
             }
         } else {
             if ($this->filesystem->has($fullKey)) {
