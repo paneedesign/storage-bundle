@@ -42,12 +42,6 @@ abstract class Media
     private $path;
 
     /**
-     * __var \SplFileInfo
-     * TODO: ma a cosa serve??
-     */
-    // protected $file;
-
-    /**
      * @ORM\Column(name="type", type="enum_media_type", nullable=true)
      */
     private $type;
