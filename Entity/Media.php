@@ -47,6 +47,11 @@ abstract class Media
     private $type;
 
     /**
+     * @ORM\Column(name="file_type", type="enum_file_type", nullable=true)
+     */
+    private $fileType;
+
+    /**
      * @ORM\Column(name="size", type="integer", nullable=false)
      */
     private $size = 0;
@@ -245,5 +250,29 @@ abstract class Media
     public function getFullKey()
     {
         return $this->path . $this->key;
+    }
+
+    /**
+     * Set file type
+     *
+     * @param string $fileType
+     *
+     * @return Media
+     */
+    public function setFileType($fileType)
+    {
+        $this->fileType = $fileType;
+
+        return $this;
+    }
+
+    /**
+     * Get file type
+     *
+     * @return string
+     */
+    public function getFileType()
+    {
+        return $this->fileType;
     }
 }

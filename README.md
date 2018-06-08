@@ -104,6 +104,7 @@ doctrine:
     dbal:
         types:
             enum_media_type: PaneeDesign\StorageBundle\DBAL\EnumMediaType
+            enum_file_type: PaneeDesign\StorageBundle\DBAL\EnumFileType
             
 //...
 
