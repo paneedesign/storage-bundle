@@ -445,6 +445,7 @@ class MediaHandler
     }
 
     /**
+     * @deprecated
      * @param string $key
      */
     public function removeThumbnails($key)
