@@ -422,15 +422,17 @@ class MediaHandler
     }
 
     /**
-     * @param string $key
+     * @param Media $media
      */
-    public function remove($key)
+    public function remove(Media $media)
     {
-        $fullKey = $this->getFullKey($key);
-
         /* @var AwsS3Adapter|LocalAdapter $adapter */
         $adapter = $this->filesystem->getAdapter();
-        @$adapter->delete($fullKey);
+
+        // Remove main media
+        @$adapter->delete($media->getFullKey());
+
+        // TODO: Remove cached thumbinails
     }
 
     /**
