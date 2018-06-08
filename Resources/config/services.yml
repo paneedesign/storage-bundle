@@ -26,7 +26,9 @@ services:
 
     ped_storage.amazon_media_handler:
         class: "%ped_storage.media_handler.class%"
-        arguments: ['@amazon_fs']
+        arguments:
+            $filesystem: '@amazon_fs'
+            $liipCacheManager: '@liip_imagine.cache.manager'
         calls:
             - method: setAwsS3Resolver
               arguments:
@@ -35,7 +37,9 @@ services:
 
     ped_storage.local_media_handler:
         class: "%ped_storage.media_handler.class%"
-        arguments: ['@local_fs']
+        arguments:
+            $filesystem: '@local_fs'
+            $liipCacheManager: '@liip_imagine.cache.manager'
         calls:
             - method: setLocalEndpoint
               arguments:

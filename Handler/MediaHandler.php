@@ -10,6 +10,7 @@ namespace PaneeDesign\StorageBundle\Handler;
 
 use Gaufrette\Extras\Resolvable\Resolver\AwsS3PresignedUrlResolver;
 use Gaufrette\Extras\Resolvable\Resolver\StaticUrlResolver;
+use Liip\ImagineBundle\Imagine\Cache\CacheManager;
 use PaneeDesign\StorageBundle\Entity\Media;
 
 use Gaufrette\Adapter\AwsS3 as AwsS3Adapter;
@@ -31,6 +32,11 @@ class MediaHandler
      * @var Filesystem|ResolvableFilesystem
      */
     private $filesystem;
+
+    /**
+     * @var CacheManager
+     */
+    private $liipCacheManager;
 
     /**
      * Entity Id
@@ -90,9 +96,10 @@ class MediaHandler
      * MediaHandler constructor.
      *
      * @param Filesystem $filesystem
+     * @param CacheManager $liipCacheManager
      * @param array $allowedMimeTypes
      */
-    public function __construct(Filesystem $filesystem, array $allowedMimeTypes = [])
+    public function __construct(Filesystem $filesystem, CacheManager $liipCacheManager, array $allowedMimeTypes = [])
     {
         $adapter = $filesystem->getAdapter();
 
@@ -101,6 +108,7 @@ class MediaHandler
         }
 
         $this->filesystem = $filesystem;
+        $this->liipCacheManager = $liipCacheManager;
 
         $this->allowedMimeTypes = array_merge([
             'image/jpeg',
@@ -432,7 +440,8 @@ class MediaHandler
         // Remove main media
         @$adapter->delete($media->getFullKey());
 
-        // TODO: Remove cached thumbinails
+        // Remove cached thumbinails
+        $this->liipCacheManager->remove($media->getFullKey(), null);
     }
 
     /**
