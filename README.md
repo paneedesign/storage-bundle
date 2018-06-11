@@ -148,7 +148,7 @@ protected function amazonUploadImageAction(Request $request, $name, $id, $type)
         ->setType($type);
         
     // optionally set a mediaType (es. image, video, thumbnail, document)
-    $uploader->setMediaType(EnumFileType::IMAGE);
+    $uploader->setFileType(EnumFileType::IMAGE);
     
     // optionally set a name (base + extension)
     $uploader->setName($image->getClientOriginalName(), $image->getExtension());
@@ -185,7 +185,7 @@ protected function localUploadImage(Request $request, $name, $id, $type)
         ->setType($type);
         
     // optionally set a mediaType (es. image, video, thumbnail, document)
-    $uploader->setMediaType(EnumFileType::IMAGE);
+    $uploader->setFileType(EnumFileType::IMAGE);
     
     // optionally set a name (base + extension)
     $uploader->setName($image->getClientOriginalName(), $image->getExtension());
@@ -220,7 +220,7 @@ protected function getAmazonImageUrl($key, $id, $type)
         ->setType($type);
         
     // optionally set a mediaType (es. image, video, thumbnail, document)
-    $uploader->setMediaType('thumbnail');
+    $uploader->setFileType('thumbnail');
       
     return $uploader->getFullUrl($key);
 }
@@ -247,7 +247,7 @@ protected function getAmazonDocumentUrl($key, $id, $type)
         ->setType($type);
 
     // optionally set a mediaType (es. image, video, thumbnail, document)
-    $uploader->setMediaType('document');
+    $uploader->setFileType('document');
       
     return $uploader->getFullUrl($key);
 }
@@ -274,7 +274,7 @@ protected function getLocalImageUrl($path, $id, $type)
         ->setType($type);
                 
     // optionally set a mediaType (es. image, video, thumbnail, document)
-    $uploader->setMediaType('thumbnail');
+    $uploader->setFileType('thumbnail');
         
     return $uploader->getFullUrl($key);
 }

@@ -59,7 +59,7 @@ class MediaHandler
      *
      * @var string
      */
-    private $mediaType;
+    private $fileType;
 
     /**
      * Media information object
@@ -204,12 +204,12 @@ class MediaHandler
     }
 
     /**
-     * @param $mediaType
+     * @param $fileType
      * @return $this
      */
-    public function setMediaType($mediaType)
+    public function setFileType($fileType)
     {
-        $this->mediaType = $mediaType;
+        $this->fileType = $fileType;
 
         return $this;
     }
@@ -217,9 +217,9 @@ class MediaHandler
     /**
      * @return string
      */
-    public function getMediaType()
+    public function getFileType()
     {
-        return $this->mediaType;
+        return $this->fileType;
     }
 
     /**
@@ -501,8 +501,8 @@ class MediaHandler
 
         $parts = [];
 
-        if ($this->mediaType) {
-            $parts[] = $this->mediaType;
+        if ($this->fileType) {
+            $parts[] = $this->fileType;
         }
 
         if ($this->type) {
@@ -534,7 +534,7 @@ class MediaHandler
             $parts[] = $this->type;
         }
 
-        if ($this->mediaType) {
+        if ($this->fileType) {
             $parts[] = 'thumbnail';
         }
 
