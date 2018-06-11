@@ -23,11 +23,6 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 class MediaHandler
 {
-    const TYPE_IMAGE     = 'image';
-    const TYPE_VIDEO     = 'video';
-    const TYPE_DOCUMENT  = 'document';
-    const TYPE_THUMBNAIL = 'thumbnail';
-
     /**
      * @var Filesystem|ResolvableFilesystem
      */
@@ -540,7 +535,7 @@ class MediaHandler
         }
 
         if ($this->mediaType) {
-            $parts[] = self::TYPE_THUMBNAIL;
+            $parts[] = 'thumbnail';
         }
 
         if ($this->id) {

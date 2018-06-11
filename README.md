@@ -148,7 +148,7 @@ protected function amazonUploadImageAction(Request $request, $name, $id, $type)
         ->setType($type);
         
     // optionally set a mediaType (es. image, video, thumbnail, document)
-    $uploader->setMediaType(MediaHandler::TYPE_IMAGE);
+    $uploader->setMediaType(EnumFileType::IMAGE);
     
     // optionally set a name (base + extension)
     $uploader->setName($image->getClientOriginalName(), $image->getExtension());
@@ -185,7 +185,7 @@ protected function localUploadImage(Request $request, $name, $id, $type)
         ->setType($type);
         
     // optionally set a mediaType (es. image, video, thumbnail, document)
-    $uploader->setMediaType(MediaHandler::TYPE_IMAGE);
+    $uploader->setMediaType(EnumFileType::IMAGE);
     
     // optionally set a name (base + extension)
     $uploader->setName($image->getClientOriginalName(), $image->getExtension());
