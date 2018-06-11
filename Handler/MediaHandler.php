@@ -55,7 +55,7 @@ class MediaHandler
     private $key;
 
     /**
-     * Media Type (es. profile, gallery, document, thumbnail)
+     * File Type (es. image, video, document)
      *
      * @var string
      */
