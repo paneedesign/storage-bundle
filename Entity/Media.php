@@ -66,7 +66,6 @@ abstract class Media
      */
     protected $createdAt;
 
-    //TODO: add fileType: image, document, video
 
     /**
      * Constructor
@@ -137,25 +136,13 @@ abstract class Media
     /**
      * Set mediaInfo
      *
-     * @param array|MediaInfo $mediaInfo
+     * @param MediaInfo $mediaInfo
      *
      * @return Media
      */
     public function setMediaInfo($mediaInfo)
     {
-        if (!is_array($mediaInfo)) {
-            $mediaInfo = get_object_vars($mediaInfo);
-        }
-
-        $this->setSize($mediaInfo['size']);
-
-        unset($mediaInfo['size']);
-        unset($mediaInfo['key']);
-        unset($mediaInfo['ext']);
-
-        if (!empty($mediaInfo)) {
-            $this->mediaInfo = $mediaInfo;
-        }
+        $this->mediaInfo = $mediaInfo;
 
         return $this;
     }
