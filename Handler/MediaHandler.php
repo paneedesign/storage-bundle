@@ -62,6 +62,13 @@ class MediaHandler
     private $fileType;
 
     /**
+     * Set if the file will be stored with public access
+     *
+     * @var boolean
+     */
+    private $hasPublicAccess = false;
+
+    /**
      * Media information object
      *
      * @var Media\MediaInfo
@@ -210,6 +217,17 @@ class MediaHandler
     public function setFileType($fileType)
     {
         $this->fileType = $fileType;
+
+        return $this;
+    }
+
+    /**
+     * @param $hasPublicAccess
+     * @return $this
+     */
+    public function setHasPublicAccess($hasPublicAccess)
+    {
+        $this->hasPublicAccess = $hasPublicAccess;
 
         return $this;
     }
@@ -414,7 +432,13 @@ class MediaHandler
         $adapter = $this->filesystem->getAdapter();
 
         if ($adapter instanceof AwsS3Adapter) {
-            $adapter->setMetadata($path, ['contentType' => $mimeType]);
+            $metadata = ['contentType' => $mimeType];
+
+            if ($this->hasPublicAccess) {
+                $metadata['ACL'] = 'public-read';
+            }
+
+            $adapter->setMetadata($path, $metadata);
         }
 
         $this->fixFileRotation($file);
