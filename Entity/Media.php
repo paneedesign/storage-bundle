@@ -8,6 +8,7 @@
 
 namespace PaneeDesign\StorageBundle\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use PaneeDesign\StorageBundle\Entity\Media\MediaInfo;
 
@@ -66,6 +67,17 @@ abstract class Media
      */
     protected $createdAt;
 
+    /**
+     * @var MediaFilter[]
+     *
+     * @ORM\OneToMany(
+     *     targetEntity="PaneeDesign\StorageBundle\Entity\MediaFilter",
+     *     mappedBy="image",
+     *     cascade={"persist"},
+     *     orphanRemoval=true
+     * )
+     */
+    protected $filters;
 
     /**
      * Constructor
@@ -73,6 +85,7 @@ abstract class Media
     public function __construct()
     {
         $this->createdAt = new \DateTime();
+        $this->filters = new ArrayCollection();
     }
 
     /**
@@ -261,5 +274,106 @@ abstract class Media
     public function getFileType()
     {
         return $this->fileType;
+    }
+
+    /**
+     * Add filter
+     *
+     * @param MediaFilter $filter
+     *
+     * @return Media
+     */
+    public function addFilter(MediaFilter $filter)
+    {
+        $this->filters[] = $filter;
+
+        return $this;
+    }
+
+    /**
+     * Add filter
+     *
+     * @param string $filterName
+     * @param $url
+     *
+     * @return Media
+     */
+    public function addFilterByName($filterName, $url)
+    {
+        if ($this->hasFilter($filterName) === false) {
+            $filter = new MediaFilter();
+            $filter->setImage($this);
+            $filter->setName($filterName);
+            $filter->setUrl($url);
+            $this->filters[] = $filter;
+        }
+
+        return $this;
+    }
+
+    /**
+     * Check if media has a filter
+     *
+     * @param string $filterName
+     *
+     * @return boolean
+     */
+    public function hasFilter($filterName)
+    {
+        foreach ($this->filters as $filter) {
+            if ($filter->getName() === $filterName) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Return image url for a given filter
+     *
+     * @param string $filterName
+     *
+     * @return string
+     */
+    public function getUrl($filterName)
+    {
+        foreach ($this->filters as $filter) {
+            if ($filter->getName() === $filterName) {
+                return $filter->getUrl();
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Remove filter
+     *
+     * @param MediaFilter $filter
+     */
+    public function removeFilter(MediaFilter $filter)
+    {
+        $this->filters->removeElement($filter);
+    }
+
+    /**
+     * Get filters
+     *
+     * @return \Doctrine\Common\Collections\Collection
+     */
+    public function getFilters()
+    {
+        return $this->filters;
+    }
+
+    /**
+     * Clear all filters
+     */
+    public function clearFilters()
+    {
+        foreach ($this->filters as $filter) {
+            $this->removeFilter($filter);
+        }
     }
 }
