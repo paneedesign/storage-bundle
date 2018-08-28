@@ -10,6 +10,7 @@ namespace PaneeDesign\StorageBundle\Handler;
 
 use Gaufrette\Extras\Resolvable\Resolver\AwsS3PresignedUrlResolver;
 use Gaufrette\Extras\Resolvable\Resolver\StaticUrlResolver;
+use Liip\ImagineBundle\Imagine\Cache\CacheManager;
 use PaneeDesign\StorageBundle\Entity\Media;
 
 use Gaufrette\Adapter\AwsS3 as AwsS3Adapter;
@@ -22,15 +23,15 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 class MediaHandler
 {
-    const TYPE_IMAGE     = 'image';
-    const TYPE_VIDEO     = 'video';
-    const TYPE_DOCUMENT  = 'document';
-    const TYPE_THUMBNAIL = 'thumbnail';
-
     /**
      * @var Filesystem|ResolvableFilesystem
      */
     private $filesystem;
+
+    /**
+     * @var CacheManager
+     */
+    private $liipCacheManager;
 
     /**
      * Entity Id
@@ -54,11 +55,18 @@ class MediaHandler
     private $key;
 
     /**
-     * Media Type (es. profile, gallery, document, thumbnail)
+     * File Type (es. image, video, document)
      *
      * @var string
      */
-    private $mediaType;
+    private $fileType;
+
+    /**
+     * Set if the file will be stored with public access
+     *
+     * @var boolean
+     */
+    private $hasPublicAccess = false;
 
     /**
      * Media information object
@@ -90,9 +98,10 @@ class MediaHandler
      * MediaHandler constructor.
      *
      * @param Filesystem $filesystem
+     * @param CacheManager $liipCacheManager
      * @param array $allowedMimeTypes
      */
-    public function __construct(Filesystem $filesystem, array $allowedMimeTypes = [])
+    public function __construct(Filesystem $filesystem, CacheManager $liipCacheManager, array $allowedMimeTypes = [])
     {
         $adapter = $filesystem->getAdapter();
 
@@ -101,6 +110,7 @@ class MediaHandler
         }
 
         $this->filesystem = $filesystem;
+        $this->liipCacheManager = $liipCacheManager;
 
         $this->allowedMimeTypes = array_merge([
             'image/jpeg',
@@ -201,12 +211,23 @@ class MediaHandler
     }
 
     /**
-     * @param $mediaType
+     * @param $fileType
      * @return $this
      */
-    public function setMediaType($mediaType)
+    public function setFileType($fileType)
     {
-        $this->mediaType = $mediaType;
+        $this->fileType = $fileType;
+
+        return $this;
+    }
+
+    /**
+     * @param $hasPublicAccess
+     * @return $this
+     */
+    public function setHasPublicAccess($hasPublicAccess)
+    {
+        $this->hasPublicAccess = $hasPublicAccess;
 
         return $this;
     }
@@ -214,9 +235,9 @@ class MediaHandler
     /**
      * @return string
      */
-    public function getMediaType()
+    public function getFileType()
     {
-        return $this->mediaType;
+        return $this->fileType;
     }
 
     /**
@@ -411,7 +432,13 @@ class MediaHandler
         $adapter = $this->filesystem->getAdapter();
 
         if ($adapter instanceof AwsS3Adapter) {
-            $adapter->setMetadata($path, ['contentType' => $mimeType]);
+            $metadata = ['contentType' => $mimeType];
+
+            if ($this->hasPublicAccess) {
+                $metadata['ACL'] = 'public-read';
+            }
+
+            $adapter->setMetadata($path, $metadata);
         }
 
         $this->fixFileRotation($file);
@@ -422,18 +449,22 @@ class MediaHandler
     }
 
     /**
-     * @param string $key
+     * @param Media $media
      */
-    public function remove($key)
+    public function remove(Media $media)
     {
-        $fullKey = $this->getFullKey($key);
-
         /* @var AwsS3Adapter|LocalAdapter $adapter */
         $adapter = $this->filesystem->getAdapter();
-        @$adapter->delete($fullKey);
+
+        // Remove main media
+        @$adapter->delete($media->getFullKey());
+
+        // Remove cached thumbinails
+        $this->liipCacheManager->remove($media->getFullKey(), null);
     }
 
     /**
+     * @deprecated
      * @param string $key
      */
     public function removeThumbnails($key)
@@ -446,22 +477,20 @@ class MediaHandler
     }
 
     /**
-     * @param string $key
+     * @param string $fullKey
      * @return bool|string
      * @throws \Gaufrette\Extras\Resolvable\UnresolvableObjectException
      */
-    public function getFullUrl($key)
+    public function getFullUrl($fullKey)
     {
         $toReturn = false;
 
         /* @var AwsS3Adapter|LocalAdapter $adapter */
         $adapter = $this->filesystem->getAdapter();
 
-        $fullKey = $this->getFullKey($key);
-
         if ($adapter instanceof LocalAdapter) {
             if ($adapter->exists($fullKey)) {
-                $toReturn = $this->localEndpoint.'/'.$fullKey;
+                $toReturn = $this->localEndpoint . '/' . $fullKey;
             }
         } else {
             if ($this->filesystem->has($fullKey)) {
@@ -496,12 +525,12 @@ class MediaHandler
 
         $parts = [];
 
-        if ($this->type) {
-            $parts[] = $this->type;
+        if ($this->fileType) {
+            $parts[] = $this->fileType;
         }
 
-        if ($this->mediaType) {
-            $parts[] = $this->mediaType;
+        if ($this->type) {
+            $parts[] = $this->type;
         }
 
         if ($this->id) {
@@ -529,8 +558,8 @@ class MediaHandler
             $parts[] = $this->type;
         }
 
-        if ($this->mediaType) {
-            $parts[] = self::TYPE_THUMBNAIL;
+        if ($this->fileType) {
+            $parts[] = 'thumbnail';
         }
 
         if ($this->id) {
@@ -578,11 +607,17 @@ class MediaHandler
 
     /**
      * @param int $id
-     * @return float
+     * @return string
      */
     private function getSubPathById($id)
     {
-        return ceil($id / 100);
+        $numericPath = ceil($id / 100);
+        $stringPath = str_replace(
+            ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0'],
+            ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'l'],
+            strval($numericPath)
+        );
+        return $stringPath;
     }
 
     /**

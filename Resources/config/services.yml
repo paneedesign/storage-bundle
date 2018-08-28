@@ -26,7 +26,9 @@ services:
 
     ped_storage.amazon_media_handler:
         class: "%ped_storage.media_handler.class%"
-        arguments: ['@amazon_fs']
+        arguments:
+            $filesystem: '@amazon_fs'
+            $liipCacheManager: '@liip_imagine.cache.manager'
         calls:
             - method: setAwsS3Resolver
               arguments:
@@ -35,7 +37,9 @@ services:
 
     ped_storage.local_media_handler:
         class: "%ped_storage.media_handler.class%"
-        arguments: ['@local_fs']
+        arguments:
+            $filesystem: '@local_fs'
+            $liipCacheManager: '@liip_imagine.cache.manager'
         calls:
             - method: setLocalEndpoint
               arguments:
@@ -68,7 +72,7 @@ services:
             - '@filesystem'
             - '@router.request_context'
             - '%kernel.root_dir%/../web'
-            - '%ped_storage.local.endpoint%/cache'
+            - '%ped_storage.local.thumbs_prefix%'
         tags:
             - { name: 'liip_imagine.cache.resolver', resolver: local_fs }
 
@@ -84,6 +88,10 @@ services:
         arguments:
             - '@ped_storage.aws_s3.client'
             - "%ped_storage.amazon_s3.bucket_name%"
+        calls:
+            - method: setCachePrefix
+              arguments:
+                  - '%ped_storage.amazon_s3.thumbs_prefix%'
         tags:
             - { name: 'liip_imagine.cache.resolver', resolver: amazon_fs }
 

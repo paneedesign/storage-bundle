@@ -7,9 +7,11 @@ ped_storage:
         bucket_name: "%storage_amazon_s3_bucket_name%"
         directory:   "%storage_amazon_s3_directory%"
         expire_at:   "%storage_amazon_s3_expire_at%"
+        thumbs_prefix: "%storage_amazon_s3_thumbs_prefix%"
     local:
         endpoint:    "%storage_local_endpoint%"
         directory:   "%storage_local_directory%"
+        thumbs_prefix: "%storage_local_thumbs_prefix%"
 
 knp_gaufrette:
     stream_wrapper:
