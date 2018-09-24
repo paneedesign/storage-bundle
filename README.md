@@ -1,7 +1,7 @@
 Pane e Design - Storage Bundle
 ==============================
 
-Users management for Symfony3 projects.
+Storage management for Symfony3 projects.
 
 Installation
 ============
@@ -123,85 +123,49 @@ ped_discriminator_map:
 Step 4: Use
 -----------
 
-You can upload a file using this snippets:
-
-* Amazon
+You can upload a picture using this snippets:
 
 ```php
 /**
- * Upload Image to S3
+ * Upload Image
  *
  * @param Request $request
  * @param string $name Image field name
  * @param int $id Entity ID
  * @param string $type Entity Type
- * @return string
+ * @return Media
  */
-protected function amazonUploadImageAction(Request $request, $name, $id, $type)
-{
-    //parameters.yml
-    //storage_adapter: amazon
-    
+protected function uploadImageAction(Request $request, $name, $id, $type)
+{  
     $image   = $request->files->get($name);
     $service = $this->getParameter('ped_storage.uploader');
     
     $uploader = $this->get($service)
         ->setId($id)
-        ->setType($type);
-        
-    // optionally set a mediaType (es. image, video, thumbnail, document)
-    $uploader->setFileType(EnumFileType::IMAGE);
+        ->setType($type)
+        ->setFileType(EnumFileType::IMAGE) //image, video, document
+        ->setGroupFolders(false);
     
-    // optionally set a name (base + extension)
-    $uploader->setName($image->getClientOriginalName(), $image->getExtension());
+    $uploader->save($image);
     
-    // optionally set a size
-    $uploader->setSize($image->getSize());
+    //Save in DB
+    $media = new Media();
     
-    return $uploader->save($image);
-}
-```
+    $media->setKey($uploader->getKey());
+    $media->setPath($uploader->getFullKey(''));
+    $media->setFileType($uploader->getFileType());
+    
+    $media->setType(EnumMediaType::GALLERY);
+    $media->setSize($image->getSize());
 
-* Local
-
-```php
-/**
- * Upload Image to local
- *
- * @param Request $request
- * @param string $name Image field name
- * @param int $id Entity ID
- * @param string $type Entity Type
- * @return string
- */
-protected function localUploadImage(Request $request, $name, $id, $type)
-{
-    //parameters.yml
-    //storage_adapter: local
-    
-    $image   = $request->files->get($name);
-    $service = $this->getParameter('ped_storage.uploader');
-    
-    $uploader = $this->get($service)
-        ->setId($id)
-        ->setType($type);
-        
-    // optionally set a mediaType (es. image, video, thumbnail, document)
-    $uploader->setFileType(EnumFileType::IMAGE);
-    
-    // optionally set a name (base + extension)
-    $uploader->setName($image->getClientOriginalName(), $image->getExtension());
-    
-    // optionally set a size
-    $uploader->setSize($image->getSize());
-    
-    return $uploader->save($image);
+    $em = $this->getDoctrine()->getManager();
+    $em->persist($media);
+    $em->flush();
 }
 ```
 
 and retrive full url by using:
 
-* Amazon 
 
 ```php
 /**
@@ -251,33 +215,6 @@ protected function getAmazonDocumentUrl($key, $id, $type)
     // optionally set a mediaType (es. image, video, thumbnail, document)
     $uploader->setFileType('document');
       
-    return $uploader->getFullUrl($key);
-}
-```
-
-* Local
-
-```php
-/**
- * Get full Image url from local
- *
- * @param $path
- * @param $type
- * @return string
- */
-protected function getLocalImageUrl($path, $id, $type)
-{
-    //parameters.yml
-    //storage_adapter: local
-    
-    $service  = $this->getParameter('ped_storage.uploader');
-    $uploader = $this->get($service)
-        ->setId($id)
-        ->setType($type);
-                
-    // optionally set a mediaType (es. image, video, thumbnail, document)
-    $uploader->setFileType('thumbnail');
-        
     return $uploader->getFullUrl($key);
 }
 ```

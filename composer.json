@@ -8,6 +8,9 @@
     "authors": [{
         "name": "Fabiano Roberto",
         "email": "fabiano@paneedesign.com"
+    },{
+        "name": "Luigi Cardamone",
+        "email": "luigi@paneedesign.com"
     }],
     "require": {
         "php": "^5.6|^7.0",
