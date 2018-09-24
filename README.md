@@ -22,7 +22,7 @@ Pane&Design repository is private so, add to `composer.json` this `vcs`
     ...
     "require": {
         ...
-        "paneedesign/storage-bundle": "^1.0"   
+        "paneedesign/storage-bundle": "^4.0"   
     }
 ```
 
@@ -81,12 +81,14 @@ parameters:
     storage_amazon_s3_key:         ~
     storage_amazon_s3_secret:      ~
     storage_amazon_s3_region:      eu-west-1
-    storage_amazon_s3_endpoint:    ~
+    storage_amazon_s3_endpoint:    'https://s3.amazonaws.com'
     storage_amazon_s3_bucket_name: ~
     storage_amazon_s3_directory:   uploads
     storage_amazon_s3_expire_at:   +1 hour
     storage_local_directory:       "%kernel.root_dir%/../web/uploads"
     storage_local_endpoint:        /uploads
+    storage_amazon_s3_thumbs_prefix: thumbs
+    storage_local_thumbs_prefix: thumbs
     storage_adapter:               local
     #storage_adapter:              amazon
 ```
