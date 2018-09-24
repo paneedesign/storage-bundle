@@ -119,6 +119,78 @@ ped_discriminator_map:
         ...
 ```
 
+Create a Controller with this route:
+
+```php
+/**
+ * @Route(
+ *     "/media/{key}",
+ *     name="media",
+ * )
+ *
+ * @param Request $request
+ * @param string $key
+ *
+ * @return Response
+ * @throws \Gaufrette\Extras\Resolvable\UnresolvableObjectException
+ * @throws \Exception
+ */
+public function mediaAction(Request $request, $key)
+{
+    $filter = $request->get('filter');
+
+    /* @var EntityRepository $repository */
+    $repository = $this->get('doctrine')
+        ->getRepository('AppBundle:Media');
+
+    /* @var Media $media*/
+    $media = $repository->findOneBy(['key' => $key]);
+
+    if ($media === null) {
+        throw $this->createNotFoundException('Mediakeynot found!');
+    }
+
+    if ($media->getFileType() !== EnumFileType::IMAGE) {
+        throw new \Exception("File type not handled!");
+    }
+
+    $service = $this->container->getParameter('ped_storage.uploader');
+    /* @var MediaHandler $uploader */
+    $uploader = $this->container->get($service);
+
+    $liipCacheManager = $this->get('liip_imagine.cache.manager');
+
+    if ($filter !== null) {
+        $path = $media->getFullKey();
+        if ($liipCacheManager->isStored($path, $filter)) {
+            $url = $liipCacheManager->resolve($path, $filter);
+        } else {
+            //Update here image filter
+            $liipServiceFilter = $this->get('liip_imagine.service.filter');
+            try {
+                $url = $liipServiceFilter->getUrlOfFilteredImage($path, $filter);
+                //Cache generated with success
+            } catch (NotLoadableException $e) {
+                throw new NotFoundHttpException(sprintf('Source image for path "%s" could not be found', $path));
+            } catch (NonExistingFilterException $e) {
+                throw new NotFoundHttpException(sprintf('Requested non-existing filter "%s"', $filter));
+            } catch (RuntimeException $e) {
+                $errorTemplate = 'Unable to create image for path "%s" and filter "%s". Message was "%s"';
+                throw new \RuntimeException(sprintf($errorTemplate, $path, $filter, $e->getMessage()), 0, $e);
+            }
+        }
+
+        $media->addFilterByName($filter, $url);
+        $em = $this->getDoctrine()->getManager();
+        $em->persist($media);
+        $em->flush();
+    } else {
+        $url = $uploader->getFullUrl($media->getFullKey());
+    }
+
+    return $this->redirect($url, 301);
+}
+```
 
 Step 4: Use
 -----------
@@ -164,34 +236,43 @@ protected function uploadImageAction(Request $request, $name, $id, $type)
 }
 ```
 
-and retrive full url by using:
+and retrive full url by using this function that can also be a Twig Filter:
 
 
 ```php
 /**
- * Get full Image url from S3
+ * @param Media $image
+ * @param string $filter
  *
- * @param $path
- * @param $type
- * @return string
+ * @return bool|string
+ * @throws \Gaufrette\Extras\Resolvable\UnresolvableObjectException
  */
-protected function getAmazonImageUrl($key, $id, $type)
+public function getMediaUrl(Media $image, $filter = null)
 {
-    //parameters.yml
-    //storage_adapter: amazon
-    
-    $service  = $this->getParameter('ped_storage.uploader');
-    $uploader = $this->get($service)
-        ->setId($id)
-        ->setType($type);
-        
-    // optionally set a mediaType (es. image, video, thumbnail, document)
-    $uploader->setFileType('thumbnail');
-      
-    return $uploader->getFullUrl($key);
+    if ($filter !== null) {
+        if ($image->hasFilter($filter)) {
+            return $image->getUrl($filter);
+        } else {
+            return $this->router->generate(
+                'media',
+                [
+                    'key'    => $image->getKey(),
+                    'filter' => $filter,
+                ]
+            );
+        }
+    } else {
+        $service = $this->container->getParameter('ped_storage.uploader');
+        /* @var MediaHandler $uploader */
+        $uploader = $this->container->get($service);
+        $url = $uploader->getFullUrl($image->getFullKey());
+        return $url;
+    }
 }
 ```
 
+
+Generate a pre-signed url to open private document. TODO: test and update this shippet 
 ```php
 /**
  * Get full Document private url from S3
