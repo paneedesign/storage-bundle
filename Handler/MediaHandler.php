@@ -379,18 +379,24 @@ class MediaHandler
 
     /**
      * @param array $allowedMimeTypes
+     * @return MediaHandler
      */
     public function setAllowedMimeTypes($allowedMimeTypes)
     {
         $this->allowedMimeTypes = $allowedMimeTypes;
+
+        return $this;
     }
 
     /**
      * @param string $allowedMimeType
+     * @return MediaHandler
      */
     public function addAllowedMimeType($allowedMimeType)
     {
         $this->allowedMimeTypes[] = $allowedMimeType;
+
+        return $this;
     }
 
     /**
