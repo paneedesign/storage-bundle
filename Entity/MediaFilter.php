@@ -29,7 +29,7 @@ class MediaFilter
     private $id;
 
     /**
-     * @ORM\ManyToOne(targetEntity="AppBundle\Entity\Media", inversedBy="filters")
+     * @ORM\ManyToOne(targetEntity="PaneeDesign\StorageBundle\Entity\Media", inversedBy="filters")
      * @ORM\JoinColumn(name="image_id", referencedColumnName="id", nullable=false)
      */
     private $image;
