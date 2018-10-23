@@ -1,4 +1,5 @@
 parameters:
+    datetime.class: \DateTime
     ped_storage.uploader:            "ped_storage.%storage_adapter%_media_handler"
     ped_storage.aws_s3.client.class: Aws\S3\S3Client
     ped_storage.media_handler.class: PaneeDesign\StorageBundle\Handler\MediaHandler
@@ -12,6 +13,10 @@ parameters:
     ped_storage.imagine.binary.loader.stream.class:  Liip\ImagineBundle\Binary\Loader\StreamLoader
 
 services:
+    expire_at_datetime:
+        class: "%datetime.class%"
+        arguments: ["%ped_storage.amazon_s3.expire_at%"]
+
     ped_storage.aws_s3.client:
         class: "%ped_storage.aws_s3.client.class%"
         factory: ["%ped_storage.aws_s3.client.class%", "factory"]
@@ -59,7 +64,7 @@ services:
             - '@ped_storage.aws_s3.client'
             - "%ped_storage.amazon_s3.bucket_name%"
             - "%ped_storage.amazon_s3.directory%"
-            - "%ped_storage.amazon_s3.expire_at%"
+            - "@expire_at_datetime"
 
     ped_storage.amazon_static_url_resolver:
         class: "%ped_storage.amazon_static_url_resolver.class%"

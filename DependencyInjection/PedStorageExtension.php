@@ -22,23 +22,23 @@ class PedStorageExtension extends Extension
         $configuration = new Configuration();
         $config = $this->processConfiguration($configuration, $configs);
 
-        if(array_key_exists('amazon_s3', $config) === false && array_key_exists('local', $config) === false) {
+        if (array_key_exists('amazon_s3', $config) === false && array_key_exists('local', $config) === false) {
             throw new \InvalidArgumentException(
                 'At least one of the parameters "ped_storage.amazon_s3" or "ped_storage.local" must be set.'
             );
         } else {
-            if(array_key_exists('amazon_s3', $config) === true) {
+            if (array_key_exists('amazon_s3', $config) === true) {
                 $amazonS3 = $config['amazon_s3'];
 
-                if(array_key_exists('secret', $amazonS3) === false) {
+                if (array_key_exists('secret', $amazonS3) === false) {
                     $this->printException('ped_storage.amazon_s3.secret', ($amazonS3['key']));
                 }
 
-                if(array_key_exists('endpoint', $amazonS3) === false) {
+                if (array_key_exists('endpoint', $amazonS3) === false) {
                     $this->printException('ped_storage.amazon_s3.endpoint', ($amazonS3['key']));
                 }
 
-                if(array_key_exists('bucket_name', $amazonS3) === false) {
+                if (array_key_exists('bucket_name', $amazonS3) === false) {
                     $this->printException('ped_storage.amazon_s3.bucket_name', ($amazonS3['key']));
                 }
 
@@ -52,10 +52,10 @@ class PedStorageExtension extends Extension
                 $container->setParameter('ped_storage.amazon_s3.thumbs_prefix', $amazonS3['thumbs_prefix']);
             }
 
-            if(array_key_exists('local', $config) === true) {
+            if (array_key_exists('local', $config) === true) {
                 $local = $config['local'];
 
-                if(array_key_exists('directory', $local) === false) {
+                if (array_key_exists('directory', $local) === false) {
                     $this->printException('ped_storage.local.directory');
                 }
 
@@ -71,7 +71,7 @@ class PedStorageExtension extends Extension
 
     private function printException($name, $toPrint = true)
     {
-        if($toPrint) {
+        if ($toPrint) {
             throw new \InvalidArgumentException(sprintf('The option "%s" must be set.', $name));
         }
     }
