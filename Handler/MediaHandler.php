@@ -233,6 +233,14 @@ class MediaHandler
     }
 
     /**
+     * @return boolean
+     */
+    public function getHasPublicAccess()
+    {
+        return $this->hasPublicAccess;
+    }
+
+    /**
      * @return string
      */
     public function getFileType()

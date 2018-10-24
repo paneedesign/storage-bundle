@@ -68,6 +68,11 @@ abstract class Media
     protected $createdAt;
 
     /**
+     * @ORM\Column(name="is_public", type="boolean", options={"default" = false}))
+     */
+    protected $isPublic = false;
+
+    /**
      * @var MediaFilter[]
      *
      * @ORM\OneToMany(
@@ -375,5 +380,29 @@ abstract class Media
         foreach ($this->filters as $filter) {
             $this->removeFilter($filter);
         }
+    }
+
+    /**
+     * Set if file is Public
+     *
+     * @param string $isPublic
+     *
+     * @return Media
+     */
+    public function setIsPublic($isPublic)
+    {
+        $this->isPublic = $isPublic;
+
+        return $this;
+    }
+
+    /**
+     * Get if file is Public
+     *
+     * @return string
+     */
+    public function getIsPublic()
+    {
+        return $this->isPublic;
     }
 }
