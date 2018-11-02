@@ -43,21 +43,9 @@
             "url": "../../*/*"
         }
     ],
-    "scripts": {
-        "symfony-scripts": [
-            "Incenteev\\ParameterHandler\\ScriptHandler::buildParameters"
-        ],
-        "post-install-cmd": [
-            "@symfony-scripts"
-        ],
-        "post-update-cmd": [
-            "@symfony-scripts"
-        ]
-    },
     "extra": {
         "branch-alias": {
-            "dev-master": "1.0-dev",
             "dev-flex": "feature/Symfony-flex"
-        },
+        }
     }
 }
