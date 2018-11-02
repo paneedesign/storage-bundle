@@ -13,8 +13,7 @@
         "email": "luigi@paneedesign.com"
     }],
     "require": {
-        "php": "^5.6|^7.0",
-        "symfony/framework-bundle": "^3.2",
+        "php": "^7.0",
         "gaufrette/extras": "~0.1",
         "knplabs/gaufrette": "~0.5",
         "knplabs/knp-gaufrette-bundle": "~0.5",
@@ -26,7 +25,6 @@
         "phpspec/phpspec": "^3.2",
         "phpunit/phpunit": "^5.6",
         "symfony/security-bundle": "^3.2",
-        "incenteev/composer-parameter-handler": "~2.0"
     },
     "config": {
         "bin-dir": "bin"
