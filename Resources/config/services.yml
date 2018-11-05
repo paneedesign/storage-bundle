@@ -1,6 +1,6 @@
 parameters:
     datetime.class: \DateTime
-    ped_storage.uploader:            "ped_storage.%storage_adapter%_media_handler"
+    ped_storage.uploader:            "ped_storage.local_media_handler"
     ped_storage.aws_s3.client.class: Aws\S3\S3Client
     ped_storage.media_handler.class: PaneeDesign\StorageBundle\Handler\MediaHandler
 

@@ -1,46 +1,53 @@
 {
     "name": "paneedesign/storage-bundle",
     "type": "symfony-bundle",
-    "description": "Storage management for Symfony3 projects.",
-    "keywords": ["storage", "aws", "filesystem", "gaufrette", "knp", "s3", "liip", "php"],
-    "homepage": "http://www.paneedesign.com/",
-    "license": "proprietary",
-    "authors": [{
-        "name": "Fabiano Roberto",
-        "email": "fabiano@paneedesign.com"
-    },{
-        "name": "Luigi Cardamone",
-        "email": "luigi@paneedesign.com"
-    }],
+    "description": "Storage management for Symfony projects.",
+    "keywords": ["storage", "aws", "file", "filesystem", "media", "gaufrette", "knp", "s3", "liip", "php"],
+    "homepage": "https://www.paneedesign.com/",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Fabiano Roberto",
+            "email": "fabiano@paneedesign.com"
+        },
+        {
+            "name": "Luigi Cardamone",
+            "email": "luigi@paneedesign.com"
+        },
+        {
+            "name":     "The contributors",
+            "homepage": "https://github.com/paneedesign/storage-bundle/contributors"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "PaneeDesign\\StorageBundle\\": ""
+        },
+        "exclude-from-classmap": [ "/Tests/" ]
+    },
     "require": {
-        "php": "^7.0",
+        "php": "^7.1",
         "gaufrette/extras": "~0.1",
         "knplabs/gaufrette": "~0.5",
         "knplabs/knp-gaufrette-bundle": "~0.5",
         "aws/aws-sdk-php": "^3.70",
         "liip/imagine-bundle": "~2.1",
-        "fresh/doctrine-enum-bundle": "^6.2"
+        "fresh/doctrine-enum-bundle": "^6.2",
+        "symfony/config": "~2.1|~3.0|~4.0",
+        "symfony/dependency-injection": "~2.1|~3.0|~4.0",
+        "symfony/framework-bundle": "~2.0|~3.0|~4.0"
     },
     "require-dev": {
-        "phpspec/phpspec": "^3.2",
         "phpunit/phpunit": "^5.6",
-        "symfony/security-bundle": "^3.2"
-    },
-    "config": {
-        "bin-dir": "bin"
-    },
-    "autoload": {
-        "psr-4": { "PaneeDesign\\StorageBundle\\": "" },
-        "exclude-from-classmap": ["/Tests/"]
+        "symfony/console": "~4.0",
+        "symfony/filesystem": "~4.0",
+        "symfony/yaml": "~4.0"
     },
     "minimum-stability": "dev",
     "prefer-stable": true,
-    "repositories": [
-        {
-            "type": "path",
-            "url": "../../*/*"
-        }
-    ],
+    "config": {
+        "sort-packages": true
+    },
     "extra": {
         "branch-alias": {
             "dev-flex": "feature/Symfony-flex"
