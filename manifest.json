@@ -21,7 +21,11 @@
         "STORAGE_LOCAL_DIRECTORY": "uploads",
         "STORAGE_LOCAL_ENDPOINT": "/uploads",
         "STORAGE_LOCAL_THUMBS_PREFIX": "thumbs",
-        "STORAGE_ADAPTER": "local",
+        "STORAGE_ADAPTER": "local"
     },
+    "gitignore": [
+        "/public/uploads",
+        "/public/thumbs"
+    ],
     "aliases": ["storage"]
 }
