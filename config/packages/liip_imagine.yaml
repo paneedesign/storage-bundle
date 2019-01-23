@@ -1,4 +1,3 @@
-
 liip_imagine:
     data_loader: "loader_%env(STORAGE_ADAPTER)%_data"
     cache: "%env(STORAGE_ADAPTER)%_fs"

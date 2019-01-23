@@ -19,7 +19,7 @@
         "STORAGE_AMAZON_S3_EXPIRE_AT": "+1 hour",
         "STORAGE_AMAZON_S3_THUMBS_PREFIX": "thumbs",
         "STORAGE_LOCAL_DIRECTORY": "uploads",
-        "STORAGE_LOCAL_ENDPOINT": "/uploads",
+        "STORAGE_LOCAL_ENDPOINT": "uploads",
         "STORAGE_LOCAL_THUMBS_PREFIX": "thumbs",
         "STORAGE_ADAPTER": "local"
     },

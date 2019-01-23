@@ -59,8 +59,9 @@ class PedStorageExtension extends Extension
                     $this->printException('ped_storage.local.directory');
                 }
 
-                $container->setParameter('ped_storage.local.directory', $local['directory']);
                 $container->setParameter('ped_storage.local.endpoint', $local['endpoint']);
+                $container->setParameter('ped_storage.local.web_root_dir', $local['web_root_dir']);
+                $container->setParameter('ped_storage.local.directory', $local['directory']);
                 $container->setParameter('ped_storage.local.thumbs_prefix', $local['thumbs_prefix']);
             }
         }

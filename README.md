@@ -72,25 +72,23 @@ class AppKernel extends Kernel
 Step 3: Configurations
 ----------------------
 
-Copy parameters
+Add to `.env`
 
-```
-// app/config/parameters.yml.dist
-parameters:
-    ...
-    storage_amazon_s3_key:         ~
-    storage_amazon_s3_secret:      ~
-    storage_amazon_s3_region:      eu-west-1
-    storage_amazon_s3_endpoint:    'https://s3.amazonaws.com'
-    storage_amazon_s3_bucket_name: ~
-    storage_amazon_s3_directory:   uploads
-    storage_amazon_s3_expire_at:   +1 hour
-    storage_local_directory:       "%kernel.root_dir%/../web/uploads"
-    storage_local_endpoint:        /uploads
-    storage_amazon_s3_thumbs_prefix: thumbs
-    storage_local_thumbs_prefix: thumbs
-    storage_adapter:               local
-    #storage_adapter:              amazon
+```dotenv
+###> paneedesign/storage-bundle ###
+STORAGE_AMAZON_S3_KEY=key
+STORAGE_AMAZON_S3_SECRET=secret
+STORAGE_AMAZON_S3_REGION=eu-west-2
+STORAGE_AMAZON_S3_ENDPOINT=https://s3.amazonaws.com
+STORAGE_AMAZON_S3_BUCKET_NAME=ped-local
+STORAGE_AMAZON_S3_DIRECTORY=uploads
+STORAGE_AMAZON_S3_EXPIRE_AT="+1 hour"
+STORAGE_AMAZON_S3_THUMBS_PREFIX=thumbs
+STORAGE_LOCAL_DIRECTORY=uploads
+STORAGE_LOCAL_ENDPOINT=uploads
+STORAGE_LOCAL_THUMBS_PREFIX=thumbs
+STORAGE_ADAPTER=local
+###< paneedesign/storage-bundle ###
 ```
 
 Add configuration:
