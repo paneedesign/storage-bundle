@@ -1,0 +1,6 @@
+ped_storage_media:
+    resource: "@PedStorageBundle/Controller/MediaController.php"
+    type:     annotation
+    options:
+        expose: true
+        i18n: false

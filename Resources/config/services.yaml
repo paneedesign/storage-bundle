@@ -106,3 +106,14 @@ services:
             - 'pedstorage://amazon_fs/'
         tags:
             - { name: 'liip_imagine.binary.loader', loader: loader_amazon_data }
+
+    PaneeDesign\StorageBundle\Twig\MediaExtension:
+        public: true
+        tags: [twig.extension]
+        arguments:
+            $container: '@service_container'
+            $router: '@router.default'
+
+    ped_storage.service.filter:
+        alias: liip_imagine.service.filter
+        public: true
