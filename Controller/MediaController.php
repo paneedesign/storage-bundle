@@ -12,13 +12,13 @@ use PaneeDesign\StorageBundle\Entity\Media;
 use PaneeDesign\StorageBundle\Entity\Repository\MediaRepository;
 use PaneeDesign\StorageBundle\Handler\MediaHandler;
 
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\Routing\Annotation\Route;
 
-class MediaController extends Controller
+class MediaController extends AbstractController
 {
     /**
      * @Route(
