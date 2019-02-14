@@ -431,15 +431,15 @@ class MediaHandler
      */
     public function save(UploadedFile $file)
     {
-        $mimeType = $file->getClientMimeType();
+        $mimeType = $file->getMimeType();
 
         // Check if the file's mime type is in the list of allowed mime types.
         if (!in_array($mimeType, $this->getAllowedMimeTypes())) {
-            throw new \InvalidArgumentException(sprintf('Files of type %s are not allowed.', $file->getClientMimeType()));
+            throw new \InvalidArgumentException(sprintf('Files of type %s are not allowed.', $mimeType));
         }
 
         $key  = uniqid();
-        $name = sprintf('%s.%s', $key, $file->guessClientExtension());
+        $name = sprintf('%s.%s', $key, $file->guessExtension());
         $path = $this->getFullKey($name);
 
         /* @var AwsS3Adapter|LocalAdapter $adapter */
