@@ -1,98 +1,87 @@
 parameters:
-    datetime.class: \DateTime
-    ped_storage.uploader:            "ped_storage.local_media_handler"
-    ped_storage.aws_s3.client.class: Aws\S3\S3Client
-    ped_storage.media_handler.class: PaneeDesign\StorageBundle\Handler\MediaHandler
-
-    ped_storage.amazon_public_url_resolver.class:    Gaufrette\Extras\Resolvable\Resolver\AwsS3PublicUrlResolver
-    ped_storage.amazon_presigned_url_resolver.class: Gaufrette\Extras\Resolvable\Resolver\AwsS3PresignedUrlResolver
-    ped_storage.amazon_static_url_resolver.class:    Gaufrette\Extras\Resolvable\Resolver\StaticUrlResolver
-
-    ped_storage.imagine.cache.resolver.local.class:  Liip\ImagineBundle\Imagine\Cache\Resolver\WebPathResolver
-    ped_storage.imagine.cache.resolver.aws_s3.class: Liip\ImagineBundle\Imagine\Cache\Resolver\AwsS3Resolver
-    ped_storage.imagine.binary.loader.stream.class:  Liip\ImagineBundle\Binary\Loader\StreamLoader
+    ped_storage.uploader: 'ped_storage.local_media_handler'
 
 services:
     expire_at_datetime:
-        class: "%datetime.class%"
-        arguments: ["%ped_storage.amazon_s3.expire_at%"]
+        class: 'DateTime'
+        arguments: ['%ped_storage.amazon_s3.expire_at%']
 
     ped_storage.aws_s3.client:
-        class: "%ped_storage.aws_s3.client.class%"
-        factory: ["%ped_storage.aws_s3.client.class%", "factory"]
+        class: 'Aws\S3\S3Client'
+        factory: ['Aws\S3\S3Client', 'factory']
         arguments:
             -
                 version:    latest
-                region:     "%ped_storage.amazon_s3.region%"
-                endpoint:   "%ped_storage.amazon_s3.endpoint%"
+                region:     '%ped_storage.amazon_s3.region%'
+                endpoint:   '%ped_storage.amazon_s3.endpoint%'
                 credentials:
-                    key:    "%ped_storage.amazon_s3.key%"
-                    secret: "%ped_storage.amazon_s3.secret%"
+                    key:    '%ped_storage.amazon_s3.key%'
+                    secret: '%ped_storage.amazon_s3.secret%'
 
     ped_storage.amazon_media_handler:
-        class: "%ped_storage.media_handler.class%"
+        class: 'PaneeDesign\StorageBundle\Handler\MediaHandler'
         arguments:
             $filesystem: '@amazon_fs'
             $liipCacheManager: '@liip_imagine.cache.manager'
         calls:
-            - method: setAwsS3Resolver
-              arguments:
-                  - '@ped_storage.amazon_public_url_resolver'
+            -   method: setAwsS3Resolver
+                arguments:
+                    - '@ped_storage.amazon_public_url_resolver'
         public: true
 
     ped_storage.local_media_handler:
-        class: "%ped_storage.media_handler.class%"
+        class: 'PaneeDesign\StorageBundle\Handler\MediaHandler'
         arguments:
             $filesystem: '@local_fs'
             $liipCacheManager: '@liip_imagine.cache.manager'
         calls:
-            - method: setLocalEndpoint
-              arguments:
-                  - '%ped_storage.local.endpoint%'
+            -   method: setLocalEndpoint
+                arguments:
+                    - '%ped_storage.local.endpoint%'
         public: true
 
     ped_storage.amazon_public_url_resolver:
-        class: "%ped_storage.amazon_public_url_resolver.class%"
+        class: 'Gaufrette\Extras\Resolvable\Resolver\AwsS3PublicUrlResolver'
         arguments:
-            - '@ped_storage.aws_s3.client'
-            - "%ped_storage.amazon_s3.bucket_name%"
-            - "%ped_storage.amazon_s3.directory%"
+            $service: '@Aws\S3\S3Client'
+            $bucket: '%ped_storage.amazon_s3.bucket_name%'
+            $baseDir: '%ped_storage.amazon_s3.directory%'
 
     ped_storage.amazon_presigned_url_resolver:
-        class: "%ped_storage.amazon_presigned_url_resolver.class%"
+        class: 'Gaufrette\Extras\Resolvable\Resolver\AwsS3PresignedUrlResolver'
         arguments:
-            - '@ped_storage.aws_s3.client'
-            - "%ped_storage.amazon_s3.bucket_name%"
-            - "%ped_storage.amazon_s3.directory%"
-            - "@expire_at_datetime"
+            $service: '@Aws\S3\S3Client'
+            $bucket: '%ped_storage.amazon_s3.bucket_name%'
+            $baseDir: '%ped_storage.amazon_s3.directory%'
+            $expiresAt: '@expire_at_datetime'
 
     ped_storage.amazon_static_url_resolver:
-        class: "%ped_storage.amazon_static_url_resolver.class%"
+        class: 'Gaufrette\Extras\Resolvable\Resolver\StaticUrlResolver'
         arguments:
-            - "%ped_storage.amazon_s3.directory%"
+            $prefix: '%ped_storage.amazon_s3.directory%'
 
     ped_storage.imagine.cache.resolver.local:
-        class: "%ped_storage.imagine.cache.resolver.local.class%"
+        class: 'Liip\ImagineBundle\Imagine\Cache\Resolver\WebPathResolver'
         arguments:
-            - '@filesystem'
-            - '@router.request_context'
-            - '%ped_storage.local.web_root_dir%'
-            - '%ped_storage.local.thumbs_prefix%'
+            $filesystem: '@filesystem'
+            $requestContext: '@router.request_context'
+            $webRoot: '%ped_storage.local.web_root_dir%'
+            $cachePrefix: '%ped_storage.local.thumbs_prefix%'
         tags:
             - { name: 'liip_imagine.cache.resolver', resolver: local_fs }
 
     ped_storage.imagine.binary.loader.local:
-        class: "%ped_storage.imagine.binary.loader.stream.class%"
+        class: 'Liip\ImagineBundle\Binary\Loader\StreamLoader'
         arguments:
-            - 'pedstorage://local_fs/'
+            $wrapperPrefix: 'pedstorage://local_fs/'
         tags:
             - { name: 'liip_imagine.binary.loader', loader: loader_local_data }
 
     ped_storage.imagine.cache.resolver.aws_s3:
-        class: "%ped_storage.imagine.cache.resolver.aws_s3.class%"
+        class: 'Liip\ImagineBundle\Imagine\Cache\Resolver\AwsS3Resolver'
         arguments:
-            - '@ped_storage.aws_s3.client'
-            - "%ped_storage.amazon_s3.bucket_name%"
+            $storage: '@Aws\S3\S3Client'
+            $bucket: '%ped_storage.amazon_s3.bucket_name%'
         calls:
             - method: setCachePrefix
               arguments:
@@ -101,9 +90,9 @@ services:
             - { name: 'liip_imagine.cache.resolver', resolver: amazon_fs }
 
     ped_storage.imagine.binary.loader.aws_s3:
-        class: "%ped_storage.imagine.binary.loader.stream.class%"
+        class: 'Liip\ImagineBundle\Binary\Loader\StreamLoader'
         arguments:
-            - 'pedstorage://amazon_fs/'
+            $wrapperPrefix: 'pedstorage://amazon_fs/'
         tags:
             - { name: 'liip_imagine.binary.loader', loader: loader_amazon_data }
 
@@ -114,6 +103,9 @@ services:
             $container: '@service_container'
             $router: '@router.default'
 
-    ped_storage.service.filter:
-        alias: liip_imagine.service.filter
+    PaneeDesign\StorageBundle\Controller\MediaController:
         public: true
+        tags: [controller.service_arguments]
+        arguments:
+            $uploader: "@=service(container.getParameter('ped_storage.uploader'))"
+            $filterService: '@liip_imagine.service.filter'

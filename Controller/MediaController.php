@@ -2,18 +2,18 @@
 /**
  * User: Fabiano Roberto <fabiano@paneedesign.com>
  * Date: 2019-01-24
- * Time: 16.00
+ * Time: 16.00.
  */
 
 namespace PaneeDesign\StorageBundle\Controller;
 
 use Liip\ImagineBundle\Exception\Binary\Loader\NotLoadableException;
 use Liip\ImagineBundle\Exception\Imagine\Filter\NonExistingFilterException;
+use Liip\ImagineBundle\Service\FilterService;
 use PaneeDesign\StorageBundle\DBAL\EnumFileType;
 use PaneeDesign\StorageBundle\Entity\Media;
 use PaneeDesign\StorageBundle\Entity\Repository\MediaRepository;
 use PaneeDesign\StorageBundle\Handler\MediaHandler;
-
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -24,6 +24,22 @@ use Symfony\Component\Routing\Annotation\Route;
 class MediaController extends AbstractController
 {
     /**
+     * @var MediaHandler
+     */
+    protected $uploader;
+
+    /**
+     * @var FilterService
+     */
+    protected $filterService;
+
+    public function __construct(MediaHandler $uploader, FilterService $filterService)
+    {
+        $this->uploader = $uploader;
+        $this->filterService = $filterService;
+    }
+
+    /**
      * @Route(
      *     "/image/{key}",
      *     requirements={"key"=".+"},
@@ -32,9 +48,10 @@ class MediaController extends AbstractController
      * )
      *
      * @param Request $request
-     * @param string $key
+     * @param string  $key
      *
      * @return Response
+     *
      * @throws \Gaufrette\Extras\Resolvable\UnresolvableObjectException
      * @throws \Exception
      */
@@ -54,17 +71,12 @@ class MediaController extends AbstractController
         }
 
         if ($media->getFileType() !== EnumFileType::IMAGE) {
-            throw new \Exception("File type not handled!");
+            throw new \Exception('File type not handled!');
         }
-
-        $service = $this->getParameter('ped_storage.uploader');
-
-        /* @var MediaHandler $uploader */
-        $uploader = $this->container->get($service);
 
         $liipCacheManager = $this->get('liip_imagine.cache.manager');
 
-        $url = $uploader->getFullUrl($media->getFullKey());
+        $url = $this->uploader->getFullUrl($media->getFullKey());
 
         if ($filter !== null) {
             $path = $media->getFullKey();
@@ -72,10 +84,9 @@ class MediaController extends AbstractController
                 $url = $liipCacheManager->resolve($path, $filter);
             } else {
                 //Update here image filter
-                $liipServiceFilter = $this->get('ped_storage.service.filter');
 
                 try {
-                    $url = $liipServiceFilter->getUrlOfFilteredImage($path, $filter);
+                    $url = $this->filterService->getUrlOfFilteredImage($path, $filter);
                     //Cache generated with success
                 } catch (NotLoadableException $e) {
                     throw new NotFoundHttpException(sprintf('Source image for path "%s" could not be found', $path));
@@ -110,6 +121,7 @@ class MediaController extends AbstractController
      * @param string $key
      *
      * @return string
+     *
      * @throws \Gaufrette\Extras\Resolvable\UnresolvableObjectException
      * @throws \Exception
      */
@@ -127,22 +139,17 @@ class MediaController extends AbstractController
         }
 
         if ($media->getFileType() !== EnumFileType::DOCUMENT) {
-            throw new \Exception("File type not handled!");
+            throw new \Exception('File type not handled!');
         }
 
         if (!$media->getIsPublic() && !$this->getUser()) {
             throw new AccessDeniedHttpException('Forbidden');
         }
 
-        $service = $this->getParameter('ped_storage.uploader');
-
-        /* @var MediaHandler $uploader */
-        $uploader = $this->container->get($service);
-
         $resolver = $this->container->get('ped_storage.amazon_presigned_url_resolver');
-        $uploader->setAwsS3Resolver($resolver);
+        $this->uploader->setAwsS3Resolver($resolver);
 
-        $url = $uploader->getFullUrl($media->getFullKey());
+        $url = $this->uploader->getFullUrl($media->getFullKey());
 
         return $this->redirect($url, 301);
     }
@@ -158,6 +165,7 @@ class MediaController extends AbstractController
      * @param string $key
      *
      * @return string
+     *
      * @throws \Gaufrette\Extras\Resolvable\UnresolvableObjectException
      * @throws \Exception
      */
@@ -175,22 +183,17 @@ class MediaController extends AbstractController
         }
 
         if ($media->getFileType() !== EnumFileType::VIDEO) {
-            throw new \Exception("File type not handled!");
+            throw new \Exception('File type not handled!');
         }
 
         if (!$media->getIsPublic() && !$this->getUser()) {
             throw new AccessDeniedHttpException('Forbidden');
         }
 
-        $service = $this->getParameter('ped_storage.uploader');
-
-        /* @var MediaHandler $uploader */
-        $uploader = $this->container->get($service);
-
         $resolver = $this->container->get('ped_storage.amazon_presigned_url_resolver');
-        $uploader->setAwsS3Resolver($resolver);
+        $this->uploader->setAwsS3Resolver($resolver);
 
-        $url = $uploader->getFullUrl($media->getFullKey());
+        $url = $this->uploader->getFullUrl($media->getFullKey());
 
         return $this->redirect($url, 301);
     }

@@ -3,7 +3,7 @@
  * Created by PhpStorm.
  * User: fabianoroberto
  * Date: 13/10/17
- * Time: 11:06
+ * Time: 11:06.
  */
 
 namespace PaneeDesign\StorageBundle\Handler;
@@ -12,13 +12,11 @@ use Gaufrette\Extras\Resolvable\Resolver\AwsS3PresignedUrlResolver;
 use Gaufrette\Extras\Resolvable\Resolver\StaticUrlResolver;
 use Liip\ImagineBundle\Imagine\Cache\CacheManager;
 use PaneeDesign\StorageBundle\Entity\Media;
-
 use Gaufrette\Adapter\AwsS3 as AwsS3Adapter;
 use Gaufrette\Adapter\Local as LocalAdapter;
 use Gaufrette\Filesystem;
 use Gaufrette\Extras\Resolvable\ResolvableFilesystem;
 use Gaufrette\Extras\Resolvable\Resolver\AwsS3PublicUrlResolver;
-
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 class MediaHandler
@@ -34,49 +32,49 @@ class MediaHandler
     private $liipCacheManager;
 
     /**
-     * Entity Id
+     * Entity Id.
      *
-     * @var integer
+     * @var int
      */
     private $id;
 
     /**
-     * Entity type name (es. customer, admin, owner)
+     * Entity type name (es. customer, admin, owner).
      *
      * @var string
      */
     private $type;
 
     /**
-     * Key to retrive storage file
+     * Key to retrive storage file.
      *
      * @var string
      */
     private $key;
 
     /**
-     * File Type (es. image, video, document)
+     * File Type (es. image, video, document).
      *
      * @var string
      */
     private $fileType;
 
     /**
-     * Set if the file will be stored with public access
+     * Set if the file will be stored with public access.
      *
-     * @var boolean
+     * @var bool
      */
     private $hasPublicAccess = false;
 
     /**
-     * Media information object
+     * Media information object.
      *
      * @var Media\MediaInfo
      */
     private $mediaInfo = null;
 
     /**
-     * Group folders using module id
+     * Group folders using module id.
      *
      * @var bool
      */
@@ -88,7 +86,7 @@ class MediaHandler
     private $localEndpoint;
 
     /**
-     * Allowed mime types
+     * Allowed mime types.
      *
      * @var array
      */
@@ -97,9 +95,9 @@ class MediaHandler
     /**
      * MediaHandler constructor.
      *
-     * @param Filesystem $filesystem
+     * @param Filesystem   $filesystem
      * @param CacheManager $liipCacheManager
-     * @param array $allowedMimeTypes
+     * @param array        $allowedMimeTypes
      */
     public function __construct(Filesystem $filesystem, CacheManager $liipCacheManager, array $allowedMimeTypes = [])
     {
@@ -115,7 +113,7 @@ class MediaHandler
         $this->allowedMimeTypes = array_merge([
             'image/jpeg',
             'image/png',
-            'image/gif'
+            'image/gif',
         ], $allowedMimeTypes);
     }
 
@@ -127,7 +125,7 @@ class MediaHandler
         $adapter = $this->filesystem->getAdapter();
 
         if ($adapter instanceof AwsS3Adapter) {
-            $decorated  = new Filesystem($adapter);
+            $decorated = new Filesystem($adapter);
             $filesystem = new ResolvableFilesystem(
                 $decorated,
                 $resolver
@@ -155,6 +153,7 @@ class MediaHandler
 
     /**
      * @param $id
+     *
      * @return $this
      */
     public function setId($id)
@@ -174,6 +173,7 @@ class MediaHandler
 
     /**
      * @param $type
+     *
      * @return $this
      */
     public function setType($type)
@@ -193,6 +193,7 @@ class MediaHandler
 
     /**
      * @param $key
+     *
      * @return $this
      */
     public function setKey($key)
@@ -212,6 +213,7 @@ class MediaHandler
 
     /**
      * @param $fileType
+     *
      * @return $this
      */
     public function setFileType($fileType)
@@ -223,6 +225,7 @@ class MediaHandler
 
     /**
      * @param $hasPublicAccess
+     *
      * @return $this
      */
     public function setHasPublicAccess($hasPublicAccess)
@@ -233,7 +236,7 @@ class MediaHandler
     }
 
     /**
-     * @return boolean
+     * @return bool
      */
     public function getHasPublicAccess()
     {
@@ -250,11 +253,11 @@ class MediaHandler
 
     /**
      * @param object|string $crop
-     * @param int $rotation
-     * @param int $priority
-     * @param string $key
-     * @param string $ext
-     * @param int $size
+     * @param int           $rotation
+     * @param int           $priority
+     * @param string        $key
+     * @param string        $ext
+     * @param int           $size
      *
      * @return $this
      */
@@ -305,6 +308,7 @@ class MediaHandler
 
     /**
      * @param int $priority
+     *
      * @return $this
      */
     public function setPriority($priority)
@@ -320,6 +324,7 @@ class MediaHandler
 
     /**
      * @param int $page
+     *
      * @return $this
      */
     public function setDocumentInfo($page = 0)
@@ -353,6 +358,7 @@ class MediaHandler
 
     /**
      * @param int $size
+     *
      * @return $this
      */
     public function setSize($size)
@@ -376,6 +382,7 @@ class MediaHandler
 
     /**
      * @param $groupFolders
+     *
      * @return $this
      */
     public function setGroupFolders($groupFolders)
@@ -387,6 +394,7 @@ class MediaHandler
 
     /**
      * @param array $allowedMimeTypes
+     *
      * @return MediaHandler
      */
     public function setAllowedMimeTypes($allowedMimeTypes)
@@ -398,6 +406,7 @@ class MediaHandler
 
     /**
      * @param string $allowedMimeType
+     *
      * @return MediaHandler
      */
     public function addAllowedMimeType($allowedMimeType)
@@ -427,6 +436,7 @@ class MediaHandler
 
     /**
      * @param UploadedFile $file
+     *
      * @return MediaHandler
      */
     public function save(UploadedFile $file)
@@ -438,7 +448,7 @@ class MediaHandler
             throw new \InvalidArgumentException(sprintf('Files of type %s are not allowed.', $mimeType));
         }
 
-        $key  = uniqid();
+        $key = uniqid();
         $name = sprintf('%s.%s', $key, $file->guessExtension());
         $path = $this->getFullKey($name);
 
@@ -479,6 +489,7 @@ class MediaHandler
 
     /**
      * @deprecated
+     *
      * @param string $key
      */
     public function removeThumbnails($key)
@@ -492,7 +503,9 @@ class MediaHandler
 
     /**
      * @param string $fullKey
+     *
      * @return bool|string
+     *
      * @throws \Gaufrette\Extras\Resolvable\UnresolvableObjectException
      */
     public function getFullUrl($fullKey)
@@ -517,6 +530,7 @@ class MediaHandler
 
     /**
      * @param string $key
+     *
      * @return int
      */
     public function getSize($key)
@@ -531,6 +545,7 @@ class MediaHandler
 
     /**
      * @param string $key
+     *
      * @return string
      */
     public function getFullKey($key)
@@ -560,6 +575,7 @@ class MediaHandler
 
     /**
      * @param string $key
+     *
      * @return string
      */
     private function getThumbnailFolder($key)
@@ -588,9 +604,10 @@ class MediaHandler
     }
 
     /**
-     * @param array $parts
+     * @param array  $parts
      * @param string $key
      * @param string $ext
+     *
      * @return string
      */
     private function computeParts($parts, $key = null, $ext = '')
@@ -621,6 +638,7 @@ class MediaHandler
 
     /**
      * @param int $id
+     *
      * @return string
      */
     private function getSubPathById($id)
@@ -631,12 +649,14 @@ class MediaHandler
             ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'l'],
             strval($numericPath)
         );
+
         return $stringPath;
     }
 
     /**
      * Fix file rotation using exif data
-     * The file is modified only if needed
+     * The file is modified only if needed.
+     *
      * @param UploadedFile $file
      */
     private function fixFileRotation(UploadedFile $file)
