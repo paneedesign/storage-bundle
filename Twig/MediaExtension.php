@@ -2,19 +2,18 @@
 /**
  * User: Fabiano Roberto <fabiano@paneedesign.com>
  * Date: 2019-01-24
- * Time: 16.00
+ * Time: 16.00.
  */
 
 namespace PaneeDesign\StorageBundle\Twig;
 
 use App\Entity\Media;
 use PaneeDesign\StorageBundle\Handler\MediaHandler;
-use Symfony\Component\Asset\Package;
-use Symfony\Component\Asset\VersionStrategy\JsonManifestVersionStrategy;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\RouterInterface;
 use Twig\Extension\AbstractExtension;
+use Twig\TwigFunction;
 
 class MediaExtension extends AbstractExtension
 {
@@ -25,32 +24,31 @@ class MediaExtension extends AbstractExtension
 
     protected $router;
 
-
     public function __construct(ContainerInterface $container, RouterInterface $router)
     {
         $this->container = $container;
-        $this->router    = $router;
+        $this->router = $router;
     }
 
     public function getFunctions()
     {
         return [
-            new \Twig_Function('image', array($this, 'image')),
-            new \Twig_Function('document', array($this, 'document')),
-            new \Twig_Function('video', array($this, 'video')),
+            new TwigFunction('image', [$this, 'image']),
+            new TwigFunction('document', [$this, 'document']),
+            new TwigFunction('video', [$this, 'video']),
         ];
     }
 
     /**
-     * @param string $type
-     * @param Media $image
+     * @param Media  $image
      * @param string $filter
-     * @param bool $fullUrl
+     * @param bool   $fullUrl
      *
      * @return bool|string
+     *
      * @throws \Gaufrette\Extras\Resolvable\UnresolvableObjectException
      */
-    public function image($type, Media $image = null, $filter = null, $fullUrl = false)
+    public function image(Media $image = null, $filter = null, $fullUrl = false)
     {
         $toReturn = null;
 
@@ -58,9 +56,9 @@ class MediaExtension extends AbstractExtension
             if ($image->hasFilter($filter)) {
                 $toReturn = $image->getUrl($filter);
             } else {
-                $urlType  = $fullUrl ? UrlGeneratorInterface::ABSOLUTE_URL : UrlGeneratorInterface::ABSOLUTE_PATH;
+                $urlType = $fullUrl ? UrlGeneratorInterface::ABSOLUTE_URL : UrlGeneratorInterface::ABSOLUTE_PATH;
                 $toReturn = $this->router->generate('ped_storage_image', [
-                    'key'    => $image->getKey(),
+                    'key' => $image->getKey(),
                     'filter' => $filter,
                 ], $urlType);
             }
@@ -77,8 +75,7 @@ class MediaExtension extends AbstractExtension
 
     /**
      * @param Media $document
-     *
-     * @param bool $fullUrl
+     * @param bool  $fullUrl
      *
      * @return string
      */
@@ -91,8 +88,7 @@ class MediaExtension extends AbstractExtension
 
     /**
      * @param Media $document
-     *
-     * @param bool $fullUrl
+     * @param bool  $fullUrl
      *
      * @return string
      */

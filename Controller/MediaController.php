@@ -7,6 +7,8 @@
 
 namespace PaneeDesign\StorageBundle\Controller;
 
+use Liip\ImagineBundle\Exception\Binary\Loader\NotLoadableException;
+use Liip\ImagineBundle\Exception\Imagine\Filter\NonExistingFilterException;
 use PaneeDesign\StorageBundle\DBAL\EnumFileType;
 use PaneeDesign\StorageBundle\Entity\Media;
 use PaneeDesign\StorageBundle\Entity\Repository\MediaRepository;
@@ -16,6 +18,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Annotation\Route;
 
 class MediaController extends AbstractController
@@ -54,12 +57,14 @@ class MediaController extends AbstractController
             throw new \Exception("File type not handled!");
         }
 
-        $service = $this->container->getParameter('ped_storage.uploader');
+        $service = $this->getParameter('ped_storage.uploader');
 
         /* @var MediaHandler $uploader */
         $uploader = $this->container->get($service);
 
         $liipCacheManager = $this->get('liip_imagine.cache.manager');
+
+        $url = $uploader->getFullUrl($media->getFullKey());
 
         if ($filter !== null) {
             $path = $media->getFullKey();
@@ -72,10 +77,10 @@ class MediaController extends AbstractController
                 try {
                     $url = $liipServiceFilter->getUrlOfFilteredImage($path, $filter);
                     //Cache generated with success
-                } catch (\NotLoadableException $e) {
-                    throw new \NotFoundHttpException(sprintf('Source image for path "%s" could not be found', $path));
-                } catch (\NonExistingFilterException $e) {
-                    throw new \NotFoundHttpException(sprintf('Requested non-existing filter "%s"', $filter));
+                } catch (NotLoadableException $e) {
+                    throw new NotFoundHttpException(sprintf('Source image for path "%s" could not be found', $path));
+                } catch (NonExistingFilterException $e) {
+                    throw new NotFoundHttpException(sprintf('Requested non-existing filter "%s"', $filter));
                 } catch (\RuntimeException $e) {
                     $errorTemplate = 'Unable to create image for path "%s" and filter "%s". Message was "%s"';
                     throw new \RuntimeException(sprintf($errorTemplate, $path, $filter, $e->getMessage()), 0, $e);
@@ -89,8 +94,6 @@ class MediaController extends AbstractController
             $em = $this->getDoctrine()->getManager();
             $em->persist($media);
             $em->flush();
-        } else {
-            $url = $uploader->getFullUrl($media->getFullKey());
         }
 
         return $this->redirect($url, 301);
@@ -131,7 +134,7 @@ class MediaController extends AbstractController
             throw new AccessDeniedHttpException('Forbidden');
         }
 
-        $service = $this->container->getParameter('ped_storage.uploader');
+        $service = $this->getParameter('ped_storage.uploader');
 
         /* @var MediaHandler $uploader */
         $uploader = $this->container->get($service);
@@ -179,7 +182,7 @@ class MediaController extends AbstractController
             throw new AccessDeniedHttpException('Forbidden');
         }
 
-        $service = $this->container->getParameter('ped_storage.uploader');
+        $service = $this->getParameter('ped_storage.uploader');
 
         /* @var MediaHandler $uploader */
         $uploader = $this->container->get($service);

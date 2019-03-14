@@ -3,7 +3,7 @@
  * Created by PhpStorm.
  * User: fabianoroberto
  * Date: 13/06/17
- * Time: 17:10
+ * Time: 17:10.
  */
 
 namespace PaneeDesign\StorageBundle\Entity;
@@ -13,8 +13,7 @@ use Doctrine\ORM\Mapping as ORM;
 use PaneeDesign\StorageBundle\Entity\Media\MediaInfo;
 
 /**
- * Class Media
- * @package PaneeDesign\StorageBundle\Entity
+ * Class Media.
  *
  * @ORM\HasLifecycleCallbacks
  * @ORM\Entity(repositoryClass="PaneeDesign\StorageBundle\Entity\Repository\MediaRepository")
@@ -85,7 +84,9 @@ abstract class Media
     protected $filters;
 
     /**
-     * Constructor
+     * Constructor.
+     *
+     * @throws \Exception
      */
     public function __construct()
     {
@@ -94,9 +95,9 @@ abstract class Media
     }
 
     /**
-     * Get id
+     * Get id.
      *
-     * @return integer
+     * @return int
      */
     public function getId()
     {
@@ -104,7 +105,7 @@ abstract class Media
     }
 
     /**
-     * Set key
+     * Set key.
      *
      * @param string $key
      *
@@ -118,7 +119,7 @@ abstract class Media
     }
 
     /**
-     * Get key
+     * Get key.
      *
      * @return string
      */
@@ -128,7 +129,7 @@ abstract class Media
     }
 
     /**
-     * Set type
+     * Set type.
      *
      * @param string $type
      *
@@ -142,7 +143,7 @@ abstract class Media
     }
 
     /**
-     * Get type
+     * Get type.
      *
      * @return string
      */
@@ -152,7 +153,7 @@ abstract class Media
     }
 
     /**
-     * Set mediaInfo
+     * Set mediaInfo.
      *
      * @param MediaInfo $mediaInfo
      *
@@ -166,7 +167,7 @@ abstract class Media
     }
 
     /**
-     * Get mediaInfo
+     * Get mediaInfo.
      *
      * @return array
      */
@@ -176,7 +177,7 @@ abstract class Media
     }
 
     /**
-     * Set createdAt
+     * Set createdAt.
      *
      * @param \DateTime $createdAt
      *
@@ -190,7 +191,7 @@ abstract class Media
     }
 
     /**
-     * Get createdAt
+     * Get createdAt.
      *
      * @return \DateTime
      */
@@ -200,7 +201,7 @@ abstract class Media
     }
 
     /**
-     * Set size
+     * Set size.
      *
      * @param int $size
      *
@@ -214,7 +215,7 @@ abstract class Media
     }
 
     /**
-     * Get size
+     * Get size.
      *
      * @return int
      */
@@ -224,7 +225,7 @@ abstract class Media
     }
 
     /**
-     * Set path
+     * Set path.
      *
      * @param int $path
      *
@@ -238,7 +239,7 @@ abstract class Media
     }
 
     /**
-     * Get path
+     * Get path.
      *
      * @return string
      */
@@ -248,7 +249,7 @@ abstract class Media
     }
 
     /**
-     * Get FullKey
+     * Get FullKey.
      *
      * @return string
      */
@@ -258,7 +259,7 @@ abstract class Media
     }
 
     /**
-     * Set file type
+     * Set file type.
      *
      * @param string $fileType
      *
@@ -272,7 +273,7 @@ abstract class Media
     }
 
     /**
-     * Get file type
+     * Get file type.
      *
      * @return string
      */
@@ -282,7 +283,7 @@ abstract class Media
     }
 
     /**
-     * Add filter
+     * Add filter.
      *
      * @param MediaFilter $filter
      *
@@ -296,7 +297,7 @@ abstract class Media
     }
 
     /**
-     * Add filter
+     * Add filter.
      *
      * @param string $filterName
      * @param $url
@@ -317,11 +318,11 @@ abstract class Media
     }
 
     /**
-     * Check if media has a filter
+     * Check if media has a filter.
      *
      * @param string $filterName
      *
-     * @return boolean
+     * @return bool
      */
     public function hasFilter($filterName)
     {
@@ -335,7 +336,7 @@ abstract class Media
     }
 
     /**
-     * Return image url for a given filter
+     * Return image url for a given filter.
      *
      * @param string $filterName
      *
@@ -353,7 +354,7 @@ abstract class Media
     }
 
     /**
-     * Remove filter
+     * Remove filter.
      *
      * @param MediaFilter $filter
      */
@@ -363,7 +364,7 @@ abstract class Media
     }
 
     /**
-     * Get filters
+     * Get filters.
      *
      * @return \Doctrine\Common\Collections\Collection
      */
@@ -373,7 +374,7 @@ abstract class Media
     }
 
     /**
-     * Clear all filters
+     * Clear all filters.
      */
     public function clearFilters()
     {
@@ -383,7 +384,7 @@ abstract class Media
     }
 
     /**
-     * Set if file is Public
+     * Set if file is Public.
      *
      * @param string $isPublic
      *
@@ -397,7 +398,7 @@ abstract class Media
     }
 
     /**
-     * Get if file is Public
+     * Get if file is Public.
      *
      * @return string
      */

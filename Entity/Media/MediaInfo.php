@@ -3,7 +3,7 @@
  * Created by PhpStorm.
  * User: Fabiano Roberto
  * Date: 25/10/17
- * Time: 12:34
+ * Time: 12:34.
  */
 
 namespace PaneeDesign\StorageBundle\Entity\Media;
@@ -21,7 +21,7 @@ class MediaInfo
     protected $ext;
 
     /**
-     * @var integer size of media
+     * @var int size of media
      */
     protected $size;
 
@@ -30,12 +30,12 @@ class MediaInfo
      *
      * @param string $key
      * @param string $ext
-     * @param int $size
+     * @param int    $size
      */
     public function __construct($key = '', $ext = '', $size = 0)
     {
-        $this->key  = $key;
-        $this->ext  = $ext;
+        $this->key = $key;
+        $this->ext = $ext;
         $this->size = $size;
     }
 

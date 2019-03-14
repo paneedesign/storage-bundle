@@ -3,7 +3,7 @@
  * Created by PhpStorm.
  * User: Fabiano Roberto
  * Date: 25/10/17
- * Time: 12:34
+ * Time: 12:34.
  */
 
 namespace PaneeDesign\StorageBundle\Entity\Media;
@@ -11,44 +11,44 @@ namespace PaneeDesign\StorageBundle\Entity\Media;
 class CropInfo extends MediaInfo
 {
     /**
-     * @var integer starting point of the x-axis
+     * @var int starting point of the x-axis
      */
     private $x1;
 
     /**
-     * @var integer starting point of the y-axis
+     * @var int starting point of the y-axis
      */
     private $y1;
 
     /**
-     * @var integer ending point of the x-axis
+     * @var int ending point of the x-axis
      */
     private $x2;
 
     /**
-     * @var integer ending point of the y-axis
+     * @var int ending point of the y-axis
      */
     private $y2;
 
     /**
-     * @var integer rotation degree
+     * @var int rotation degree
      */
     private $rotation;
 
     /**
-     * @var integer priority in gallery
+     * @var int priority in gallery
      */
     private $priority;
 
     /**
      * CropInfo constructor.
      *
-     * @param int $x1
-     * @param int $y1
-     * @param int $x2
-     * @param int $y2
-     * @param int $rotation
-     * @param int $priority
+     * @param int    $x1
+     * @param int    $y1
+     * @param int    $x2
+     * @param int    $y2
+     * @param int    $rotation
+     * @param int    $priority
      * @param string $key
      * @param string $ext
      */

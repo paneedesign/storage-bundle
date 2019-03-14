@@ -3,7 +3,7 @@
  * Created by PhpStorm.
  * User: luigi
  * Date: 05/06/18
- * Time: 9.58
+ * Time: 9.58.
  */
 
 namespace PaneeDesign\StorageBundle\Entity;
@@ -11,8 +11,7 @@ namespace PaneeDesign\StorageBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * Class MediaFilter
- * @package PaneeDesign\StorageBundle\Entity
+ * Class MediaFilter.
  *
  * @ORM\Entity()
  * @ORM\HasLifecycleCallbacks
@@ -20,7 +19,7 @@ use Doctrine\ORM\Mapping as ORM;
 class MediaFilter
 {
     /**
-     * @var integer
+     * @var int
      *
      * @ORM\Column(name="id", type="integer")
      * @ORM\Id
@@ -45,9 +44,9 @@ class MediaFilter
     private $url;
 
     /**
-     * Get id
+     * Get id.
      *
-     * @return integer
+     * @return int
      */
     public function getId()
     {
@@ -55,7 +54,7 @@ class MediaFilter
     }
 
     /**
-     * Set filter
+     * Set filter.
      *
      * @param string $name
      *
@@ -69,7 +68,7 @@ class MediaFilter
     }
 
     /**
-     * Get filter
+     * Get filter.
      *
      * @return string
      */
@@ -79,7 +78,7 @@ class MediaFilter
     }
 
     /**
-     * Set image
+     * Set image.
      *
      * @param Media $image
      *
@@ -93,7 +92,7 @@ class MediaFilter
     }
 
     /**
-     * Get image
+     * Get image.
      *
      * @return Media
      */
@@ -103,7 +102,7 @@ class MediaFilter
     }
 
     /**
-     * Set url
+     * Set url.
      *
      * @param string $url
      *
@@ -117,7 +116,7 @@ class MediaFilter
     }
 
     /**
-     * Get url
+     * Get url.
      *
      * @return string
      */

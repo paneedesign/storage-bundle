@@ -3,7 +3,7 @@
  * Created by PhpStorm.
  * User: Fabiano Roberto
  * Date: 25/10/17
- * Time: 12:34
+ * Time: 12:34.
  */
 
 namespace PaneeDesign\StorageBundle\Entity\Media;
@@ -11,15 +11,14 @@ namespace PaneeDesign\StorageBundle\Entity\Media;
 class DocumentInfo extends MediaInfo
 {
     /**
-     * @var integer page number
+     * @var int page number
      */
     private $page;
-
 
     /**
      * DocumentInfo constructor.
      *
-     * @param int $page
+     * @param int    $page
      * @param string $key
      * @param string $ext
      */
