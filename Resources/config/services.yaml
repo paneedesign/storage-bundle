@@ -43,14 +43,14 @@ services:
     ped_storage.amazon_public_url_resolver:
         class: 'Gaufrette\Extras\Resolvable\Resolver\AwsS3PublicUrlResolver'
         arguments:
-            $service: '@Aws\S3\S3Client'
+            $service: '@ped_storage.aws_s3.client'
             $bucket: '%ped_storage.amazon_s3.bucket_name%'
             $baseDir: '%ped_storage.amazon_s3.directory%'
 
     ped_storage.amazon_presigned_url_resolver:
         class: 'Gaufrette\Extras\Resolvable\Resolver\AwsS3PresignedUrlResolver'
         arguments:
-            $service: '@Aws\S3\S3Client'
+            $service: '@ped_storage.aws_s3.client'
             $bucket: '%ped_storage.amazon_s3.bucket_name%'
             $baseDir: '%ped_storage.amazon_s3.directory%'
             $expiresAt: '@expire_at_datetime'
@@ -80,7 +80,7 @@ services:
     ped_storage.imagine.cache.resolver.aws_s3:
         class: 'Liip\ImagineBundle\Imagine\Cache\Resolver\AwsS3Resolver'
         arguments:
-            $storage: '@Aws\S3\S3Client'
+            $storage: '@ped_storage.aws_s3.client'
             $bucket: '%ped_storage.amazon_s3.bucket_name%'
         calls:
             - method: setCachePrefix
