@@ -53,14 +53,14 @@ class MediaInfo
 
     public function setExt($key)
     {
-        $this->key = $key;
+        $this->ext = $key;
 
         return $this;
     }
 
     public function getExt()
     {
-        return $this->key;
+        return $this->ext;
     }
 
     public function setSize($size)
