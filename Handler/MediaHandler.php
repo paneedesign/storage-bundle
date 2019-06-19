@@ -473,6 +473,22 @@ class MediaHandler
     }
 
     /**
+     * @param Media $source
+     * @param Media $dest
+     *
+     * @return bool|int|string
+     */
+    public function copy(Media $source, Media $dest)
+    {
+        /* @var AwsS3Adapter|LocalAdapter $adapter */
+        $adapter = $this->filesystem->getAdapter();
+
+        $content = $adapter->read($source->getFullKey());
+
+        return $adapter->write($dest->getFullKey(), $content);
+    }
+
+    /**
      * @param Media $media
      */
     public function remove(Media $media)
