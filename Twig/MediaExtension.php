@@ -1,6 +1,8 @@
 <?php
+
+declare(strict_types=1);
 /**
- * User: Fabiano Roberto <fabiano@paneedesign.com>
+ * User: Fabiano Roberto <fabiano.roberto@ped.technology>
  * Date: 2019-01-24
  * Time: 16.00.
  */
@@ -44,9 +46,9 @@ class MediaExtension extends AbstractExtension
      * @param string $filter
      * @param bool   $fullUrl
      *
-     * @return bool|string
-     *
      * @throws \Gaufrette\Extras\Resolvable\UnresolvableObjectException
+     *
+     * @return bool|string
      */
     public function image(Media $image = null, $filter = null, $fullUrl = false)
     {

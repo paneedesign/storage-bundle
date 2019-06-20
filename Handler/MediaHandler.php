@@ -1,22 +1,23 @@
 <?php
+
+declare(strict_types=1);
 /**
- * Created by PhpStorm.
- * User: fabianoroberto
+ * User: Fabiano Roberto <fabiano.roberto@ped.technology>
  * Date: 13/10/17
  * Time: 11:06.
  */
 
 namespace PaneeDesign\StorageBundle\Handler;
 
-use Gaufrette\Extras\Resolvable\Resolver\AwsS3PresignedUrlResolver;
-use Gaufrette\Extras\Resolvable\Resolver\StaticUrlResolver;
-use Liip\ImagineBundle\Imagine\Cache\CacheManager;
-use PaneeDesign\StorageBundle\Entity\Media;
 use Gaufrette\Adapter\AwsS3 as AwsS3Adapter;
 use Gaufrette\Adapter\Local as LocalAdapter;
-use Gaufrette\Filesystem;
 use Gaufrette\Extras\Resolvable\ResolvableFilesystem;
+use Gaufrette\Extras\Resolvable\Resolver\AwsS3PresignedUrlResolver;
 use Gaufrette\Extras\Resolvable\Resolver\AwsS3PublicUrlResolver;
+use Gaufrette\Extras\Resolvable\Resolver\StaticUrlResolver;
+use Gaufrette\Filesystem;
+use Liip\ImagineBundle\Imagine\Cache\CacheManager;
+use PaneeDesign\StorageBundle\Entity\Media;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 class MediaHandler
@@ -118,7 +119,7 @@ class MediaHandler
     }
 
     /**
-     * @param AwsS3PublicUrlResolver|AwsS3PresignedUrlResolver|StaticUrlResolver $resolver
+     * @param AwsS3PresignedUrlResolver|AwsS3PublicUrlResolver|StaticUrlResolver $resolver
      */
     public function setAwsS3Resolver($resolver)
     {
@@ -146,7 +147,7 @@ class MediaHandler
     /**
      * @return string
      */
-    public function getLocalEndpoint()
+    public function getLocalEndpoint(): string
     {
         return $this->localEndpoint;
     }
@@ -156,7 +157,7 @@ class MediaHandler
      *
      * @return $this
      */
-    public function setId($id)
+    public function setId($id): self
     {
         $this->id = $id;
 
@@ -166,7 +167,7 @@ class MediaHandler
     /**
      * @return int
      */
-    public function getId()
+    public function getId(): int
     {
         return $this->id;
     }
@@ -176,7 +177,7 @@ class MediaHandler
      *
      * @return $this
      */
-    public function setType($type)
+    public function setType($type): self
     {
         $this->type = $type;
 
@@ -186,7 +187,7 @@ class MediaHandler
     /**
      * @return string
      */
-    public function getType()
+    public function getType(): string
     {
         return $this->type;
     }
@@ -196,7 +197,7 @@ class MediaHandler
      *
      * @return $this
      */
-    public function setKey($key)
+    public function setKey($key): self
     {
         $this->key = $key;
 
@@ -206,7 +207,7 @@ class MediaHandler
     /**
      * @return string
      */
-    public function getKey()
+    public function getKey(): string
     {
         return $this->key;
     }
@@ -216,7 +217,7 @@ class MediaHandler
      *
      * @return $this
      */
-    public function setFileType($fileType)
+    public function setFileType($fileType): self
     {
         $this->fileType = $fileType;
 
@@ -228,7 +229,7 @@ class MediaHandler
      *
      * @return $this
      */
-    public function setHasPublicAccess($hasPublicAccess)
+    public function setHasPublicAccess($hasPublicAccess): self
     {
         $this->hasPublicAccess = $hasPublicAccess;
 
@@ -238,7 +239,7 @@ class MediaHandler
     /**
      * @return bool
      */
-    public function getHasPublicAccess()
+    public function getHasPublicAccess(): bool
     {
         return $this->hasPublicAccess;
     }
@@ -246,7 +247,7 @@ class MediaHandler
     /**
      * @return string
      */
-    public function getFileType()
+    public function getFileType(): string
     {
         return $this->fileType;
     }
@@ -261,12 +262,12 @@ class MediaHandler
      *
      * @return $this
      */
-    public function setCropInfo($crop = null, $rotation = null, $priority = 0, $key = '', $ext = '', $size = 0)
+    public function setCropInfo($crop = null, $rotation = null, $priority = 0, $key = '', $ext = '', $size = 0): self
     {
         if ($crop !== null) {
-            if (is_object($crop)) {
-                $cropInfo = $crop;
-            } else {
+            $cropInfo = $crop;
+
+            if (\is_object($crop) === false) {
                 $cropInfo = json_decode($crop);
             }
 
@@ -311,7 +312,7 @@ class MediaHandler
      *
      * @return $this
      */
-    public function setPriority($priority)
+    public function setPriority($priority): self
     {
         if ($this->mediaInfo instanceof Media\CropInfo === false) {
             $this->mediaInfo = new Media\CropInfo();
@@ -327,7 +328,7 @@ class MediaHandler
      *
      * @return $this
      */
-    public function setDocumentInfo($page = 0)
+    public function setDocumentInfo($page = 0): self
     {
         if ($this->mediaInfo instanceof Media\DocumentInfo) {
             $this->mediaInfo->setPage($page);
@@ -344,7 +345,7 @@ class MediaHandler
      *
      * @return $this
      */
-    public function setName($key, $ext)
+    public function setName($key, $ext): self
     {
         if ($this->mediaInfo instanceof Media\MediaInfo) {
             $this->mediaInfo->setKey($key);
@@ -361,7 +362,7 @@ class MediaHandler
      *
      * @return $this
      */
-    public function setSize($size)
+    public function setSize($size): self
     {
         if ($this->mediaInfo instanceof Media\MediaInfo === false) {
             $this->mediaInfo = new Media\MediaInfo();
@@ -375,17 +376,17 @@ class MediaHandler
     /**
      * @return array
      */
-    public function getMediaInfo()
+    public function getMediaInfo(): ?array
     {
         return $this->mediaInfo->toJSON();
     }
 
     /**
-     * @param $groupFolders
+     * @param bool $groupFolders
      *
      * @return $this
      */
-    public function setGroupFolders($groupFolders)
+    public function setGroupFolders(bool $groupFolders): self
     {
         $this->groupFolders = $groupFolders;
 
@@ -397,7 +398,7 @@ class MediaHandler
      *
      * @return MediaHandler
      */
-    public function setAllowedMimeTypes($allowedMimeTypes)
+    public function setAllowedMimeTypes(array $allowedMimeTypes): self
     {
         $this->allowedMimeTypes = $allowedMimeTypes;
 
@@ -409,7 +410,7 @@ class MediaHandler
      *
      * @return MediaHandler
      */
-    public function addAllowedMimeType($allowedMimeType)
+    public function addAllowedMimeType(string $allowedMimeType): self
     {
         $this->allowedMimeTypes[] = $allowedMimeType;
 
@@ -419,7 +420,7 @@ class MediaHandler
     /**
      * @param string $allowedMimeType
      */
-    public function removeAllowedMimeType($allowedMimeType)
+    public function removeAllowedMimeType(string $allowedMimeType): void
     {
         if ($index = array_search($allowedMimeType, $this->allowedMimeTypes) === false) {
             unset($this->allowedMimeTypes[$index]);
@@ -429,7 +430,7 @@ class MediaHandler
     /**
      * @return array
      */
-    public function getAllowedMimeTypes()
+    public function getAllowedMimeTypes(): array
     {
         return $this->allowedMimeTypes;
     }
@@ -439,12 +440,12 @@ class MediaHandler
      *
      * @return MediaHandler
      */
-    public function save(UploadedFile $file)
+    public function save(UploadedFile $file): self
     {
         $mimeType = $file->getMimeType();
 
         // Check if the file's mime type is in the list of allowed mime types.
-        if (!in_array($mimeType, $this->getAllowedMimeTypes())) {
+        if (\in_array($mimeType, $this->getAllowedMimeTypes()) === false) {
             throw new \InvalidArgumentException(sprintf('Files of type %s are not allowed.', $mimeType));
         }
 
@@ -504,27 +505,13 @@ class MediaHandler
     }
 
     /**
-     * @deprecated
-     *
-     * @param string $key
-     */
-    public function removeThumbnails($key)
-    {
-        $fullKey = $this->getThumbnailFolder($key);
-
-        /* @var AwsS3Adapter|LocalAdapter $adapter */
-        $adapter = $this->filesystem->getAdapter();
-        @$adapter->delete($fullKey);
-    }
-
-    /**
      * @param string $fullKey
      *
-     * @return bool|string
-     *
      * @throws \Gaufrette\Extras\Resolvable\UnresolvableObjectException
+     *
+     * @return bool|string
      */
-    public function getFullUrl($fullKey)
+    public function getFullUrl(string $fullKey)
     {
         $toReturn = false;
 
@@ -549,7 +536,7 @@ class MediaHandler
      *
      * @return int
      */
-    public function getSize($key)
+    public function getSize(string $key): int
     {
         $fullKey = $this->getFullKey($key);
 
@@ -564,9 +551,11 @@ class MediaHandler
      *
      * @return string
      */
-    public function getFullKey($key)
+    public function getFullKey(?string $key = null): string
     {
-        $this->setKey($key);
+        if ($key) {
+            $this->setKey($key);
+        }
 
         $parts = [];
 
@@ -579,41 +568,13 @@ class MediaHandler
         }
 
         if ($this->id) {
+            $path = $this->id;
+
             if ($this->groupFolders) {
-                $parts[] = $this->getSubPathById($this->id);
-            } else {
-                $parts[] = $this->id;
+                $path = $this->getSubPathById($this->id);
             }
-        }
 
-        return $this->computeParts($parts, $key);
-    }
-
-    /**
-     * @param string $key
-     *
-     * @return string
-     */
-    private function getThumbnailFolder($key)
-    {
-        list($key) = explode('.', $key);
-
-        $parts = [];
-
-        if ($this->type) {
-            $parts[] = $this->type;
-        }
-
-        if ($this->fileType) {
-            $parts[] = 'thumbnail';
-        }
-
-        if ($this->id) {
-            if ($this->groupFolders) {
-                $parts[] = $this->getSubPathById($this->id);
-            } else {
-                $parts[] = $this->id;
-            }
+            $parts[] = $path;
         }
 
         return $this->computeParts($parts, $key);
@@ -626,15 +587,15 @@ class MediaHandler
      *
      * @return string
      */
-    private function computeParts($parts, $key = null, $ext = '')
+    private function computeParts(array $parts, ?string $key = null, ?string $ext = null): string
     {
-        if ($ext === '') {
-            $name = $key;
-        } else {
+        $name = $key;
+
+        if ($ext !== null) {
             $name = sprintf('%s.%s', $key, $ext);
         }
 
-        switch (count($parts)) {
+        switch (\count($parts)) {
             case 3:
                 $toReturn = sprintf('%s/%s/%s/%s', $parts[0], $parts[1], $parts[2], $name);
                 break;
@@ -657,13 +618,13 @@ class MediaHandler
      *
      * @return string
      */
-    private function getSubPathById($id)
+    private function getSubPathById(int $id): string
     {
         $numericPath = ceil($id / 100);
         $stringPath = str_replace(
             ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0'],
             ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'l'],
-            strval($numericPath)
+            (string) $numericPath
         );
 
         return $stringPath;
@@ -675,7 +636,7 @@ class MediaHandler
      *
      * @param UploadedFile $file
      */
-    private function fixFileRotation(UploadedFile $file)
+    private function fixFileRotation(UploadedFile $file): void
     {
         if ($file->guessExtension() == 'jpeg') {
             $toRotate = 0;

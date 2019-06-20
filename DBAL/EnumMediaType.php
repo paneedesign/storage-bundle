@@ -1,7 +1,8 @@
 <?php
+
+declare(strict_types=1);
 /**
- * Created by PhpStorm.
- * User: fabianoroberto
+ * User: Fabiano Roberto <fabiano.roberto@ped.technology>
  * Date: 01/06/16
  * Time: 13:34.
  */
@@ -12,10 +13,10 @@ use Fresh\DoctrineEnumBundle\DBAL\Types\AbstractEnumType;
 
 class EnumMediaType extends AbstractEnumType
 {
-    const PROFILE = 'profile';
-    const COVER = 'cover';
-    const GALLERY = 'gallery';
-    const VIDEO = 'video';
+    public const PROFILE = 'profile';
+    public const COVER = 'cover';
+    public const GALLERY = 'gallery';
+    public const VIDEO = 'video';
 
     protected static $choices = [
         self::PROFILE => 'Profile',

@@ -1,7 +1,8 @@
 <?php
+
+declare(strict_types=1);
 /**
- * Created by PhpStorm.
- * User: fabianoroberto
+ * User: Fabiano Roberto <fabiano.roberto@ped.technology>
  * Date: 13/06/17
  * Time: 17:10.
  */
@@ -30,6 +31,18 @@ abstract class Media
      * @ORM\GeneratedValue(strategy="AUTO")
      */
     protected $id;
+
+    /**
+     * @var MediaFilter[]
+     *
+     * @ORM\OneToMany(
+     *     targetEntity="PaneeDesign\StorageBundle\Entity\MediaFilter",
+     *     mappedBy="image",
+     *     cascade={"persist"},
+     *     orphanRemoval=true
+     * )
+     */
+    protected $filters;
 
     /**
      * @ORM\Column(name="filename", type="string", length=40, nullable=false)
@@ -64,24 +77,12 @@ abstract class Media
     /**
      * @ORM\Column(name="created_at", type="datetime")
      */
-    protected $createdAt;
+    private $createdAt;
 
     /**
      * @ORM\Column(name="is_public", type="boolean", options={"default" = false}))
      */
-    protected $isPublic = false;
-
-    /**
-     * @var MediaFilter[]
-     *
-     * @ORM\OneToMany(
-     *     targetEntity="PaneeDesign\StorageBundle\Entity\MediaFilter",
-     *     mappedBy="image",
-     *     cascade={"persist"},
-     *     orphanRemoval=true
-     * )
-     */
-    protected $filters;
+    private $isPublic = false;
 
     /**
      * Constructor.

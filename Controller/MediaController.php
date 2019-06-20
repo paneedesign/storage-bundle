@@ -1,14 +1,19 @@
 <?php
+
+declare(strict_types=1);
 /**
- * User: Fabiano Roberto <fabiano@paneedesign.com>
+ * User: Fabiano Roberto <fabiano.roberto@ped.technology>
  * Date: 2019-01-24
  * Time: 16.00.
  */
 
 namespace PaneeDesign\StorageBundle\Controller;
 
+use App\Exception\StorageException;
+use Gaufrette\Extras\Resolvable\UnresolvableObjectException;
 use Liip\ImagineBundle\Exception\Binary\Loader\NotLoadableException;
 use Liip\ImagineBundle\Exception\Imagine\Filter\NonExistingFilterException;
+use Liip\ImagineBundle\Imagine\Cache\CacheManager;
 use Liip\ImagineBundle\Service\FilterService;
 use PaneeDesign\StorageBundle\DBAL\EnumFileType;
 use PaneeDesign\StorageBundle\Entity\Media;
@@ -29,64 +34,64 @@ class MediaController extends AbstractController
     protected $uploader;
 
     /**
-     * @var FilterService
+     * @var MediaRepository
      */
-    protected $filterService;
+    protected $repository;
 
-    public function __construct(MediaHandler $uploader, FilterService $filterService)
+    public function __construct(MediaHandler $uploader, MediaRepository $repository)
     {
         $this->uploader = $uploader;
-        $this->filterService = $filterService;
+        $this->repository = $repository;
     }
 
     /**
      * @Route(
      *     "/image/{key}",
-     *     requirements={"key"=".+"},
+     *     requirements={"key" = ".+"},
      *     name="ped_storage_image",
-     *     options={"i18n": false}
+     *     options={"i18n" = false}
      * )
      *
-     * @param Request $request
-     * @param string  $key
+     * @param Request       $request
+     * @param CacheManager  $cacheManager
+     * @param FilterService $filterService
+     * @param string        $key
+     *
+     * @throws UnresolvableObjectException
+     * @throws StorageException
      *
      * @return Response
-     *
-     * @throws \Gaufrette\Extras\Resolvable\UnresolvableObjectException
-     * @throws \Exception
      */
-    public function imageAction(Request $request, $key)
-    {
+    public function imageAction(
+        Request $request,
+        CacheManager $cacheManager,
+        FilterService $filterService,
+        string $key
+    ) {
         $filter = $request->get('filter');
 
-        /* @var MediaRepository $repository */
-        $repository = $this->get('doctrine')
-                           ->getRepository(Media::class);
-
         /* @var Media $media */
-        $media = $repository->findOneBy(['key' => $key]);
+        $media = $this->repository->findOneBy(['key' => $key]);
 
         if ($media === null) {
-            throw $this->createNotFoundException('Mediakeynot found!');
+            throw new StorageException('Media key not found', 'INVALID_MEDIA_KEY');
         }
 
         if ($media->getFileType() !== EnumFileType::IMAGE) {
-            throw new \Exception('File type not handled!');
+            throw new StorageException('File type not handled', 'INVALID_MEDIA_TYPE');
         }
-
-        $liipCacheManager = $this->get('liip_imagine.cache.manager');
 
         $url = $this->uploader->getFullUrl($media->getFullKey());
 
         if ($filter !== null) {
             $path = $media->getFullKey();
-            if ($liipCacheManager->isStored($path, $filter)) {
-                $url = $liipCacheManager->resolve($path, $filter);
+
+            if ($cacheManager->isStored($path, $filter)) {
+                $url = $cacheManager->resolve($path, $filter);
             } else {
                 //Update here image filter
-
                 try {
-                    $url = $this->filterService->getUrlOfFilteredImage($path, $filter);
+                    $url = $filterService->getUrlOfFilteredImage($path, $filter);
                     //Cache generated with success
                 } catch (NotLoadableException $e) {
                     throw new NotFoundHttpException(sprintf('Source image for path "%s" could not be found', $path));
@@ -99,7 +104,6 @@ class MediaController extends AbstractController
             }
 
             //Maybe process $url to have the same domain for all pictures
-
             $media->addFilterByName($filter, $url);
 
             $em = $this->getDoctrine()->getManager();
@@ -113,33 +117,29 @@ class MediaController extends AbstractController
     /**
      * @Route(
      *     "/document/{key}",
-     *     requirements={"key"=".+"},
+     *     requirements={"key" = ".+"},
      *     name="ped_storage_document",
-     *     options={"i18n": false}
+     *     options={"i18n" = false}
      * )
      *
      * @param string $key
      *
-     * @return string
+     * @throws StorageException
+     * @throws UnresolvableObjectException
      *
-     * @throws \Gaufrette\Extras\Resolvable\UnresolvableObjectException
-     * @throws \Exception
+     * @return Response
      */
-    public function documentAction($key)
+    public function documentAction(string $key)
     {
-        /* @var MediaRepository $repository */
-        $repository = $this->get('doctrine')
-                           ->getRepository(Media::class);
-
         /* @var Media $media */
-        $media = $repository->findOneBy(['key' => $key]);
+        $media = $this->repository->findOneBy(['key' => $key]);
 
         if ($media === null) {
-            throw $this->createNotFoundException('Mediakeynot found!');
+            throw new StorageException('Media key not found', 'INVALID_MEDIA_KEY');
         }
 
         if ($media->getFileType() !== EnumFileType::DOCUMENT) {
-            throw new \Exception('File type not handled!');
+            throw new StorageException('File type not handled', 'INVALID_MEDIA_TYPE');
         }
 
         if (!$media->getIsPublic() && !$this->getUser()) {
@@ -157,33 +157,29 @@ class MediaController extends AbstractController
     /**
      * @Route(
      *     "/video/{key}",
-     *     requirements={"key"=".+"},
+     *     requirements={"key" = ".+"},
      *     name="ped_storage_video",
-     *     options={"i18n": false}
+     *     options={"i18n" = false}
      * )
      *
      * @param string $key
      *
-     * @return string
+     * @throws StorageException
+     * @throws UnresolvableObjectException
      *
-     * @throws \Gaufrette\Extras\Resolvable\UnresolvableObjectException
-     * @throws \Exception
+     * @return Response
      */
-    public function videoAction($key)
+    public function videoAction(string $key)
     {
-        /* @var MediaRepository $repository */
-        $repository = $this->get('doctrine')
-                           ->getRepository(Media::class);
-
         /* @var Media $media */
-        $media = $repository->findOneBy(['key' => $key]);
+        $media = $this->repository->findOneBy(['key' => $key]);
 
         if ($media === null) {
-            throw $this->createNotFoundException('Mediakeynot found!');
+            throw new StorageException('Media key not found', 'INVALID_MEDIA_KEY');
         }
 
         if ($media->getFileType() !== EnumFileType::VIDEO) {
-            throw new \Exception('File type not handled!');
+            throw new StorageException('File type not handled', 'INVALID_MEDIA_TYPE');
         }
 
         if (!$media->getIsPublic() && !$this->getUser()) {

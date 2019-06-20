@@ -1,7 +1,8 @@
 <?php
+
+declare(strict_types=1);
 /**
- * Created by PhpStorm.
- * User: luigi
+ * User: Luigi Cardamone <luigi.cardamone@ped.technology>
  * Date: 05/06/18
  * Time: 9.58.
  */
@@ -13,7 +14,7 @@ use Doctrine\ORM\Mapping as ORM;
 /**
  * Class MediaFilter.
  *
- * @ORM\Entity()
+ * @ORM\Entity
  * @ORM\HasLifecycleCallbacks
  */
 class MediaFilter

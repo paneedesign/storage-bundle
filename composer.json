@@ -1,18 +1,21 @@
 {
     "name": "paneedesign/storage-bundle",
-    "type": "symfony-bundle",
-    "description": "Storage management for Symfony projects.",
+    "description": "Storage management for Symfony 3+ projects.",
+    "type": "library",
     "keywords": ["storage", "aws", "file", "filesystem", "media", "gaufrette", "knp", "s3", "liip", "php"],
-    "homepage": "https://www.paneedesign.com/",
+    "homepage": "https://www.ped.company/",
+    "readme": "README.md",
     "license": "MIT",
     "authors": [
         {
             "name": "Fabiano Roberto",
-            "email": "fabiano@paneedesign.com"
+            "email": "fabiano.roberto@ped.technology",
+            "role": "Senior Back-end Developer"
         },
         {
             "name": "Luigi Cardamone",
-            "email": "luigi@paneedesign.com"
+            "email": "luigi.cardamone@ped.technology",
+            "role": "Senior Back-end Developer"
         },
         {
             "name":     "The contributors",
@@ -20,8 +23,9 @@
         }
     ],
     "require": {
-        "php": "^7.2",
+        "php": "^7.2.0",
         "ext-gd": "*",
+        "ext-exif": "*",
         "gaufrette/extras": "~0.1",
         "knplabs/gaufrette": "~0.5",
         "knplabs/knp-gaufrette-bundle": "~0.5",
@@ -56,16 +60,8 @@
         }
     },
     "scripts": {
-        "auto-scripts": {
-            "cache:clear": "symfony-cmd",
-            "assets:install %PUBLIC_DIR%": "symfony-cmd",
-            "security-checker security:check": "script"
-        },
-        "post-install-cmd": [
-            "@auto-scripts"
-        ],
-        "post-update-cmd": [
-            "@auto-scripts"
+        "beautify": [
+            "vendor/bin/php-cs-fixer fix --verbose --config=.php_cs.dist ."
         ]
     },
     "conflict": {

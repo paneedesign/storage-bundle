@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PaneeDesign\StorageBundle\Entity\Repository;
 
 use Doctrine\ORM\EntityRepository;

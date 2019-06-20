@@ -1,6 +1,16 @@
+###> symfony/framework-bundle ###
 /vendor/
-/bin/
+###< symfony/framework-bundle ###
 
-/composer.phar
-/composer.lock
-/Resources/config/parameters.yml
+###> ide ###
+.idea
+###< ide ###
+
+###> composer ###
+composer.phar
+###< composer ###
+
+###> friendsofphp/php-cs-fixer ###
+/.php_cs
+/.php_cs.cache
+###< friendsofphp/php-cs-fixer ###

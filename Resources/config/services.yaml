@@ -96,6 +96,11 @@ services:
         tags:
             - { name: 'liip_imagine.binary.loader', loader: loader_amazon_data }
 
+    repository.media:
+        class: PaneeDesign\StorageBundle\Entity\Repository\MediaRepository
+        factory: ['@doctrine.orm.default_entity_manager', 'getRepository']
+        arguments: ['PedStorageBundle:Media']
+
     PaneeDesign\StorageBundle\Twig\MediaExtension:
         public: true
         tags: [twig.extension]
@@ -108,4 +113,4 @@ services:
         tags: [controller.service_arguments]
         arguments:
             $uploader: "@=service(container.getParameter('ped_storage.uploader'))"
-            $filterService: '@liip_imagine.service.filter'
+            $repository: "@repository.media"

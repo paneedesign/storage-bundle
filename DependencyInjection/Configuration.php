@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PaneeDesign\StorageBundle\DependencyInjection;
 
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
@@ -17,8 +19,14 @@ class Configuration implements ConfigurationInterface
      */
     public function getConfigTreeBuilder()
     {
-        $treeBuilder = new TreeBuilder();
-        $rootNode = $treeBuilder->root('ped_storage');
+        $treeBuilder = new TreeBuilder('ped_database_swift_mailer');
+
+        if (method_exists($treeBuilder, 'getRootNode')) {
+            $rootNode = $treeBuilder->getRootNode();
+        } else {
+            // BC layer for symfony/config 4.1 and older
+            $rootNode = $treeBuilder->root('ped_storage');
+        }
 
         $rootNode
             ->children()
