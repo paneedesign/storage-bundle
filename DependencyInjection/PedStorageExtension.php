@@ -21,32 +21,32 @@ class PedStorageExtension extends Extension
      *
      * @throws \Exception
      */
-    public function load(array $configs, ContainerBuilder $container)
+    public function load(array $configs, ContainerBuilder $container): void
     {
         $configuration = new Configuration();
         $config = $this->processConfiguration($configuration, $configs);
 
-        if (\array_key_exists('amazon_s3', $config) === false && \array_key_exists('local', $config) === false) {
+        if (false === \array_key_exists('amazon_s3', $config) && false === \array_key_exists('local', $config)) {
             throw new \InvalidArgumentException(
                 'At least one of the parameters "ped_storage.amazon_s3" or "ped_storage.local" must be set.'
             );
         }
-        if (\array_key_exists('amazon_s3', $config) === true) {
+        if (true === \array_key_exists('amazon_s3', $config)) {
             $amazonS3 = $config['amazon_s3'];
 
-            if (\array_key_exists('secret', $amazonS3) === false) {
+            if (false === \array_key_exists('secret', $amazonS3)) {
                 throw new \InvalidArgumentException(
                     'The option ped_storage.amazon_s3.secret must be set.'
                 );
             }
 
-            if (\array_key_exists('endpoint', $amazonS3) === false) {
+            if (false === \array_key_exists('endpoint', $amazonS3)) {
                 throw new \InvalidArgumentException(
                     'The option ped_storage.amazon_s3.endpoint must be set.'
                 );
             }
 
-            if (\array_key_exists('bucket_name', $amazonS3) === false) {
+            if (false === \array_key_exists('bucket_name', $amazonS3)) {
                 throw new \InvalidArgumentException(
                     'The option ped_storage.amazon_s3.bucket_name must be set.'
                 );
@@ -62,10 +62,10 @@ class PedStorageExtension extends Extension
             $container->setParameter('ped_storage.amazon_s3.thumbs_prefix', $amazonS3['thumbs_prefix']);
         }
 
-        if (\array_key_exists('local', $config) === true) {
+        if (true === \array_key_exists('local', $config)) {
             $local = $config['local'];
 
-            if (\array_key_exists('directory', $local) === false) {
+            if (false === \array_key_exists('directory', $local)) {
                 throw new \InvalidArgumentException(
                     'The option ped_storage.local.directory must be set.'
                 );

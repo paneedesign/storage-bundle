@@ -50,29 +50,27 @@ class MediaExtension extends AbstractExtension
      *
      * @return bool|string
      */
-    public function image(Media $image = null, $filter = null, $fullUrl = false)
+    public function image(Media $image, ?string $filter = null, ?bool $fullUrl = false): string
     {
-        $toReturn = null;
-
-        if ($filter !== null) {
+        if (null !== $filter) {
             if ($image->hasFilter($filter)) {
-                $toReturn = $image->getUrl($filter);
-            } else {
-                $urlType = $fullUrl ? UrlGeneratorInterface::ABSOLUTE_URL : UrlGeneratorInterface::ABSOLUTE_PATH;
-                $toReturn = $this->router->generate('ped_storage_image', [
-                    'key' => $image->getKey(),
-                    'filter' => $filter,
-                ], $urlType);
+                return $image->getUrl($filter);
             }
-        } else {
-            $service = $this->container->getParameter('ped_storage.uploader');
 
-            /* @var MediaHandler $uploader */
-            $uploader = $this->container->get($service);
-            $toReturn = $uploader->getFullUrl($image->getFullKey());
+            $urlType = $fullUrl ? UrlGeneratorInterface::ABSOLUTE_URL : UrlGeneratorInterface::ABSOLUTE_PATH;
+
+            return $this->router->generate('ped_storage_image', [
+                'key' => $image->getKey(),
+                'filter' => $filter,
+            ], $urlType);
         }
 
-        return $toReturn;
+        $service = $this->container->getParameter('ped_storage.uploader');
+
+        /* @var MediaHandler $uploader */
+        $uploader = $this->container->get($service);
+
+        return $uploader->getFullUrl($image->getFullKey());
     }
 
     /**
@@ -81,7 +79,7 @@ class MediaExtension extends AbstractExtension
      *
      * @return string
      */
-    public function document(Media $document, $fullUrl = false)
+    public function document(Media $document, ?bool $fullUrl = false): string
     {
         $urlType = $fullUrl ? UrlGeneratorInterface::ABSOLUTE_URL : UrlGeneratorInterface::ABSOLUTE_PATH;
 
@@ -94,7 +92,7 @@ class MediaExtension extends AbstractExtension
      *
      * @return string
      */
-    public function video(Media $document, $fullUrl = false)
+    public function video(Media $document, ?bool $fullUrl = false): string
     {
         $urlType = $fullUrl ? UrlGeneratorInterface::ABSOLUTE_URL : UrlGeneratorInterface::ABSOLUTE_PATH;
 

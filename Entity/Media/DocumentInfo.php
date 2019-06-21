@@ -30,7 +30,7 @@ class DocumentInfo extends MediaInfo
         parent::__construct($key, $ext);
     }
 
-    public function setPage($page)
+    public function setPage($page): void
     {
         $this->page = (int) $page;
     }

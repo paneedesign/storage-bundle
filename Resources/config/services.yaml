@@ -114,3 +114,4 @@ services:
         arguments:
             $uploader: "@=service(container.getParameter('ped_storage.uploader'))"
             $repository: "@repository.media"
+            $filterService: "@liip_imagine.service.filter"

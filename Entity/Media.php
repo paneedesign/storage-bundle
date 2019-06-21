@@ -307,7 +307,7 @@ abstract class Media
      */
     public function addFilterByName($filterName, $url)
     {
-        if ($this->hasFilter($filterName) === false) {
+        if (false === $this->hasFilter($filterName)) {
             $filter = new MediaFilter();
             $filter->setImage($this);
             $filter->setName($filterName);
@@ -359,7 +359,7 @@ abstract class Media
      *
      * @param MediaFilter $filter
      */
-    public function removeFilter(MediaFilter $filter)
+    public function removeFilter(MediaFilter $filter): void
     {
         $this->filters->removeElement($filter);
     }
@@ -377,7 +377,7 @@ abstract class Media
     /**
      * Clear all filters.
      */
-    public function clearFilters()
+    public function clearFilters(): void
     {
         foreach ($this->filters as $filter) {
             $this->removeFilter($filter);

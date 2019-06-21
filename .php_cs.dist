@@ -4,8 +4,7 @@ return PhpCsFixer\Config::create()
     ->setRiskyAllowed(true)
     ->setRules([
         '@Symfony' => true,
-        '@Symfony:risky' => true,
-        '@PHP71Migration:risky' => true,
+        '@PHP71Migration' => true,
         'concat_space' => ['spacing' => 'one'],
         'array_syntax' => ['syntax' => 'short'],
         'fully_qualified_strict_types' => false,

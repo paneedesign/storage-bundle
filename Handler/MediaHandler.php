@@ -121,7 +121,7 @@ class MediaHandler
     /**
      * @param AwsS3PresignedUrlResolver|AwsS3PublicUrlResolver|StaticUrlResolver $resolver
      */
-    public function setAwsS3Resolver($resolver)
+    public function setAwsS3Resolver($resolver): void
     {
         $adapter = $this->filesystem->getAdapter();
 
@@ -139,7 +139,7 @@ class MediaHandler
     /**
      * @param string $localEndpoint
      */
-    public function setLocalEndpoint($localEndpoint)
+    public function setLocalEndpoint($localEndpoint): void
     {
         $this->localEndpoint = $localEndpoint;
     }
@@ -264,10 +264,10 @@ class MediaHandler
      */
     public function setCropInfo($crop = null, $rotation = null, $priority = 0, $key = '', $ext = '', $size = 0): self
     {
-        if ($crop !== null) {
+        if (null !== $crop) {
             $cropInfo = $crop;
 
-            if (\is_object($crop) === false) {
+            if (false === \is_object($crop)) {
                 $cropInfo = json_decode($crop);
             }
 
@@ -276,7 +276,7 @@ class MediaHandler
             $this->mediaInfo->setHeight($cropInfo->height);
         }
 
-        if ($rotation !== null) {
+        if (null !== $rotation) {
             $this->setRotation($rotation);
         }
 
@@ -284,7 +284,7 @@ class MediaHandler
             $this->setPriority($priority);
         }
 
-        if ($key !== '' && $ext !== '') {
+        if ('' !== $key && '' !== $ext) {
             $this->setName($key, $ext);
         }
 
@@ -298,9 +298,9 @@ class MediaHandler
     /**
      * @param $rotation
      */
-    public function setRotation($rotation)
+    public function setRotation($rotation): void
     {
-        if ($this->mediaInfo instanceof Media\CropInfo === false) {
+        if (false === $this->mediaInfo instanceof Media\CropInfo) {
             $this->mediaInfo = new Media\CropInfo();
         }
 
@@ -314,7 +314,7 @@ class MediaHandler
      */
     public function setPriority($priority): self
     {
-        if ($this->mediaInfo instanceof Media\CropInfo === false) {
+        if (false === $this->mediaInfo instanceof Media\CropInfo) {
             $this->mediaInfo = new Media\CropInfo();
         }
 
@@ -364,7 +364,7 @@ class MediaHandler
      */
     public function setSize($size): self
     {
-        if ($this->mediaInfo instanceof Media\MediaInfo === false) {
+        if (false === $this->mediaInfo instanceof Media\MediaInfo) {
             $this->mediaInfo = new Media\MediaInfo();
         }
 
@@ -422,7 +422,7 @@ class MediaHandler
      */
     public function removeAllowedMimeType(string $allowedMimeType): void
     {
-        if ($index = array_search($allowedMimeType, $this->allowedMimeTypes) === false) {
+        if ($index = false === array_search($allowedMimeType, $this->allowedMimeTypes)) {
             unset($this->allowedMimeTypes[$index]);
         }
     }
@@ -445,7 +445,7 @@ class MediaHandler
         $mimeType = $file->getMimeType();
 
         // Check if the file's mime type is in the list of allowed mime types.
-        if (\in_array($mimeType, $this->getAllowedMimeTypes()) === false) {
+        if (false === \in_array($mimeType, $this->getAllowedMimeTypes())) {
             throw new \InvalidArgumentException(sprintf('Files of type %s are not allowed.', $mimeType));
         }
 
@@ -492,7 +492,7 @@ class MediaHandler
     /**
      * @param Media $media
      */
-    public function remove(Media $media)
+    public function remove(Media $media): void
     {
         /* @var AwsS3Adapter|LocalAdapter $adapter */
         $adapter = $this->filesystem->getAdapter();
@@ -591,7 +591,7 @@ class MediaHandler
     {
         $name = $key;
 
-        if ($ext !== null) {
+        if (null !== $ext) {
             $name = sprintf('%s.%s', $key, $ext);
         }
 
@@ -638,7 +638,7 @@ class MediaHandler
      */
     private function fixFileRotation(UploadedFile $file): void
     {
-        if ($file->guessExtension() == 'jpeg') {
+        if ('jpeg' == $file->guessExtension()) {
             $toRotate = 0;
 
             $exif = @exif_read_data($file->getPathname());
@@ -656,7 +656,7 @@ class MediaHandler
                 }
             }
 
-            if ($toRotate != 0) {
+            if ($toRotate) {
                 $image = @imagecreatefromjpeg($file->getPathname());
 
                 if (!empty($image)) {

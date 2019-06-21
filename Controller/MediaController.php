@@ -13,7 +13,6 @@ use App\Exception\StorageException;
 use Gaufrette\Extras\Resolvable\UnresolvableObjectException;
 use Liip\ImagineBundle\Exception\Binary\Loader\NotLoadableException;
 use Liip\ImagineBundle\Exception\Imagine\Filter\NonExistingFilterException;
-use Liip\ImagineBundle\Imagine\Cache\CacheManager;
 use Liip\ImagineBundle\Service\FilterService;
 use PaneeDesign\StorageBundle\DBAL\EnumFileType;
 use PaneeDesign\StorageBundle\Entity\Media;
@@ -38,10 +37,19 @@ class MediaController extends AbstractController
      */
     protected $repository;
 
-    public function __construct(MediaHandler $uploader, MediaRepository $repository)
-    {
+    /**
+     * @var FilterService
+     */
+    protected $filterService;
+
+    public function __construct(
+        MediaHandler $uploader,
+        MediaRepository $repository,
+        FilterService $filterService
+    ) {
         $this->uploader = $uploader;
         $this->repository = $repository;
+        $this->filterService = $filterService;
     }
 
     /**
@@ -52,55 +60,44 @@ class MediaController extends AbstractController
      *     options={"i18n" = false}
      * )
      *
-     * @param Request       $request
-     * @param CacheManager  $cacheManager
-     * @param FilterService $filterService
-     * @param string        $key
+     * @param Request $request
+     * @param string  $key
      *
      * @throws UnresolvableObjectException
      * @throws StorageException
      *
      * @return Response
      */
-    public function imageAction(
-        Request $request,
-        CacheManager $cacheManager,
-        FilterService $filterService,
-        string $key
-    ) {
+    public function imageAction(Request $request, string $key)
+    {
         $filter = $request->get('filter');
 
         /* @var Media $media */
         $media = $this->repository->findOneBy(['key' => $key]);
 
-        if ($media === null) {
+        if (null === $media) {
             throw new StorageException('Media key not found', 'INVALID_MEDIA_KEY');
         }
 
-        if ($media->getFileType() !== EnumFileType::IMAGE) {
+        if (EnumFileType::IMAGE !== $media->getFileType()) {
             throw new StorageException('File type not handled', 'INVALID_MEDIA_TYPE');
         }
 
         $url = $this->uploader->getFullUrl($media->getFullKey());
 
-        if ($filter !== null) {
+        if (null !== $filter) {
             $path = $media->getFullKey();
 
-            if ($cacheManager->isStored($path, $filter)) {
-                $url = $cacheManager->resolve($path, $filter);
-            } else {
-                //Update here image filter
-                try {
-                    $url = $filterService->getUrlOfFilteredImage($path, $filter);
-                    //Cache generated with success
-                } catch (NotLoadableException $e) {
-                    throw new NotFoundHttpException(sprintf('Source image for path "%s" could not be found', $path));
-                } catch (NonExistingFilterException $e) {
-                    throw new NotFoundHttpException(sprintf('Requested non-existing filter "%s"', $filter));
-                } catch (\RuntimeException $e) {
-                    $errorTemplate = 'Unable to create image for path "%s" and filter "%s". Message was "%s"';
-                    throw new \RuntimeException(sprintf($errorTemplate, $path, $filter, $e->getMessage()), 0, $e);
-                }
+            try {
+                $url = $this->filterService->getUrlOfFilteredImage($path, $filter);
+                //Cache generated with success
+            } catch (NotLoadableException $e) {
+                throw new NotFoundHttpException(sprintf('Source image for path "%s" could not be found', $path));
+            } catch (NonExistingFilterException $e) {
+                throw new NotFoundHttpException(sprintf('Requested non-existing filter "%s"', $filter));
+            } catch (\RuntimeException $e) {
+                $errorTemplate = 'Unable to create image for path "%s" and filter "%s". Message was "%s"';
+                throw new \RuntimeException(sprintf($errorTemplate, $path, $filter, $e->getMessage()), 0, $e);
             }
 
             //Maybe process $url to have the same domain for all pictures
@@ -134,11 +131,11 @@ class MediaController extends AbstractController
         /* @var Media $media */
         $media = $this->repository->findOneBy(['key' => $key]);
 
-        if ($media === null) {
+        if (null === $media) {
             throw new StorageException('Media key not found', 'INVALID_MEDIA_KEY');
         }
 
-        if ($media->getFileType() !== EnumFileType::DOCUMENT) {
+        if (EnumFileType::DOCUMENT !== $media->getFileType()) {
             throw new StorageException('File type not handled', 'INVALID_MEDIA_TYPE');
         }
 
@@ -174,11 +171,11 @@ class MediaController extends AbstractController
         /* @var Media $media */
         $media = $this->repository->findOneBy(['key' => $key]);
 
-        if ($media === null) {
+        if (null === $media) {
             throw new StorageException('Media key not found', 'INVALID_MEDIA_KEY');
         }
 
-        if ($media->getFileType() !== EnumFileType::VIDEO) {
+        if (EnumFileType::VIDEO !== $media->getFileType()) {
             throw new StorageException('File type not handled', 'INVALID_MEDIA_TYPE');
         }
 
