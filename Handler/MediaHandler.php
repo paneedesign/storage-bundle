@@ -449,8 +449,14 @@ class MediaHandler
             throw new \InvalidArgumentException(sprintf('Files of type %s are not allowed.', $mimeType));
         }
 
+        $ext = $file->guessExtension();
+
+        if ($ext === null) {
+            $ext = $file->getClientOriginalExtension();
+        }
+
         $key = uniqid();
-        $name = sprintf('%s.%s', $key, $file->guessExtension());
+        $name = sprintf('%s.%s', $key, $ext);
         $path = $this->getFullKey($name);
 
         /* @var AwsS3Adapter|LocalAdapter $adapter */
