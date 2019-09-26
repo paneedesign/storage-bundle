@@ -14,11 +14,13 @@ use Fresh\DoctrineEnumBundle\DBAL\Types\AbstractEnumType;
 class EnumFileType extends AbstractEnumType
 {
     public const IMAGE = 'image';
+    public const AUDIO = 'audio';
     public const VIDEO = 'video';
     public const DOCUMENT = 'document';
 
     protected static $choices = [
         self::IMAGE => 'Image',
+        self::AUDIO => 'Audio',
         self::VIDEO => 'Video',
         self::DOCUMENT => 'Document',
     ];

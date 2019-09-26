@@ -228,7 +228,7 @@ abstract class Media
     /**
      * Set path.
      *
-     * @param int $path
+     * @param string $path
      *
      * @return Media
      */

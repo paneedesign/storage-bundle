@@ -38,6 +38,7 @@ class MediaExtension extends AbstractExtension
             new TwigFunction('image', [$this, 'image']),
             new TwigFunction('document', [$this, 'document']),
             new TwigFunction('video', [$this, 'video']),
+            new TwigFunction('audio', [$this, 'audio']),
         ];
     }
 
@@ -87,15 +88,28 @@ class MediaExtension extends AbstractExtension
     }
 
     /**
-     * @param Media $document
+     * @param Media $video
      * @param bool  $fullUrl
      *
      * @return string
      */
-    public function video(Media $document, ?bool $fullUrl = false): string
+    public function video(Media $video, ?bool $fullUrl = false): string
     {
         $urlType = $fullUrl ? UrlGeneratorInterface::ABSOLUTE_URL : UrlGeneratorInterface::ABSOLUTE_PATH;
 
-        return $this->router->generate('ped_storage_video', ['key' => $document->getKey()], $urlType);
+        return $this->router->generate('ped_storage_video', ['key' => $video->getKey()], $urlType);
+    }
+
+    /**
+     * @param Media $audio
+     * @param bool  $fullUrl
+     *
+     * @return string
+     */
+    public function audio(Media $audio, ?bool $fullUrl = false): string
+    {
+        $urlType = $fullUrl ? UrlGeneratorInterface::ABSOLUTE_URL : UrlGeneratorInterface::ABSOLUTE_PATH;
+
+        return $this->router->generate('ped_storage_audio', ['key' => $audio->getKey()], $urlType);
     }
 }

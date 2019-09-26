@@ -16,13 +16,17 @@ class EnumMediaType extends AbstractEnumType
     public const PROFILE = 'profile';
     public const COVER = 'cover';
     public const GALLERY = 'gallery';
+    public const AUDIO = 'audio';
     public const VIDEO = 'video';
+    public const DOCUMENT = 'document';
 
     protected static $choices = [
         self::PROFILE => 'Profile',
         self::COVER => 'Cover',
         self::GALLERY => 'Gallery',
+        self::AUDIO => 'Audio',
         self::VIDEO => 'Video',
+        self::DOCUMENT => 'Document',
     ];
 
     protected $name = 'enum_media_type';

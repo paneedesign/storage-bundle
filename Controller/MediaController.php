@@ -190,4 +190,44 @@ class MediaController extends AbstractController
 
         return $this->redirect($url, 301);
     }
+
+    /**
+     * @Route(
+     *     "/audio/{key}",
+     *     requirements={"key" = ".+"},
+     *     name="ped_storage_audio",
+     *     options={"i18n" = false}
+     * )
+     *
+     * @param string $key
+     *
+     * @throws StorageException
+     * @throws UnresolvableObjectException
+     *
+     * @return Response
+     */
+    public function audioAction(string $key)
+    {
+        /* @var Media $media */
+        $media = $this->repository->findOneBy(['key' => $key]);
+
+        if (null === $media) {
+            throw new StorageException('Media key not found', 'INVALID_MEDIA_KEY');
+        }
+
+        if (EnumFileType::AUDIO !== $media->getFileType()) {
+            throw new StorageException('File type not handled', 'INVALID_MEDIA_TYPE');
+        }
+
+        if (!$media->getIsPublic() && !$this->getUser()) {
+            throw new AccessDeniedHttpException('Forbidden');
+        }
+
+        $resolver = $this->container->get('ped_storage.amazon_presigned_url_resolver');
+        $this->uploader->setAwsS3Resolver($resolver);
+
+        $url = $this->uploader->getFullUrl($media->getFullKey());
+
+        return $this->redirect($url, 301);
+    }
 }
