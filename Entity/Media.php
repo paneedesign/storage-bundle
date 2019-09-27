@@ -45,44 +45,44 @@ abstract class Media
     protected $filters;
 
     /**
-     * @ORM\Column(name="filename", type="string", length=40, nullable=false)
+     * @ORM\Column(name="filename", type="string", length=255, nullable=false)
      */
-    private $key;
+    protected $key;
 
     /**
      * @ORM\Column(name="path", type="string", nullable=false)
      */
-    private $path;
+    protected $path;
 
     /**
      * @ORM\Column(name="type", type="enum_media_type", nullable=true)
      */
-    private $type;
+    protected $type;
 
     /**
      * @ORM\Column(name="file_type", type="enum_file_type", nullable=true)
      */
-    private $fileType;
+    protected $fileType;
 
     /**
      * @ORM\Column(name="size", type="integer", nullable=false)
      */
-    private $size = 0;
+    protected $size = 0;
 
     /**
      * @ORM\Column(name="media_info", type="json_array", nullable=true)
      */
-    private $mediaInfo = null;
+    protected $mediaInfo = null;
 
     /**
      * @ORM\Column(name="created_at", type="datetime")
      */
-    private $createdAt;
+    protected $createdAt;
 
     /**
      * @ORM\Column(name="is_public", type="boolean", options={"default" = false}))
      */
-    private $isPublic = false;
+    protected $isPublic = false;
 
     /**
      * Constructor.
