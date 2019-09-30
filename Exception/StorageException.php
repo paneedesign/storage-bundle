@@ -8,7 +8,7 @@ declare(strict_types=1);
  * Time: 12:30.
  */
 
-namespace App\Exception;
+namespace PaneeDesign\StorageBundle\Exception;
 
 use Exception;
 

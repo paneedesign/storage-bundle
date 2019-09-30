@@ -9,7 +9,7 @@ declare(strict_types=1);
 
 namespace PaneeDesign\StorageBundle\Twig;
 
-use App\Entity\Media;
+use PaneeDesign\StorageBundle\Entity\Media;
 use PaneeDesign\StorageBundle\Handler\MediaHandler;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;

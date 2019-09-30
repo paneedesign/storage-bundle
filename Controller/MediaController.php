@@ -9,7 +9,7 @@ declare(strict_types=1);
 
 namespace PaneeDesign\StorageBundle\Controller;
 
-use App\Exception\StorageException;
+use PaneeDesign\StorageBundle\StorageException;
 use Gaufrette\Extras\Resolvable\UnresolvableObjectException;
 use Liip\ImagineBundle\Exception\Binary\Loader\NotLoadableException;
 use Liip\ImagineBundle\Exception\Imagine\Filter\NonExistingFilterException;
