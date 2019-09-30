@@ -54,11 +54,13 @@ services:
             $bucket: '%ped_storage.amazon_s3.bucket_name%'
             $baseDir: '%ped_storage.amazon_s3.directory%'
             $expiresAt: '@expire_at_datetime'
+        public: true
 
     ped_storage.amazon_static_url_resolver:
         class: 'Gaufrette\Extras\Resolvable\Resolver\StaticUrlResolver'
         arguments:
             $prefix: '%ped_storage.amazon_s3.directory%'
+        public: true
 
     ped_storage.imagine.cache.resolver.local:
         class: 'Liip\ImagineBundle\Imagine\Cache\Resolver\WebPathResolver'
