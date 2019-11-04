@@ -451,7 +451,7 @@ class MediaHandler
 
         $ext = $file->guessExtension();
 
-        if ($ext === null) {
+        if (null === $ext) {
             $ext = $file->getClientOriginalExtension();
         }
 

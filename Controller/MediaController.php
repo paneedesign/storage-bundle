@@ -9,7 +9,6 @@ declare(strict_types=1);
 
 namespace PaneeDesign\StorageBundle\Controller;
 
-use PaneeDesign\StorageBundle\StorageException;
 use Gaufrette\Extras\Resolvable\UnresolvableObjectException;
 use Liip\ImagineBundle\Exception\Binary\Loader\NotLoadableException;
 use Liip\ImagineBundle\Exception\Imagine\Filter\NonExistingFilterException;
@@ -18,6 +17,7 @@ use PaneeDesign\StorageBundle\DBAL\EnumFileType;
 use PaneeDesign\StorageBundle\Entity\Media;
 use PaneeDesign\StorageBundle\Entity\Repository\MediaRepository;
 use PaneeDesign\StorageBundle\Handler\MediaHandler;
+use PaneeDesign\StorageBundle\StorageException;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;

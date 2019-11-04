@@ -1,30 +1,13 @@
 Pane e Design - Storage Bundle
 ==============================
 
-Storage management for Symfony3 projects.
+A Symfony bundle that provide tools to handle media storage locally or on S3.
 
 Installation
 ============
 
 Step 1: Download the Bundle
 ---------------------------
-
-Pane&Design repository is private so, add to `composer.json` this `vcs`
-
-```json
-    "repositories" : [
-        ...
-        {
-            "type" : "vcs",
-            "url" : "git@bitbucket.org:paneedesign/storage-bundle.git"
-        }
-    ],
-    ...
-    "require": {
-        ...
-        "paneedesign/storage-bundle": "^5.0"   
-    }
-```
 
 Open a command console, enter your project directory and execute the
 following command to download the latest stable version of this bundle:
@@ -76,6 +59,18 @@ Add to `.env`
 
 ```dotenv
 ###> paneedesign/storage-bundle ###
+STORAGE_ADAPTER=local
+STORAGE_LOCAL_DIRECTORY=uploads
+STORAGE_LOCAL_ENDPOINT=uploads
+STORAGE_LOCAL_THUMBS_PREFIX=thumbs
+###< paneedesign/storage-bundle ###
+```
+
+or
+
+```dotenv
+###> paneedesign/storage-bundle ###
+STORAGE_ADAPTER=amazon
 STORAGE_AMAZON_S3_KEY=key
 STORAGE_AMAZON_S3_SECRET=secret
 STORAGE_AMAZON_S3_REGION=eu-west-2
@@ -84,17 +79,11 @@ STORAGE_AMAZON_S3_BUCKET_NAME=ped-local
 STORAGE_AMAZON_S3_DIRECTORY=uploads
 STORAGE_AMAZON_S3_EXPIRE_AT="+1 hour"
 STORAGE_AMAZON_S3_THUMBS_PREFIX=thumbs
-STORAGE_LOCAL_DIRECTORY=uploads
-STORAGE_LOCAL_ENDPOINT=uploads
-STORAGE_LOCAL_THUMBS_PREFIX=thumbs
-STORAGE_ADAPTER=local
 ###< paneedesign/storage-bundle ###
 ```
 
 Copy under `config/packeges` following files: 
 
-* `config/packeges/knp_gaufrette.yaml`
-* `config/packeges/liip_imagine.yaml`
 * `config/packeges/ped_storage.yaml`
 
 and under `config/routes`:

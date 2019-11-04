@@ -1,7 +1,5 @@
-parameters:
-    ped_storage.uploader: "ped_storage.%env(STORAGE_ADAPTER)%_media_handler"
-
 ped_storage:
+    adapter:           "%env(STORAGE_ADAPTER)%"
     amazon_s3:
         key:           "%env(STORAGE_AMAZON_S3_KEY)%"
         secret:        "%env(STORAGE_AMAZON_S3_SECRET)%"
@@ -13,6 +11,5 @@ ped_storage:
         thumbs_prefix: "%env(STORAGE_AMAZON_S3_THUMBS_PREFIX)%"
     local:
         endpoint:      "%env(STORAGE_LOCAL_ENDPOINT)%"
-        web_root_dir:  "%kernel.project_dir%/public"
         directory:     "%kernel.project_dir%/public/%env(STORAGE_LOCAL_DIRECTORY)%"
         thumbs_prefix: "%env(STORAGE_LOCAL_THUMBS_PREFIX)%"
