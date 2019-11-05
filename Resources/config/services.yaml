@@ -1,0 +1,20 @@
+services:
+    repository.media:
+        class: PaneeDesign\StorageBundle\Entity\Repository\MediaRepository
+        factory: ['@doctrine.orm.default_entity_manager', 'getRepository']
+        arguments: ['PedStorageBundle:Media']
+
+    PaneeDesign\StorageBundle\Twig\MediaExtension:
+        public: true
+        tags: [twig.extension]
+        arguments:
+            $container: '@service_container'
+            $router: '@router.default'
+
+    PaneeDesign\StorageBundle\Controller\MediaController:
+        public: true
+        tags: [controller.service_arguments]
+        arguments:
+            $uploader: "@ped_storage.uploader"
+            $repository: "@repository.media"
+            $filterService: "@liip_imagine.service.filter"

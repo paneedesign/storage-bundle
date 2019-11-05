@@ -70,7 +70,7 @@ or
 
 ```dotenv
 ###> paneedesign/storage-bundle ###
-STORAGE_ADAPTER=amazon
+STORAGE_ADAPTER=amazon_s3
 STORAGE_AMAZON_S3_KEY=key
 STORAGE_AMAZON_S3_SECRET=secret
 STORAGE_AMAZON_S3_REGION=eu-west-2
@@ -119,107 +119,197 @@ ped_discriminator_map:
 Step 4: Use
 -----------
 
-You can upload a picture using this snippets:
+You can store image or document and retrive full url of resource using this snippets:
 
 ```php
-/**
- * Upload Image
- *
- * @param Request $request
- * @param string $name Image field name
- * @param int $id Entity ID
- * @param string $type Entity Type
- * @return Media
- */
-protected function uploadImageAction(Request $request, $name, $id, $type)
-{  
-    $image   = $request->files->get($name);
-    $service = $this->getParameter('ped_storage.uploader');
-    
-    $uploader = $this->get($service)
-        ->setId($id)
-        ->setType($type)
-        ->setFileType(EnumFileType::IMAGE) //image, video, document
-        ->setGroupFolders(false);
-    
-    $uploader->save($image);
-    
-    //Save in DB
-    $media = new Media();
-    
-    $media->setKey($uploader->getKey());
-    $media->setPath($uploader->getFullKey(''));
-    $media->setFileType($uploader->getFileType());
-    
-    $media->setType(EnumMediaType::GALLERY);
-    $media->setSize($image->getSize());
+<?php
 
-    $em = $this->getDoctrine()->getManager();
-    $em->persist($media);
-    $em->flush();
-}
-```
+declare(strict_types=1);
 
-and retrive full url by using this function that can also be a Twig Filter:
+namespace App\Handler;
 
+use App\Entity\Media;
+use Gaufrette\Extras\Resolvable\UnresolvableObjectException;
+use PaneeDesign\StorageBundle\DBAL\EnumFileType;
+use PaneeDesign\StorageBundle\DBAL\EnumMediaType;
+use PaneeDesign\StorageBundle\Entity\Media as PedMedia;
+use PaneeDesign\StorageBundle\Handler\MediaHandler;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Symfony\Component\Routing\RouterInterface;
 
-```php
-/**
- * @param Media $image
- * @param string $filter
- *
- * @return bool|string
- * @throws \Gaufrette\Extras\Resolvable\UnresolvableObjectException
- */
-public function getMediaUrl(Media $image, $filter = null)
+class StorageHandler
 {
-    if ($filter !== null) {
-        if ($image->hasFilter($filter)) {
-            return $image->getUrl($filter);
-        } else {
-            return $this->router->generate(
-                'media',
-                [
-                    'key'    => $image->getKey(),
-                    'filter' => $filter,
-                ]
-            );
-        }
-    } else {
-        $service = $this->container->getParameter('ped_storage.uploader');
-        /* @var MediaHandler $uploader */
-        $uploader = $this->container->get($service);
-        $url = $uploader->getFullUrl($image->getFullKey());
-        return $url;
+    /**
+     * @var RouterInterface
+     */
+    protected $router;
+    /**
+     * @var MediaHandler
+     */
+    private $mediaHandler;
+
+    /**
+     * MediaManager constructor.
+     *
+     * @param MediaHandler    $mediaHandler
+     * @param RouterInterface $router
+     */
+    public function __construct(MediaHandler $mediaHandler, RouterInterface $router)
+    {
+        $this->mediaHandler = $mediaHandler;
+        $this->router = $router;
     }
-}
-```
 
+    /**
+     * @param PedMedia    $media
+     * @param string|null $filter
+     *
+     * @return string
+     */
+    public function generateAbsoluteUri(PedMedia $media, ?string $filter = null)
+    {
+        $url = '';
 
-Generate a pre-signed url to open private document. TODO: test and update this snippet 
-```php
-/**
- * Get full Document private url from S3
- *
- * @param $path
- * @param $type
- * @return string
- */
-protected function getAmazonDocumentUrl($key, $id, $type)
-{
-    //parameters.yml
-    //storage_adapter: amazon
-    
-    $service  = $this->getParameter('ped_storage.uploader');
-    $resolver = $this->get('ped_storage.amazon_presigned_url_resolver');
-    $uploader = $this->get($service)
-        ->setAwsS3Resolver($resolver)
-        ->setId($id)
-        ->setType($type);
+        try {
+            if (null !== $filter) {
+                if ($media->hasFilter($filter)) {
+                    $url = $media->getUrl($filter);
+                } else {
+                    $url = $this->router->generate('ped_storage_image', [
+                        'key' => $media->getKey(),
+                        'filter' => $filter,
+                    ]);
+                }
+            } else {
+                $url = $this->mediaHandler->getFullUrl($media->getFullKey());
+            }
+        } catch (UnresolvableObjectException $e) {
+        } catch (\Exception $e) {
+        }
 
-    // optionally set a mediaType (es. image, video, thumbnail, document)
-    $uploader->setFileType('document');
-      
-    return $uploader->getFullUrl($key);
+        return $url ?: '';
+    }
+
+    /**
+     * @param int           $entityId
+     * @param string        $type
+     * @param UploadedFile  $media
+     * @param PedMedia|null $image
+     * @param string|null   $mediaType
+     *
+     * @throws \Exception
+     *
+     * @return Media
+     */
+    public function storeImage(
+        int $entityId,
+        string $type,
+        UploadedFile $media,
+        ?PedMedia $image = null,
+        ?string $mediaType = EnumMediaType::PROFILE
+    ): Media {
+        $hasPublicAccess = false;
+        $allowedMimeTypes = [
+            'image/jpeg',
+            'image/png',
+            'image/gif',
+        ];
+
+        $uploader = $this->getUploader($entityId, $type, EnumFileType::IMAGE, $hasPublicAccess, $allowedMimeTypes);
+
+        if (null === $image) {
+            $image = new Media();
+            $image->setType($mediaType);
+        } else {
+            $image->clearFilters();
+            $uploader->remove($image);
+        }
+
+        $uploader->save($media);
+
+        $image = new Media();
+        $image->setKey($uploader->getKey());
+        $image->setPath($uploader->getFullKey(''));
+        $image->setFileType($uploader->getFileType());
+        $image->setSize($media->getSize());
+        $image->setIsPublic($uploader->getHasPublicAccess());
+
+        return $image;
+    }
+
+    /**
+     * @param int           $entityId
+     * @param string        $type
+     * @param UploadedFile  $media
+     * @param PedMedia|null $document
+     * @param string|null   $mediaType
+     *
+     * @throws \Exception
+     *
+     * @return Media
+     */
+    public function storeDocument(
+        int $entityId,
+        string $type,
+        UploadedFile $media,
+        ?PedMedia $document = null,
+        ?string $mediaType = EnumMediaType::DOCUMENT
+    ): Media {
+        $hasPublicAccess = true;
+        $allowedMimeTypes = [
+            'image/jpeg',
+            'image/png',
+            'image/gif',
+            'application/pdf',
+        ];
+
+        $uploader = $this->getUploader($entityId, $type, EnumFileType::DOCUMENT, $hasPublicAccess, $allowedMimeTypes);
+
+        if (null === $document) {
+            $document = new Media();
+            $document->setType($mediaType);
+        } else {
+            $document->clearFilters();
+            $uploader->remove($document);
+        }
+
+        $uploader->save($media);
+
+        $document = new Media();
+        $document->setKey($uploader->getKey());
+        $document->setPath($uploader->getFullKey(''));
+        $document->setFileType($uploader->getFileType());
+        $document->setSize($media->getSize());
+        $document->setIsPublic($uploader->getHasPublicAccess());
+
+        return $document;
+    }
+
+    /**
+     * @param int    $entityId
+     * @param string $type
+     * @param string $fileType
+     * @param array  $allowedMimeTypes
+     * @param bool   $hasPublicAccess
+     *
+     * @return MediaHandler
+     */
+    private function getUploader(
+        int $entityId,
+        string $type,
+        string $fileType,
+        bool $hasPublicAccess,
+        array $allowedMimeTypes = []
+    ): MediaHandler {
+        /* @var MediaHandler $uploader */
+        $uploader = $this->mediaHandler
+            ->setId($entityId)
+            ->setType($type)
+            ->setFileType($fileType)
+            ->setAllowedMimeTypes($allowedMimeTypes)
+            ->setHasPublicAccess($hasPublicAccess);
+
+        return $uploader;
+    }
 }
 ```

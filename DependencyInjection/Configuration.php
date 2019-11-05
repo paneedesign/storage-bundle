@@ -14,6 +14,9 @@ use Symfony\Component\Config\Definition\ConfigurationInterface;
  */
 class Configuration implements ConfigurationInterface
 {
+    public const LOCAL_ADAPTER = 'local';
+    public const AMAZON_S3_ADAPTER = 'amazon_s3';
+
     /**
      * {@inheritdoc}
      */
@@ -30,32 +33,28 @@ class Configuration implements ConfigurationInterface
 
         $rootNode
             ->validate()
-            ->ifTrue(function ($v) {
-                $requiredSettings = [];
+                ->ifTrue(function ($v) {
+                    $requiredSettings = [$v['adapter']];
 
-                switch ($v['adapter']) {
-                    case 'local':
-                        $requiredSettings = ['local'];
-                        break;
-                    case 'amazon':
-                        $requiredSettings = ['amazon_s3'];
-                        break;
-                }
-
-                foreach ($requiredSettings as $setting) {
-                    if (!array_key_exists($setting, $v)) {
-                        return true;
+                    foreach ($requiredSettings as $setting) {
+                        if (
+                            !array_key_exists($setting, $v) ||
+                            (array_key_exists($setting, $v) && false === $v[$setting]['enabled'])
+                        ) {
+                            return true;
+                        }
                     }
-                }
 
-                return false;
-            })
-            ->thenInvalid('Missing required options for "%s"')
+                    return false;
+                })
+                ->then(function ($v) {
+                    return sprintf('Missing required option %s', $v['adapter']);
+                })
             ->end()
             ->children()
                 ->enumNode('adapter')
-                    ->defaultValue('local')
-                    ->values(['local', 'amazon'])
+                    ->defaultValue(self::LOCAL_ADAPTER)
+                    ->values([self::LOCAL_ADAPTER, self::AMAZON_S3_ADAPTER])
                     ->info('Name of adapter to use to store media')
                     ->isRequired()
                     ->cannotBeEmpty()
@@ -69,13 +68,13 @@ class Configuration implements ConfigurationInterface
 
     private function addAmazonS3Section()
     {
-        $treeBuilder = new TreeBuilder('amazon_s3');
+        $treeBuilder = new TreeBuilder(self::AMAZON_S3_ADAPTER);
 
         if (method_exists($treeBuilder, 'getRootNode')) {
             $node = $treeBuilder->getRootNode();
         } else {
             // BC layer for symfony/config 4.1 and older
-            $node = $treeBuilder->root('amazon_s3');
+            $node = $treeBuilder->root(self::AMAZON_S3_ADAPTER);
         }
 
         $node
@@ -125,13 +124,13 @@ class Configuration implements ConfigurationInterface
 
     private function addLocalSection()
     {
-        $treeBuilder = new TreeBuilder('local');
+        $treeBuilder = new TreeBuilder(self::LOCAL_ADAPTER);
 
         if (method_exists($treeBuilder, 'getRootNode')) {
             $node = $treeBuilder->getRootNode();
         } else {
             // BC layer for symfony/config 4.1 and older
-            $node = $treeBuilder->root('local');
+            $node = $treeBuilder->root(self::LOCAL_ADAPTER);
         }
 
         $node
