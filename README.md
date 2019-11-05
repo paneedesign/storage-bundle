@@ -1,10 +1,14 @@
-Pane e Design - Storage Bundle
-==============================
+<h1 align="center">Welcome to PED Storage Bundle 👋</h1>
+<p>
+  <img alt="Version" src="https://img.shields.io/badge/version-v6.0.0-blue.svg?cacheSeconds=2592000" />
+  <a href="#" target="_blank">
+    <img alt="License: MIT" src="https://img.shields.io/badge/License-MIT-yellow.svg" />
+  </a>
+</p>
 
 A Symfony bundle that provide tools to handle media storage locally or on S3.
 
-Installation
-============
+## Installation
 
 Step 1: Download the Bundle
 ---------------------------
@@ -313,3 +317,26 @@ class StorageHandler
     }
 }
 ```
+
+## Authors
+
+👤 **Fabiano Roberto <fabiano.roberto@ped.technology>**
+
+* Twitter: [@dr_thief](https://twitter.com/dr_thief)
+* Github: [@fabianoroberto](https://github.com/fabianoroberto)
+
+👤 **Luigi Cardamone <luigi.cardamone@ped.technology>**
+
+* Twitter: [@CardamoneLuigi](https://twitter.com/CardamoneLuigi)
+* Github: [@LuigiCardamone](https://github.com/LuigiCardamone)
+
+## 🤝 Contributing
+
+Contributions, issues and feature requests are welcome!<br />Feel free to check [issues page](https://github.com/paneedesign/storage-bundle/issues).
+
+## Show your support
+
+Give a ⭐️ if this project helped you!
+
+***
+_This README was generated with ❤️ by [readme-md-generator](https://github.com/kefranabg/readme-md-generator)_
