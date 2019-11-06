@@ -68,13 +68,6 @@ class MediaHandler
     private $hasPublicAccess = false;
 
     /**
-     * Media information object.
-     *
-     * @var Media\MediaInfo
-     */
-    private $mediaInfo = null;
-
-    /**
      * Group folders using module id.
      *
      * @var bool
@@ -116,6 +109,20 @@ class MediaHandler
             'image/png',
             'image/gif',
         ], $allowedMimeTypes);
+    }
+
+    public function isInstanceOfAmazonS3()
+    {
+        $adapter = $this->filesystem->getAdapter();
+
+        return $adapter instanceof AwsS3Adapter;
+    }
+
+    public function isInstanceOfLocal()
+    {
+        $adapter = $this->filesystem->getAdapter();
+
+        return $adapter instanceof LocalAdapter;
     }
 
     /**
@@ -253,135 +260,6 @@ class MediaHandler
     }
 
     /**
-     * @param object|string $crop
-     * @param int           $rotation
-     * @param int           $priority
-     * @param string        $key
-     * @param string        $ext
-     * @param int           $size
-     *
-     * @return $this
-     */
-    public function setCropInfo($crop = null, $rotation = null, $priority = 0, $key = '', $ext = '', $size = 0): self
-    {
-        if (null !== $crop) {
-            $cropInfo = $crop;
-
-            if (false === \is_object($crop)) {
-                $cropInfo = json_decode($crop);
-            }
-
-            $this->mediaInfo = new Media\CropInfo($cropInfo->x, $cropInfo->y);
-            $this->mediaInfo->setWidth($cropInfo->width);
-            $this->mediaInfo->setHeight($cropInfo->height);
-        }
-
-        if (null !== $rotation) {
-            $this->setRotation($rotation);
-        }
-
-        if ($priority > 0) {
-            $this->setPriority($priority);
-        }
-
-        if ('' !== $key && '' !== $ext) {
-            $this->setName($key, $ext);
-        }
-
-        if ($size > 0) {
-            $this->setSize($size);
-        }
-
-        return $this;
-    }
-
-    /**
-     * @param $rotation
-     */
-    public function setRotation($rotation): void
-    {
-        if (false === $this->mediaInfo instanceof Media\CropInfo) {
-            $this->mediaInfo = new Media\CropInfo();
-        }
-
-        $this->mediaInfo->setRotation($rotation);
-    }
-
-    /**
-     * @param int $priority
-     *
-     * @return $this
-     */
-    public function setPriority($priority): self
-    {
-        if (false === $this->mediaInfo instanceof Media\CropInfo) {
-            $this->mediaInfo = new Media\CropInfo();
-        }
-
-        $this->mediaInfo->setPriority($priority);
-
-        return $this;
-    }
-
-    /**
-     * @param int $page
-     *
-     * @return $this
-     */
-    public function setDocumentInfo($page = 0): self
-    {
-        if ($this->mediaInfo instanceof Media\DocumentInfo) {
-            $this->mediaInfo->setPage($page);
-        } else {
-            $this->mediaInfo = new Media\DocumentInfo($page);
-        }
-
-        return $this;
-    }
-
-    /**
-     * @param string $key
-     * @param string $ext
-     *
-     * @return $this
-     */
-    public function setName($key, $ext): self
-    {
-        if ($this->mediaInfo instanceof Media\MediaInfo) {
-            $this->mediaInfo->setKey($key);
-            $this->mediaInfo->setExt($ext);
-        } else {
-            $this->mediaInfo = new Media\MediaInfo($key, $ext);
-        }
-
-        return $this;
-    }
-
-    /**
-     * @param int $size
-     *
-     * @return $this
-     */
-    public function setSize($size): self
-    {
-        if (false === $this->mediaInfo instanceof Media\MediaInfo) {
-            $this->mediaInfo = new Media\MediaInfo();
-        }
-
-        $this->mediaInfo->setSize($size);
-
-        return $this;
-    }
-
-    /**
-     * @return array
-     */
-    public function getMediaInfo(): ?array
-    {
-        return $this->mediaInfo->toJSON();
-    }
-
-    /**
      * @param bool $groupFolders
      *
      * @return $this
@@ -514,7 +392,6 @@ class MediaHandler
      * @param string $fullKey
      *
      * @throws \Gaufrette\Extras\Resolvable\UnresolvableObjectException
-     *
      * @return bool|string
      */
     public function getFullUrl(string $fullKey)

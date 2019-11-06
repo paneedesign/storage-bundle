@@ -11,13 +11,12 @@ namespace PaneeDesign\StorageBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
-use PaneeDesign\StorageBundle\Entity\Media\MediaInfo;
 
 /**
  * Class Media.
  *
  * @ORM\HasLifecycleCallbacks
- * @ORM\Entity(repositoryClass="PaneeDesign\StorageBundle\Entity\Repository\MediaRepository")
+ * @ORM\Entity(repositoryClass="PaneeDesign\StorageBundle\Repository\MediaRepository")
  * @ORM\Table(name="media", uniqueConstraints={@ORM\UniqueConstraint(name="name_idx", columns={"filename"})})
  * @ORM\InheritanceType("SINGLE_TABLE")
  * @ORM\DiscriminatorColumn(name="discr", type="string")
@@ -83,6 +82,11 @@ abstract class Media
      * @ORM\Column(name="is_public", type="boolean", options={"default" = false}))
      */
     protected $isPublic = false;
+
+    /**
+     * @ORM\Embedded(class="PaneeDesign\StorageBundle\Entity\CropFilter")
+     */
+    private $cropFilter;
 
     /**
      * Constructor.
@@ -153,28 +157,16 @@ abstract class Media
         return $this->type;
     }
 
-    /**
-     * Set mediaInfo.
-     *
-     * @param MediaInfo $mediaInfo
-     *
-     * @return Media
-     */
-    public function setMediaInfo($mediaInfo)
+    public function setCropFilter(?CropFilter $cropFilter): self
     {
-        $this->mediaInfo = $mediaInfo;
+        $this->cropFilter = $cropFilter;
 
         return $this;
     }
 
-    /**
-     * Get mediaInfo.
-     *
-     * @return array
-     */
-    public function getMediaInfo()
+    public function getCropFilter(): ?CropFilter
     {
-        return $this->mediaInfo;
+        return $this->cropFilter;
     }
 
     /**

@@ -15,9 +15,9 @@ use Liip\ImagineBundle\Exception\Imagine\Filter\NonExistingFilterException;
 use Liip\ImagineBundle\Service\FilterService;
 use PaneeDesign\StorageBundle\DBAL\EnumFileType;
 use PaneeDesign\StorageBundle\Entity\Media;
-use PaneeDesign\StorageBundle\Entity\Repository\MediaRepository;
+use PaneeDesign\StorageBundle\Exception\StorageException;
 use PaneeDesign\StorageBundle\Handler\MediaHandler;
-use PaneeDesign\StorageBundle\StorageException;
+use PaneeDesign\StorageBundle\Repository\MediaRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -68,16 +68,10 @@ class MediaController extends AbstractController
      *
      * @return Response
      */
-    public function imageAction(Request $request, string $key)
+    public function getImage(Request $request, string $key)
     {
         $filter = $request->get('filter');
-
-        /* @var Media $media */
-        $media = $this->repository->findOneBy(['key' => $key]);
-
-        if (null === $media) {
-            throw new StorageException('Media key not found', 'INVALID_MEDIA_KEY');
-        }
+        $media = $this->getMediaByKey($key);
 
         if (EnumFileType::IMAGE !== $media->getFileType()) {
             throw new StorageException('File type not handled', 'INVALID_MEDIA_TYPE');
@@ -126,29 +120,9 @@ class MediaController extends AbstractController
      *
      * @return Response
      */
-    public function documentAction(string $key)
+    public function getDocument(string $key)
     {
-        /* @var Media $media */
-        $media = $this->repository->findOneBy(['key' => $key]);
-
-        if (null === $media) {
-            throw new StorageException('Media key not found', 'INVALID_MEDIA_KEY');
-        }
-
-        if (EnumFileType::DOCUMENT !== $media->getFileType()) {
-            throw new StorageException('File type not handled', 'INVALID_MEDIA_TYPE');
-        }
-
-        if (!$media->getIsPublic() && !$this->getUser()) {
-            throw new AccessDeniedHttpException('Forbidden');
-        }
-
-        $resolver = $this->container->get('ped_storage.amazon_presigned_url_resolver');
-        $this->uploader->setAwsS3Resolver($resolver);
-
-        $url = $this->uploader->getFullUrl($media->getFullKey());
-
-        return $this->redirect($url, 301);
+        return $this->getMediaByKeyAndType($key, EnumFileType::DOCUMENT);
     }
 
     /**
@@ -166,29 +140,9 @@ class MediaController extends AbstractController
      *
      * @return Response
      */
-    public function videoAction(string $key)
+    public function getVideo(string $key)
     {
-        /* @var Media $media */
-        $media = $this->repository->findOneBy(['key' => $key]);
-
-        if (null === $media) {
-            throw new StorageException('Media key not found', 'INVALID_MEDIA_KEY');
-        }
-
-        if (EnumFileType::VIDEO !== $media->getFileType()) {
-            throw new StorageException('File type not handled', 'INVALID_MEDIA_TYPE');
-        }
-
-        if (!$media->getIsPublic() && !$this->getUser()) {
-            throw new AccessDeniedHttpException('Forbidden');
-        }
-
-        $resolver = $this->container->get('ped_storage.amazon_presigned_url_resolver');
-        $this->uploader->setAwsS3Resolver($resolver);
-
-        $url = $this->uploader->getFullUrl($media->getFullKey());
-
-        return $this->redirect($url, 301);
+        return $this->getMediaByKeyAndType($key, EnumFileType::VIDEO);
     }
 
     /**
@@ -206,7 +160,48 @@ class MediaController extends AbstractController
      *
      * @return Response
      */
-    public function audioAction(string $key)
+    public function getAudio(string $key)
+    {
+        return $this->getMediaByKeyAndType($key, EnumFileType::AUDIO);
+    }
+
+    /**
+     * @param string $key
+     * @param string $type
+     *
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse
+     * @throws StorageException
+     * @throws UnresolvableObjectException
+     */
+    protected function getMediaByKeyAndType(string $key, string $type)
+    {
+        $media = $this->getMediaByKey($key);
+
+        if ($type !== $media->getFileType()) {
+            throw new StorageException('File type not handled', 'INVALID_MEDIA_TYPE');
+        }
+
+        if (!$media->getIsPublic() && !$this->getUser()) {
+            throw new AccessDeniedHttpException('Forbidden');
+        }
+
+        if ($this->uploader->isInstanceOfAmazonS3()) {
+            $resolver = $this->container->get('ped_storage.amazon_presigned_url_resolver');
+            $this->uploader->setAwsS3Resolver($resolver);
+        }
+
+        $url = $this->uploader->getFullUrl($media->getFullKey());
+
+        return $this->redirect($url, 301);
+    }
+
+    /**
+     * @param string $key
+     *
+     * @return Media
+     * @throws StorageException
+     */
+    private function getMediaByKey(string $key): Media
     {
         /* @var Media $media */
         $media = $this->repository->findOneBy(['key' => $key]);
@@ -215,19 +210,6 @@ class MediaController extends AbstractController
             throw new StorageException('Media key not found', 'INVALID_MEDIA_KEY');
         }
 
-        if (EnumFileType::AUDIO !== $media->getFileType()) {
-            throw new StorageException('File type not handled', 'INVALID_MEDIA_TYPE');
-        }
-
-        if (!$media->getIsPublic() && !$this->getUser()) {
-            throw new AccessDeniedHttpException('Forbidden');
-        }
-
-        $resolver = $this->container->get('ped_storage.amazon_presigned_url_resolver');
-        $this->uploader->setAwsS3Resolver($resolver);
-
-        $url = $this->uploader->getFullUrl($media->getFullKey());
-
-        return $this->redirect($url, 301);
+        return $media;
     }
 }

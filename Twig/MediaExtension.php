@@ -11,7 +11,6 @@ namespace PaneeDesign\StorageBundle\Twig;
 
 use PaneeDesign\StorageBundle\Entity\Media;
 use PaneeDesign\StorageBundle\Handler\MediaHandler;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\RouterInterface;
 use Twig\Extension\AbstractExtension;
@@ -20,15 +19,18 @@ use Twig\TwigFunction;
 class MediaExtension extends AbstractExtension
 {
     /**
-     * @var ContainerInterface
+     * @var MediaHandler
      */
-    protected $container;
+    protected $uploader;
 
+    /**
+     * @var RouterInterface
+     */
     protected $router;
 
-    public function __construct(ContainerInterface $container, RouterInterface $router)
+    public function __construct(MediaHandler $uploader, RouterInterface $router)
     {
-        $this->container = $container;
+        $this->uploader = $uploader;
         $this->router = $router;
     }
 
@@ -48,7 +50,6 @@ class MediaExtension extends AbstractExtension
      * @param bool   $fullUrl
      *
      * @throws \Gaufrette\Extras\Resolvable\UnresolvableObjectException
-     *
      * @return bool|string
      */
     public function image(Media $image, ?string $filter = null, ?bool $fullUrl = false): string
@@ -66,12 +67,7 @@ class MediaExtension extends AbstractExtension
             ], $urlType);
         }
 
-        $service = $this->container->getParameter('ped_storage.uploader');
-
-        /* @var MediaHandler $uploader */
-        $uploader = $this->container->get($service);
-
-        return $uploader->getFullUrl($image->getFullKey());
+        return $this->uploader->getFullUrl($image->getFullKey());
     }
 
     /**

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace PaneeDesign\StorageBundle\Entity\Repository;
+namespace PaneeDesign\StorageBundle\Repository;
 
 use Doctrine\ORM\EntityRepository;
 

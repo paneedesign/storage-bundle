@@ -1,6 +1,6 @@
 services:
     repository.media:
-        class: PaneeDesign\StorageBundle\Entity\Repository\MediaRepository
+        class: PaneeDesign\StorageBundle\Repository\MediaRepository
         factory: ['@doctrine.orm.default_entity_manager', 'getRepository']
         arguments: ['PedStorageBundle:Media']
 
@@ -8,13 +8,13 @@ services:
         public: true
         tags: [twig.extension]
         arguments:
-            $container: '@service_container'
+            $uploader: '@ped_storage.uploader'
             $router: '@router.default'
 
     PaneeDesign\StorageBundle\Controller\MediaController:
         public: true
         tags: [controller.service_arguments]
         arguments:
-            $uploader: "@ped_storage.uploader"
-            $repository: "@repository.media"
-            $filterService: "@liip_imagine.service.filter"
+            $uploader: '@ped_storage.uploader'
+            $repository: '@repository.media'
+            $filterService: '@liip_imagine.service.filter'
