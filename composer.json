@@ -67,16 +67,4 @@
     "conflict": {
         "symfony/symfony": "*"
     },
-    "extra": {
-        "branch-alias": {
-            "dev-flex": "feature/Symfony-flex"
-        },
-        "symfony": {
-            "id": "01B246F85237FB1F3C796B2BF2B0DC6F",
-            "allow-contrib": false,
-            "require": "4.2.*"
-        }
-    },
-    "minimum-stability": "dev",
-    "prefer-stable": true
 }
