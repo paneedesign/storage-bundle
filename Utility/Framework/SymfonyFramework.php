@@ -11,7 +11,7 @@ declare(strict_types=1);
  * file that was distributed with this source code.
  */
 
-namespace Ped\StorageBundle\Utility\Framework;
+namespace PaneeDesign\StorageBundle\Utility\Framework;
 
 use Symfony\Component\HttpKernel\Kernel;
 

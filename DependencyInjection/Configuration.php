@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace PaneeDesign\StorageBundle\DependencyInjection;
 
-use Ped\StorageBundle\Utility\Framework\SymfonyFramework;
+use PaneeDesign\StorageBundle\Utility\Framework\SymfonyFramework;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 
