@@ -73,7 +73,7 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-flex": "feature/Symfony-flex"
+            "dev-master": "release/6.0"
         }
     }
 }
