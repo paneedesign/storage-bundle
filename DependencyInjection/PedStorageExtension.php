@@ -130,8 +130,12 @@ class PedStorageExtension extends Extension implements PrependExtensionInterface
 
     private function loadLocalResolvers(string $adapter, ContainerBuilder $container)
     {
-        if ($container->hasParameter('ped_storage.thumbs_prefix')) {
+        if (
+            $container->hasParameter('ped_storage.thumbs_prefix') &&
+            $container->hasParameter('ped_storage.local.web_root_dir')
+        ) {
             $cacheResolver = new ChildDefinition('liip_imagine.cache.resolver.prototype.web_path');
+            $cacheResolver->setArgument('$webRoot', $container->getParameter('ped_storage.local.web_root_dir'));
             $cacheResolver->setArgument('$cachePrefix', $container->getParameter('ped_storage.thumbs_prefix'));
 
             $cacheResolver->addTag('liip_imagine.cache.resolver', [
