@@ -66,5 +66,5 @@
     },
     "conflict": {
         "symfony/symfony": "*"
-    },
+    }
 }
