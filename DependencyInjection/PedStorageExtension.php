@@ -42,7 +42,7 @@ class PedStorageExtension extends Extension implements PrependExtensionInterface
                     if (Configuration::LOCAL_ADAPTER === $config['adapter']) {
                         $knpConfiguration['adapters'][sprintf('%s_adapter', $config['adapter'])] = [
                             'local' => [
-                                'directory' => sprintf('%s/%s', $config['web_root_dir'], $config['directory']),
+                                'directory' => sprintf('%s/%s', $config['local']['web_root_dir'], $config['directory']),
                             ],
                         ];
                     } elseif (Configuration::AMAZON_S3_ADAPTER === $config['adapter']) {
@@ -98,7 +98,7 @@ class PedStorageExtension extends Extension implements PrependExtensionInterface
                 case Configuration::LOCAL_ADAPTER:
                     $container->setParameter(
                         'ped_storage.directory',
-                        sprintf('%s/%s', $config['web_root_dir'], $config['directory'])
+                        sprintf('%s/%s', $config['local']['web_root_dir'], $config['directory'])
                     );
 
                     $this->loadParameters($config['adapter'], $config[Configuration::LOCAL_ADAPTER], $container);
@@ -135,8 +135,8 @@ class PedStorageExtension extends Extension implements PrependExtensionInterface
             $container->hasParameter('ped_storage.local.web_root_dir')
         ) {
             $cacheResolver = new ChildDefinition('liip_imagine.cache.resolver.prototype.web_path');
-            $cacheResolver->setArgument('$webRoot', $container->getParameter('ped_storage.local.web_root_dir'));
-            $cacheResolver->setArgument('$cachePrefix', $container->getParameter('ped_storage.thumbs_prefix'));
+            $cacheResolver->replaceArgument(2, $container->getParameter('ped_storage.local.web_root_dir'));
+            $cacheResolver->replaceArgument(3, $container->getParameter('ped_storage.thumbs_prefix'));
 
             $cacheResolver->addTag('liip_imagine.cache.resolver', [
                 'resolver' => sprintf('%s_fs', $adapter),
@@ -233,7 +233,7 @@ class PedStorageExtension extends Extension implements PrependExtensionInterface
     private function loadLoaders(string $adapter, ContainerBuilder $container)
     {
         $binaryLoader = new Definition(StreamLoader::class);
-        $binaryLoader->setArgument('$wrapperPrefix', sprintf('pedstorage://%s_fs/', $adapter));
+        $binaryLoader->addArgument(sprintf('pedstorage://%s_fs/', $adapter));
         $binaryLoader->addTag('liip_imagine.binary.loader', [
             'loader' => sprintf('loader_%s_data', $adapter),
         ]);

@@ -35,7 +35,11 @@ class Configuration implements ConfigurationInterface
         $rootNode
             ->validate()
                 ->ifTrue(function ($v) {
-                    $requiredSettings = [$v['adapter']];
+                    $requiredSettings = [];
+
+                    if ($v['adapter'] === Configuration::AMAZON_S3_ADAPTER) {
+                        $requiredSettings[] = $v['adapter'];
+                    }
 
                     foreach ($requiredSettings as $setting) {
                         if (
@@ -49,7 +53,9 @@ class Configuration implements ConfigurationInterface
                     return false;
                 })
                 ->then(function ($v) {
-                    return sprintf('Missing required option %s', $v['adapter']);
+                    throw new \InvalidArgumentException(
+                        sprintf('Missing required option \'%s\'', $v['adapter'])
+                    );
                 })
             ->end()
             ->children()
