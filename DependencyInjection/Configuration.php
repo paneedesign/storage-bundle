@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace PaneeDesign\StorageBundle\DependencyInjection;
 
+use Ped\StorageBundle\Utility\Framework\SymfonyFramework;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 
@@ -59,6 +60,16 @@ class Configuration implements ConfigurationInterface
                     ->isRequired()
                     ->cannotBeEmpty()
                 ->end()
+                ->scalarNode('directory')
+                    ->defaultValue('uploads')
+                    ->info('Folder where store media')
+                    ->cannotBeEmpty()
+                ->end()
+                ->scalarNode('thumbs_prefix')
+                    ->defaultValue('thumbs')
+                    ->info('Folder where store thumbnails')
+                    ->cannotBeEmpty()
+                ->end()
                 ->append($this->addAmazonS3Section())
                 ->append($this->addLocalSection())
             ->end();
@@ -103,19 +114,9 @@ class Configuration implements ConfigurationInterface
                     ->info('Amazon S3 Bucket name')
                     ->cannotBeEmpty()
                 ->end()
-                ->scalarNode('directory')
-                    ->info('Folder where store media')
-                    ->defaultValue('uploads')
-                    ->cannotBeEmpty()
-                ->end()
                 ->scalarNode('expire_at')
                     ->info('Max age of a media in a Presigned URL Resolver')
                     ->defaultValue('+1 hour')
-                ->end()
-                ->scalarNode('thumbs_prefix')
-                    ->info('Folder where store thumbnails')
-                    ->defaultValue('thumbs')
-                    ->cannotBeEmpty()
                 ->end()
             ->end();
 
@@ -138,18 +139,13 @@ class Configuration implements ConfigurationInterface
             ->canBeEnabled()
             ->children()
                 ->scalarNode('endpoint')
-                    ->defaultValue('uploads')
-                    ->info('The default endpoint to where store media')
+                    ->defaultValue('/uploads')
+                    ->info('The default endpoint to where retrive media')
                     ->cannotBeEmpty()
                 ->end()
-                ->scalarNode('directory')
-                    ->defaultValue('%kernel.project_dir%/web/uploads')
-                    ->info('Folder where store media')
-                    ->cannotBeEmpty()
-                ->end()
-                ->scalarNode('thumbs_prefix')
-                    ->defaultValue('thumbs')
-                    ->info('Folder where store thumbnails')
+                ->scalarNode('web_root_dir')
+                    ->defaultValue(SymfonyFramework::getContainerResolvableRootWebPath())
+                    ->info('Root where store media (%kernel.project_dir%/web for Symfony < 4.0.0 otherwise %kernel.project_dir%/public)')
                     ->cannotBeEmpty()
                 ->end()
             ->end();

@@ -5,18 +5,16 @@ declare(strict_types=1);
 namespace PaneeDesign\StorageBundle\DependencyInjection;
 
 use Aws\S3\S3Client;
-use Gaufrette\Adapter\AwsS3;
-use Gaufrette\Adapter\Local;
 use Gaufrette\Extras\Resolvable\Resolver\AwsS3PresignedUrlResolver;
 use Gaufrette\Extras\Resolvable\Resolver\AwsS3PublicUrlResolver;
 use Gaufrette\Extras\Resolvable\Resolver\StaticUrlResolver;
-use Gaufrette\Filesystem;
 use Liip\ImagineBundle\Binary\Loader\StreamLoader;
 use Liip\ImagineBundle\Imagine\Cache\Resolver\AwsS3Resolver;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\DependencyInjection\Extension\PrependExtensionInterface;
 use Symfony\Component\DependencyInjection\Loader;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 
@@ -25,8 +23,62 @@ use Symfony\Component\HttpKernel\DependencyInjection\Extension;
  *
  * @see http://symfony.com/doc/current/cookbook/bundles/extension.html
  */
-class PedStorageExtension extends Extension
+class PedStorageExtension extends Extension implements PrependExtensionInterface
 {
+    public function prepend(ContainerBuilder $container)
+    {
+        $configs = $container->getExtensionConfig($this->getAlias());
+        $config = $this->processConfiguration(new Configuration(), $configs);
+
+        foreach ($container->getExtensions() as $name => $extension) {
+            switch ($name) {
+                case 'knp_gaufrette':
+                    $knpConfiguration = [
+                        'stream_wrapper' => [
+                            'protocol' => 'pedstorage',
+                        ],
+                    ];
+
+                    if (Configuration::LOCAL_ADAPTER === $config['adapter']) {
+                        $knpConfiguration['adapters'][sprintf('%s_adapter', $config['adapter'])] = [
+                            'local' => [
+                                'directory' => sprintf('%s/%s', $config['web_root_dir'], $config['directory']),
+                            ],
+                        ];
+                    } elseif (Configuration::AMAZON_S3_ADAPTER === $config['adapter']) {
+                        $knpConfiguration['adapters'][sprintf('local_%s', $config['adapter'])] = [
+                            'aws_s3' => [
+                                'service_id' => 'ped_storage.amazon_s3.client',
+                                'bucket_name' => $config['amazon_s3']['bucket_name'],
+                                'options' => [
+                                    'create' => true,
+                                    'directory' => ['directory'],
+                                ],
+                            ],
+                        ];
+                    }
+
+                    $knpConfiguration['filesystems'][sprintf('%s_fs', $config['adapter'])] = [
+                        'adapter' => sprintf('%s_adapter', $config['adapter']),
+                        'alias' => 'ped_storage.filesystem',
+                    ];
+
+                    $container->prependExtensionConfig($name, $knpConfiguration);
+
+                    break;
+                case 'liip_imagine':
+                    $liipConfiguration = [
+                        'data_loader' => sprintf('loader_%s_data', $config['adapter']),
+                        'cache' => sprintf('%s_fs', $config['adapter']),
+                    ];
+
+                    $container->prependExtensionConfig($name, $liipConfiguration);
+
+                    break;
+            }
+        }
+    }
+
     /**
      * {@inheritdoc}
      *
@@ -39,14 +91,19 @@ class PedStorageExtension extends Extension
 
         if (is_array($config) && \array_key_exists('adapter', $config)) {
             $container->setParameter('ped_storage.adapter', $config['adapter']);
-            $container->setParameter('knp_gaufrette.stream_wrapper.protocol', 'pedstorage');
+            $container->setParameter('ped_storage.directory', $config['directory']);
+            $container->setParameter('ped_storage.thumbs_prefix', $config['thumbs_prefix']);
 
             switch ($config['adapter']) {
                 case Configuration::LOCAL_ADAPTER:
+                    $container->setParameter(
+                        'ped_storage.directory',
+                        sprintf('%s/%s', $config['web_root_dir'], $config['directory'])
+                    );
+
                     $this->loadParameters($config['adapter'], $config[Configuration::LOCAL_ADAPTER], $container);
                     $this->loadLocalResolvers($config['adapter'], $container);
                     $this->loadLoaders($config['adapter'], $container);
-                    $this->loadExternalResources($config['adapter'], $container);
 
                     break;
                 case Configuration::AMAZON_S3_ADAPTER:
@@ -54,7 +111,6 @@ class PedStorageExtension extends Extension
                     $this->loadAmazonS3Client($container);
                     $this->loadAmazonS3Resolvers($config['adapter'], $container);
                     $this->loadLoaders($config['adapter'], $container);
-                    $this->loadExternalResources($config['adapter'], $container);
 
                     break;
             }
@@ -74,9 +130,9 @@ class PedStorageExtension extends Extension
 
     private function loadLocalResolvers(string $adapter, ContainerBuilder $container)
     {
-        if ($container->hasParameter('ped_storage.local.thumbs_prefix')) {
+        if ($container->hasParameter('ped_storage.thumbs_prefix')) {
             $cacheResolver = new ChildDefinition('liip_imagine.cache.resolver.prototype.web_path');
-            $cacheResolver->setArgument('$cachePrefix', $container->getParameter('ped_storage.local.thumbs_prefix'));
+            $cacheResolver->setArgument('$cachePrefix', $container->getParameter('ped_storage.thumbs_prefix'));
 
             $cacheResolver->addTag('liip_imagine.cache.resolver', [
                 'resolver' => sprintf('%s_fs', $adapter),
@@ -122,12 +178,12 @@ class PedStorageExtension extends Extension
         if (
             $container->hasDefinition('ped_storage.amazon_s3.client') &&
             $container->hasParameter('ped_storage.amazon_s3.bucket_name') &&
-            $container->hasParameter('ped_storage.amazon_s3.directory')
+            $container->hasParameter('ped_storage.directory')
         ) {
             $publicUrlResolver = new Definition(AwsS3PublicUrlResolver::class);
             $publicUrlResolver->setArgument('$service', $container->getDefinition('ped_storage.amazon_s3.client'));
             $publicUrlResolver->setArgument('$bucket', $container->getParameter('ped_storage.amazon_s3.bucket_name'));
-            $publicUrlResolver->setArgument('$baseDir', $container->getParameter('ped_storage.amazon_s3.directory'));
+            $publicUrlResolver->setArgument('$baseDir', $container->getParameter('ped_storage.directory'));
             $publicUrlResolver->setPublic(true);
 
             $container->setDefinition('ped_storage.amazon_public_url_resolver', $publicUrlResolver);
@@ -136,7 +192,7 @@ class PedStorageExtension extends Extension
                 $presignedUrlResolver = new Definition(AwsS3PresignedUrlResolver::class);
                 $presignedUrlResolver->setArgument('$service', $container->getDefinition('ped_storage.amazon_s3.client'));
                 $presignedUrlResolver->setArgument('$bucket', $container->getParameter('ped_storage.amazon_s3.bucket_name'));
-                $presignedUrlResolver->setArgument('$baseDir', $container->getParameter('ped_storage.amazon_s3.directory'));
+                $presignedUrlResolver->setArgument('$baseDir', $container->getParameter('ped_storage.directory'));
                 $presignedUrlResolver->setArgument('$expiresAt', $container->getDefinition('expire_at_datetime'));
                 $presignedUrlResolver->setPublic(true);
 
@@ -144,7 +200,7 @@ class PedStorageExtension extends Extension
             }
 
             $staticUrlResolver = new Definition(StaticUrlResolver::class);
-            $staticUrlResolver->setArgument('$prefix', $container->getParameter('ped_storage.amazon_s3.directory'));
+            $staticUrlResolver->setArgument('$prefix', $container->getParameter('ped_storage.directory'));
             $staticUrlResolver->setPublic(true);
 
             $container->setDefinition('ped_storage.amazon_static_url_resolver', $staticUrlResolver);
@@ -153,13 +209,13 @@ class PedStorageExtension extends Extension
         if (
             $container->hasDefinition('ped_storage.amazon_s3.client') &&
             $container->hasParameter('ped_storage.amazon_s3.bucket_name') &&
-            $container->hasParameter('ped_storage.amazon_s3.thumbs_prefix')
+            $container->hasParameter('ped_storage.thumbs_prefix')
         ) {
             $cacheResolver = new Definition(AwsS3Resolver::class);
             $cacheResolver->setArgument('$storage', $container->getDefinition('ped_storage.amazon_s3.client'));
             $cacheResolver->setArgument('$bucket', $container->getParameter('ped_storage.amazon_s3.bucket_name'));
             $cacheResolver->addMethodCall('setCachePrefix', [
-                $container->getParameter('ped_storage.amazon_s3.thumbs_prefix'),
+                $container->getParameter('ped_storage.thumbs_prefix'),
             ]);
 
             $cacheResolver->addTag('liip_imagine.cache.resolver', [
@@ -179,40 +235,5 @@ class PedStorageExtension extends Extension
         ]);
 
         $container->setDefinition(sprintf('ped_storage.imagine.binary.loader.%s', $adapter), $binaryLoader);
-    }
-
-    private function loadExternalResources(string $adapter, ContainerBuilder $container)
-    {
-        $filesystem = new Definition(Filesystem::class);
-
-        if (Configuration::LOCAL_ADAPTER === $adapter) {
-            if ($container->hasParameter('ped_storage.local.directory')) {
-                $localAdapter = new Definition(Local::class);
-                $localAdapter->setArgument('$directory', $container->getParameter('ped_storage.local.directory'));
-
-                $filesystem->setArgument('$adapter', $localAdapter);
-            }
-        } elseif (Configuration::AMAZON_S3_ADAPTER === $adapter) {
-            if (
-                $container->hasDefinition('ped_storage.amazon_s3.client') &&
-                $container->hasParameter('ped_storage.amazon_s3.bucket_name') &&
-                $container->hasParameter('ped_storage.amazon_s3.directory')
-            ) {
-                $awsS3Adapter = new Definition(AwsS3::class);
-                $awsS3Adapter->setArgument('$service', $container->getDefinition('ped_storage.amazon_s3.client'));
-                $awsS3Adapter->setArgument('$bucket', $container->getParameter('ped_storage.amazon_s3.bucket_name'));
-                $awsS3Adapter->setArgument('$options', [
-                    'create' => true,
-                    'directory' => $container->getParameter('ped_storage.amazon_s3.directory'),
-                ]);
-
-                $filesystem->setArgument('$adapter', $awsS3Adapter);
-            }
-        }
-
-        $container->setDefinition('ped_storage.filesystem', $filesystem);
-
-        //$container->setParameter('liip_imagine.data_loader', sprintf('loader_%s_data', $adapter));
-        //$container->setParameter('liip_imagine.cache', sprintf('%s_fs', $adapter));
     }
 }

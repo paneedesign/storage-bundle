@@ -64,9 +64,9 @@ Add to `.env`
 ```dotenv
 ###> paneedesign/storage-bundle ###
 STORAGE_ADAPTER=local
-STORAGE_LOCAL_DIRECTORY=uploads
-STORAGE_LOCAL_ENDPOINT=uploads
-STORAGE_LOCAL_THUMBS_PREFIX=thumbs
+STORAGE_DIRECTORY=uploads
+STORAGE_THUMBS_PREFIX=thumbs
+STORAGE_LOCAL_ENDPOINT=/uploads
 ###< paneedesign/storage-bundle ###
 ```
 
@@ -75,14 +75,14 @@ or
 ```dotenv
 ###> paneedesign/storage-bundle ###
 STORAGE_ADAPTER=amazon_s3
+STORAGE_DIRECTORY=uploads
+STORAGE_THUMBS_PREFIX=thumbs
 STORAGE_AMAZON_S3_KEY=key
 STORAGE_AMAZON_S3_SECRET=secret
 STORAGE_AMAZON_S3_REGION=eu-west-2
 STORAGE_AMAZON_S3_ENDPOINT=https://s3.amazonaws.com
 STORAGE_AMAZON_S3_BUCKET_NAME=ped-local
-STORAGE_AMAZON_S3_DIRECTORY=uploads
 STORAGE_AMAZON_S3_EXPIRE_AT="+1 hour"
-STORAGE_AMAZON_S3_THUMBS_PREFIX=thumbs
 ###< paneedesign/storage-bundle ###
 ```
 

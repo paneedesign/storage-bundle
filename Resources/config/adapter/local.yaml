@@ -7,5 +7,5 @@ services:
         calls:
             -   method: setLocalEndpoint
                 arguments:
-                    - '%ped_storage.local.endpoint%'
+                    - "%env(STORAGE_LOCAL_ENDPOINT)%"
         public: true
