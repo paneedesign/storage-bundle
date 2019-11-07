@@ -318,6 +318,98 @@ class StorageHandler
 }
 ```
 
+## Bonus
+
+Resize:
+-------
+
+Required: 
+
+* filter
+
+In `config/packages/liip_imagine.yaml` define filter as:
+
+```yaml
+liip_imagine:
+    #filters
+    filter_sets:
+        # 1x1
+        icon_1-1:
+            quality: 75
+            filters:
+                relative_resize:
+                    heighten: 40
+                thumbnail:
+                    size: [40, 40]
+                    mode: outbound
+                    allow_upscale: true
+        small_1-1:
+            quality: 75
+            filters:
+                relative_resize:
+                    heighten: 400
+                thumbnail:
+                    size: [400, 400]
+                    mode: outbound
+                    allow_upscale: true
+        medium_1-1:
+            quality: 85
+            filters:
+                relative_resize:
+                    heighten: 800
+                thumbnail:
+                    size: [800, 800]
+                    mode: outbound
+                    allow_upscale: true
+        large_1-1:
+            quality: 90
+            filters:
+                relative_resize:
+                    heighten: 1200
+                thumbnail:
+                    size: [1200, 1200]
+                    mode: outbound
+                    allow_upscale: true
+        xlarge_1-1:
+            quality: 95
+            filters:
+                relative_resize:
+                    heighten: 1600
+                thumbnail:
+                    size: [1600, 1600]
+                    mode: outbound
+                    allow_upscale: true
+```
+
+so when you call this url http://example.com/image/5dc350316d2ee.jpeg?filter=icon_1-1 you have a square image scaled to dimension 40x40px
+
+Crop:
+-----
+
+Required: 
+
+* filter
+* start-x
+* start-y
+* width
+* height
+
+when you call this url http://example.com/image/5dc350316d2ee.jpeg?filter=crop_medium_1-1&start-x=20&start-y=50&width=800&height=800 combine scale option of `medium_1-1` with crop info.
+
+So you have a crop of original image from point `[20,50]` to `[820,850]` (width and height equal 800px) and scale to 800x800px
+
+Rotate:
+------
+
+Required: 
+
+* filter
+* angle
+
+when you call this url http://example.com/image/5dc350316d2ee.jpeg?filter=rotate_medium_1-1&angle=90 combine scale option of `medium_1-1` with rotation angle.
+
+So original image is rotated of 90° and scaled to 800x800px
+
 ## Authors
 
 👤 **Fabiano Roberto <fabiano.roberto@ped.technology>**

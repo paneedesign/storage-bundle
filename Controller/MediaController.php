@@ -88,11 +88,9 @@ class MediaController extends AbstractController
                     $filterName = str_replace('crop_', '', $filter);
 
                     $runtimeFilters = [
-                        'filters' => [
-                            'crop' => [
-                                'start' => [$request->get('start-x'), $request->get('start-y')],
-                                'size'  => [$request->get('width'), $request->get('height')],
-                            ],
+                        'crop' => [
+                            'start' => [$request->get('start-x'), $request->get('start-y')],
+                            'size'  => [$request->get('width'), $request->get('height')],
                         ],
                     ];
 
@@ -103,10 +101,8 @@ class MediaController extends AbstractController
                     $filterName = str_replace('rotate_', '', $filter);
 
                     $runtimeFilters = [
-                        'filters' => [
-                            'rotate' => [
-                                'angle' => $request->get('angle'),
-                            ],
+                        'rotate' => [
+                            'angle' => $request->get('angle'),
                         ],
                     ];
 
