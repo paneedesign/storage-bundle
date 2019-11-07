@@ -9,6 +9,8 @@ declare(strict_types=1);
 
 namespace PaneeDesign\StorageBundle\Entity;
 
+use Doctrine\ORM\Mapping as ORM;
+
 /**
  * @ORM\Embeddable
  */

@@ -81,9 +81,42 @@ class MediaController extends AbstractController
 
         if (null !== $filter) {
             $path = $media->getFullKey();
+            $mediaFilterName = $filter;
 
             try {
-                $url = $this->filterService->getUrlOfFilteredImage($path, $filter);
+                if (strpos($filter, 'crop_') > -1) {
+                    $filterName = str_replace('crop_', '', $filter);
+
+                    $runtimeFilters = [
+                        'filters' => [
+                            'crop' => [
+                                'start' => [$request->get('start-x'), $request->get('start-y')],
+                                'size'  => [$request->get('width'), $request->get('height')],
+                            ],
+                        ],
+                    ];
+
+                    $mediaFilterName = md5(serialize($runtimeFilters));
+
+                    $url = $this->filterService->getUrlOfFilteredImageWithRuntimeFilters($path, $filterName, $runtimeFilters);
+                } elseif (strpos($filter, 'rotate_') > -1) {
+                    $filterName = str_replace('rotate_', '', $filter);
+
+                    $runtimeFilters = [
+                        'filters' => [
+                            'rotate' => [
+                                'angle' => $request->get('angle'),
+                            ],
+                        ],
+                    ];
+
+                    $mediaFilterName = md5(serialize($runtimeFilters));
+
+                    $url = $this->filterService->getUrlOfFilteredImageWithRuntimeFilters($path, $filterName, $runtimeFilters);
+                } else {
+                    $url = $this->filterService->getUrlOfFilteredImage($path, $filter);
+                }
+                //
                 //Cache generated with success
             } catch (NotLoadableException $e) {
                 throw new NotFoundHttpException(sprintf('Source image for path "%s" could not be found', $path));
@@ -95,7 +128,7 @@ class MediaController extends AbstractController
             }
 
             //Maybe process $url to have the same domain for all pictures
-            $media->addFilterByName($filter, $url);
+            $media->addFilterByName($mediaFilterName, $url);
 
             $em = $this->getDoctrine()->getManager();
             $em->persist($media);
