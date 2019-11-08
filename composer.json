@@ -30,7 +30,7 @@
         "ext-exif": "*",
         "ext-gd": "*",
         "aws/aws-sdk-php": "^3.70",
-        "fresh/doctrine-enum-bundle": "^6.2",
+        "fresh/doctrine-enum-bundle": "^5.3|^6.5",
         "gaufrette/extras": "~0.1",
         "knplabs/gaufrette": "~0.5",
         "knplabs/knp-gaufrette-bundle": "~0.5",
