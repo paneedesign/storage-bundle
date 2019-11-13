@@ -392,6 +392,7 @@ class MediaHandler
      * @param string $fullKey
      *
      * @throws \Gaufrette\Extras\Resolvable\UnresolvableObjectException
+     *
      * @return bool|string
      */
     public function getFullUrl(string $fullKey)
@@ -412,6 +413,19 @@ class MediaHandler
         }
 
         return $toReturn;
+    }
+
+    /**
+     * @param string $fullKey
+     *
+     * @return bool|false|string
+     */
+    public function getFileContent(string $fullKey)
+    {
+        /* @var AwsS3Adapter|LocalAdapter $adapter */
+        $adapter = $this->filesystem->getAdapter();
+
+        return $adapter->read($fullKey);
     }
 
     /**
