@@ -538,6 +538,19 @@ class MediaHandler
     }
 
     /**
+     * @param string $fullKey
+     *
+     * @return bool|false|string
+     */
+    public function getFileContent(string $fullKey)
+    {
+        /* @var AwsS3Adapter|LocalAdapter $adapter */
+        $adapter = $this->filesystem->getAdapter();
+
+        return $adapter->read($fullKey);
+    }
+
+    /**
      * @param string $key
      *
      * @return int
