@@ -52,7 +52,7 @@ class PedStorageExtension extends Extension implements PrependExtensionInterface
                                 'bucket_name' => $config['amazon_s3']['bucket_name'],
                                 'options' => [
                                     'create' => true,
-                                    'directory' => ['directory'],
+                                    'directory' => $config['directory'],
                                 ],
                             ],
                         ];
