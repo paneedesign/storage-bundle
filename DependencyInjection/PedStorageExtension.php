@@ -46,7 +46,7 @@ class PedStorageExtension extends Extension implements PrependExtensionInterface
                             ],
                         ];
                     } elseif (Configuration::AMAZON_S3_ADAPTER === $config['adapter']) {
-                        $knpConfiguration['adapters'][sprintf('local_%s', $config['adapter'])] = [
+                        $knpConfiguration['adapters'][sprintf('%s_adapter', $config['adapter'])] = [
                             'aws_s3' => [
                                 'service_id' => 'ped_storage.amazon_s3.client',
                                 'bucket_name' => $config['amazon_s3']['bucket_name'],
