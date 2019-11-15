@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace PaneeDesign\StorageBundle\Controller;
 
+use Gaufrette\Extras\Resolvable\Resolver\AwsS3PresignedUrlResolver;
 use Gaufrette\Extras\Resolvable\UnresolvableObjectException;
 use Liip\ImagineBundle\Exception\Binary\Loader\NotLoadableException;
 use Liip\ImagineBundle\Exception\Imagine\Filter\NonExistingFilterException;
@@ -42,14 +43,21 @@ class MediaController extends AbstractController
      */
     protected $filterService;
 
+    /**
+     * @var AwsS3PresignedUrlResolver
+     */
+    protected $resolver;
+
     public function __construct(
         MediaHandler $uploader,
         MediaRepository $repository,
-        FilterService $filterService
+        FilterService $filterService,
+        AwsS3PresignedUrlResolver $resolver
     ) {
         $this->uploader = $uploader;
         $this->repository = $repository;
         $this->filterService = $filterService;
+        $this->resolver = $resolver;
     }
 
     /**
@@ -210,13 +218,8 @@ class MediaController extends AbstractController
             throw new StorageException('File type not handled', 'INVALID_MEDIA_TYPE');
         }
 
-        if (!$media->getIsPublic() && !$this->getUser()) {
-            throw new AccessDeniedHttpException('Forbidden');
-        }
-
         if ($this->uploader->isInstanceOfAmazonS3()) {
-            $resolver = $this->container->get('ped_storage.amazon_presigned_url_resolver');
-            $this->uploader->setAwsS3Resolver($resolver);
+            $this->uploader->setAwsS3Resolver($this->resolver);
         }
 
         $url = $this->uploader->getFullUrl($media->getFullKey());
