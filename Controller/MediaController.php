@@ -11,6 +11,7 @@ namespace PaneeDesign\StorageBundle\Controller;
 
 use Gaufrette\Extras\Resolvable\Resolver\AwsS3PresignedUrlResolver;
 use Gaufrette\Extras\Resolvable\Resolver\AwsS3PublicUrlResolver;
+use Gaufrette\Extras\Resolvable\ResolverInterface;
 use Gaufrette\Extras\Resolvable\UnresolvableObjectException;
 use Liip\ImagineBundle\Exception\Binary\Loader\NotLoadableException;
 use Liip\ImagineBundle\Exception\Imagine\Filter\NonExistingFilterException;
@@ -45,7 +46,7 @@ class MediaController extends AbstractController
     protected $filterService;
 
     /**
-     * @var AwsS3PresignedUrlResolver
+     * @var ResolverInterface
      */
     protected $resolver;
 
@@ -53,7 +54,7 @@ class MediaController extends AbstractController
         MediaHandler $uploader,
         MediaRepository $repository,
         FilterService $filterService,
-        AwsS3PresignedUrlResolver $resolver
+        ResolverInterface $resolver
     ) {
         $this->uploader = $uploader;
         $this->repository = $repository;
