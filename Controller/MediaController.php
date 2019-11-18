@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace PaneeDesign\StorageBundle\Controller;
 
 use Gaufrette\Extras\Resolvable\Resolver\AwsS3PresignedUrlResolver;
+use Gaufrette\Extras\Resolvable\Resolver\AwsS3PublicUrlResolver;
 use Gaufrette\Extras\Resolvable\UnresolvableObjectException;
 use Liip\ImagineBundle\Exception\Binary\Loader\NotLoadableException;
 use Liip\ImagineBundle\Exception\Imagine\Filter\NonExistingFilterException;
@@ -220,6 +221,12 @@ class MediaController extends AbstractController
 
         if ($this->uploader->isInstanceOfAmazonS3()) {
             $this->uploader->setAwsS3Resolver($this->resolver);
+
+            if ($this->resolver instanceof AwsS3PublicUrlResolver) {
+                if (!$media->getIsPublic() && !$this->getUser()) {
+                    throw new AccessDeniedHttpException('Forbidden');
+                }
+            }
         }
 
         $url = $this->uploader->getFullUrl($media->getFullKey());
