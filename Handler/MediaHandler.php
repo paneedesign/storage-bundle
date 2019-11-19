@@ -12,9 +12,7 @@ namespace PaneeDesign\StorageBundle\Handler;
 use Gaufrette\Adapter\AwsS3 as AwsS3Adapter;
 use Gaufrette\Adapter\Local as LocalAdapter;
 use Gaufrette\Extras\Resolvable\ResolvableFilesystem;
-use Gaufrette\Extras\Resolvable\Resolver\AwsS3PresignedUrlResolver;
-use Gaufrette\Extras\Resolvable\Resolver\AwsS3PublicUrlResolver;
-use Gaufrette\Extras\Resolvable\Resolver\StaticUrlResolver;
+use Gaufrette\Extras\Resolvable\ResolverInterface;
 use Gaufrette\Filesystem;
 use Liip\ImagineBundle\Imagine\Cache\CacheManager;
 use PaneeDesign\StorageBundle\Entity\Media;
@@ -88,10 +86,6 @@ class MediaHandler
 
     /**
      * MediaHandler constructor.
-     *
-     * @param Filesystem   $filesystem
-     * @param CacheManager $liipCacheManager
-     * @param array        $allowedMimeTypes
      */
     public function __construct(Filesystem $filesystem, CacheManager $liipCacheManager, array $allowedMimeTypes = [])
     {
@@ -125,10 +119,7 @@ class MediaHandler
         return $adapter instanceof LocalAdapter;
     }
 
-    /**
-     * @param AwsS3PresignedUrlResolver|AwsS3PublicUrlResolver|StaticUrlResolver $resolver
-     */
-    public function setAwsS3Resolver($resolver): void
+    public function setAwsS3Resolver(ResolverInterface $resolver): void
     {
         $adapter = $this->filesystem->getAdapter();
 
@@ -151,9 +142,6 @@ class MediaHandler
         $this->localEndpoint = $localEndpoint;
     }
 
-    /**
-     * @return string
-     */
     public function getLocalEndpoint(): string
     {
         return $this->localEndpoint;
@@ -171,9 +159,6 @@ class MediaHandler
         return $this;
     }
 
-    /**
-     * @return int
-     */
     public function getId(): int
     {
         return $this->id;
@@ -191,9 +176,6 @@ class MediaHandler
         return $this;
     }
 
-    /**
-     * @return string
-     */
     public function getType(): string
     {
         return $this->type;
@@ -211,9 +193,6 @@ class MediaHandler
         return $this;
     }
 
-    /**
-     * @return string
-     */
     public function getKey(): string
     {
         return $this->key;
@@ -243,25 +222,17 @@ class MediaHandler
         return $this;
     }
 
-    /**
-     * @return bool
-     */
     public function getHasPublicAccess(): bool
     {
         return $this->hasPublicAccess;
     }
 
-    /**
-     * @return string
-     */
     public function getFileType(): string
     {
         return $this->fileType;
     }
 
     /**
-     * @param bool $groupFolders
-     *
      * @return $this
      */
     public function setGroupFolders(bool $groupFolders): self
@@ -272,8 +243,6 @@ class MediaHandler
     }
 
     /**
-     * @param array $allowedMimeTypes
-     *
      * @return MediaHandler
      */
     public function setAllowedMimeTypes(array $allowedMimeTypes): self
@@ -284,8 +253,6 @@ class MediaHandler
     }
 
     /**
-     * @param string $allowedMimeType
-     *
      * @return MediaHandler
      */
     public function addAllowedMimeType(string $allowedMimeType): self
@@ -295,9 +262,6 @@ class MediaHandler
         return $this;
     }
 
-    /**
-     * @param string $allowedMimeType
-     */
     public function removeAllowedMimeType(string $allowedMimeType): void
     {
         if ($index = false === array_search($allowedMimeType, $this->allowedMimeTypes)) {
@@ -305,17 +269,12 @@ class MediaHandler
         }
     }
 
-    /**
-     * @return array
-     */
     public function getAllowedMimeTypes(): array
     {
         return $this->allowedMimeTypes;
     }
 
     /**
-     * @param UploadedFile $file
-     *
      * @return MediaHandler
      */
     public function save(UploadedFile $file): self
@@ -358,9 +317,6 @@ class MediaHandler
     }
 
     /**
-     * @param Media $source
-     * @param Media $dest
-     *
      * @return bool|int|string
      */
     public function copy(Media $source, Media $dest)
@@ -373,9 +329,6 @@ class MediaHandler
         return $adapter->write($dest->getFullKey(), $content);
     }
 
-    /**
-     * @param Media $media
-     */
     public function remove(Media $media): void
     {
         /* @var AwsS3Adapter|LocalAdapter $adapter */
@@ -389,8 +342,6 @@ class MediaHandler
     }
 
     /**
-     * @param string $fullKey
-     *
      * @throws \Gaufrette\Extras\Resolvable\UnresolvableObjectException
      *
      * @return bool|string
@@ -416,8 +367,6 @@ class MediaHandler
     }
 
     /**
-     * @param string $fullKey
-     *
      * @return bool|false|string
      */
     public function getFileContent(string $fullKey)
@@ -428,11 +377,6 @@ class MediaHandler
         return $adapter->read($fullKey);
     }
 
-    /**
-     * @param string $key
-     *
-     * @return int
-     */
     public function getSize(string $key): int
     {
         $fullKey = $this->getFullKey($key);
@@ -445,8 +389,6 @@ class MediaHandler
 
     /**
      * @param string $key
-     *
-     * @return string
      */
     public function getFullKey(?string $key = null): string
     {
@@ -478,11 +420,8 @@ class MediaHandler
     }
 
     /**
-     * @param array  $parts
      * @param string $key
      * @param string $ext
-     *
-     * @return string
      */
     private function computeParts(array $parts, ?string $key = null, ?string $ext = null): string
     {
@@ -510,11 +449,6 @@ class MediaHandler
         return $toReturn;
     }
 
-    /**
-     * @param int $id
-     *
-     * @return string
-     */
     private function getSubPathById(int $id): string
     {
         $numericPath = ceil($id / 100);
@@ -530,8 +464,6 @@ class MediaHandler
     /**
      * Fix file rotation using exif data
      * The file is modified only if needed.
-     *
-     * @param UploadedFile $file
      */
     private function fixFileRotation(UploadedFile $file): void
     {

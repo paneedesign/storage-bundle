@@ -45,11 +45,11 @@ class MediaExtension extends AbstractExtension
     }
 
     /**
-     * @param Media  $image
      * @param string $filter
      * @param bool   $fullUrl
      *
      * @throws \Gaufrette\Extras\Resolvable\UnresolvableObjectException
+     *
      * @return bool|string
      */
     public function image(Media $image, ?string $filter = null, ?bool $fullUrl = false): string
@@ -71,10 +71,7 @@ class MediaExtension extends AbstractExtension
     }
 
     /**
-     * @param Media $document
-     * @param bool  $fullUrl
-     *
-     * @return string
+     * @param bool $fullUrl
      */
     public function document(Media $document, ?bool $fullUrl = false): string
     {
@@ -84,10 +81,7 @@ class MediaExtension extends AbstractExtension
     }
 
     /**
-     * @param Media $video
-     * @param bool  $fullUrl
-     *
-     * @return string
+     * @param bool $fullUrl
      */
     public function video(Media $video, ?bool $fullUrl = false): string
     {
@@ -97,10 +91,7 @@ class MediaExtension extends AbstractExtension
     }
 
     /**
-     * @param Media $audio
-     * @param bool  $fullUrl
-     *
-     * @return string
+     * @param bool $fullUrl
      */
     public function audio(Media $audio, ?bool $fullUrl = false): string
     {

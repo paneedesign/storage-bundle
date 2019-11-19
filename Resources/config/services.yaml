@@ -18,4 +18,4 @@ services:
             $uploader: '@ped_storage.uploader'
             $repository: '@repository.media'
             $filterService: '@liip_imagine.service.filter'
-            $resolver: '@ped_storage.amazon_presigned_url_resolver'
+            $resolver: '@?ped_storage.amazon_presigned_url_resolver'

@@ -9,7 +9,6 @@ declare(strict_types=1);
 
 namespace PaneeDesign\StorageBundle\Controller;
 
-use Gaufrette\Extras\Resolvable\Resolver\AwsS3PresignedUrlResolver;
 use Gaufrette\Extras\Resolvable\Resolver\AwsS3PublicUrlResolver;
 use Gaufrette\Extras\Resolvable\ResolverInterface;
 use Gaufrette\Extras\Resolvable\UnresolvableObjectException;
@@ -54,7 +53,7 @@ class MediaController extends AbstractController
         MediaHandler $uploader,
         MediaRepository $repository,
         FilterService $filterService,
-        ResolverInterface $resolver
+        ?ResolverInterface $resolver = null
     ) {
         $this->uploader = $uploader;
         $this->repository = $repository;
@@ -69,9 +68,6 @@ class MediaController extends AbstractController
      *     name="ped_storage_image",
      *     options={"i18n" = false}
      * )
-     *
-     * @param Request $request
-     * @param string  $key
      *
      * @throws UnresolvableObjectException
      * @throws StorageException
@@ -100,7 +96,7 @@ class MediaController extends AbstractController
                     $runtimeFilters = [
                         'crop' => [
                             'start' => [$request->get('start-x'), $request->get('start-y')],
-                            'size'  => [$request->get('width'), $request->get('height')],
+                            'size' => [$request->get('width'), $request->get('height')],
                         ],
                     ];
 
@@ -152,8 +148,6 @@ class MediaController extends AbstractController
      *     options={"i18n" = false}
      * )
      *
-     * @param string $key
-     *
      * @throws StorageException
      * @throws UnresolvableObjectException
      *
@@ -171,8 +165,6 @@ class MediaController extends AbstractController
      *     name="ped_storage_video",
      *     options={"i18n" = false}
      * )
-     *
-     * @param string $key
      *
      * @throws StorageException
      * @throws UnresolvableObjectException
@@ -192,8 +184,6 @@ class MediaController extends AbstractController
      *     options={"i18n" = false}
      * )
      *
-     * @param string $key
-     *
      * @throws StorageException
      * @throws UnresolvableObjectException
      *
@@ -205,12 +195,10 @@ class MediaController extends AbstractController
     }
 
     /**
-     * @param string $key
-     * @param string $type
-     *
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse
      * @throws StorageException
      * @throws UnresolvableObjectException
+     *
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse
      */
     protected function getMediaByKeyAndType(string $key, string $type)
     {
@@ -220,11 +208,11 @@ class MediaController extends AbstractController
             throw new StorageException('File type not handled', 'INVALID_MEDIA_TYPE');
         }
 
-        if ($this->uploader->isInstanceOfAmazonS3()) {
+        if ($this->uploader->isInstanceOfAmazonS3() && null !== $this->resolver) {
             $this->uploader->setAwsS3Resolver($this->resolver);
 
             if ($this->resolver instanceof AwsS3PublicUrlResolver) {
-                if (!$media->getIsPublic() && !$this->getUser()) {
+                if (false === $media->isPublic()) {
                     throw new AccessDeniedHttpException('Forbidden');
                 }
             }
@@ -236,9 +224,6 @@ class MediaController extends AbstractController
     }
 
     /**
-     * @param string $key
-     *
-     * @return Media
      * @throws StorageException
      */
     private function getMediaByKey(string $key): Media

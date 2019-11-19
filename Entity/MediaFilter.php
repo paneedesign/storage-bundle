@@ -10,15 +10,17 @@ declare(strict_types=1);
 namespace PaneeDesign\StorageBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use PaneeDesign\StorageBundle\Entity\Traits\Timestampable\Timestampable;
 
 /**
  * Class MediaFilter.
  *
  * @ORM\Entity
- * @ORM\HasLifecycleCallbacks
  */
 class MediaFilter
 {
+    use Timestampable;
+
     /**
      * @var int
      *
@@ -80,8 +82,6 @@ class MediaFilter
 
     /**
      * Set image.
-     *
-     * @param Media $image
      *
      * @return MediaFilter
      */
