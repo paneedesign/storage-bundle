@@ -23,7 +23,11 @@ parameters:
 
 ```yaml
 ped_storage:
-    adapter: local
+    adapter:       local
+    directory:     "%env(STORAGE_DIRECTORY)%"
+    thumbs_prefix: "%env(STORAGE_THUMBS_PREFIX)%"
+    local:
+        endpoint: "%env(STORAGE_LOCAL_ENDPOINT)%"
 ```
 
 or
@@ -58,3 +62,17 @@ ped_storage:
 ```
 
 * Replace `@=service(container.getParameter('ped_storage.uploader'))` with `@ped_storage.uploader`
+* Replace:
+
+```php
+$service = $this->getParameter('ped_storage.uploader');
+
+/* @var MediaHandler $uploader */
+$uploader = $this->get($service);
+```
+
+with:
+
+```php
+$uploader = $this->get('ped_storage.uploader');
+```
