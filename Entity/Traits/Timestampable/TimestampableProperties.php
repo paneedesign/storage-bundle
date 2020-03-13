@@ -14,12 +14,12 @@ use Doctrine\ORM\Mapping as ORM;
 trait TimestampableProperties
 {
     /**
-     * @ORM\Column(type="datetime", nullable=true, options={"default" = "CURRENT_TIMESTAMP"})
+     * @ORM\Column(type="datetime", nullable=true, options={"default": "CURRENT_TIMESTAMP"})
      */
     protected $createdAt;
 
     /**
-     * @ORM\Column(type="datetime", nullable=true, options={"default" = "CURRENT_TIMESTAMP"})
+     * @ORM\Column(type="datetime", nullable=true, options={"default": "CURRENT_TIMESTAMP"})
      */
     protected $updatedAt;
 }

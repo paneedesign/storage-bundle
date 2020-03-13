@@ -89,7 +89,7 @@ class PedStorageExtension extends Extension implements PrependExtensionInterface
         $configuration = new Configuration();
         $config = $this->processConfiguration($configuration, $configs);
 
-        if (is_array($config) && \array_key_exists('adapter', $config)) {
+        if (\is_array($config) && \array_key_exists('adapter', $config)) {
             $container->setParameter('ped_storage.adapter', $config['adapter']);
             $container->setParameter('ped_storage.directory', $config['directory']);
             $container->setParameter('ped_storage.thumbs_prefix', $config['thumbs_prefix']);

@@ -64,9 +64,9 @@ class MediaController extends AbstractController
     /**
      * @Route(
      *     "/image/{key}",
-     *     requirements={"key" = ".+"},
+     *     requirements={"key": ".+"},
      *     name="ped_storage_image",
-     *     options={"i18n" = false}
+     *     options={"i18n": false}
      * )
      *
      * @throws UnresolvableObjectException
@@ -143,9 +143,9 @@ class MediaController extends AbstractController
     /**
      * @Route(
      *     "/document/{key}",
-     *     requirements={"key" = ".+"},
+     *     requirements={"key": ".+"},
      *     name="ped_storage_document",
-     *     options={"i18n" = false}
+     *     options={"i18n": false}
      * )
      *
      * @throws StorageException
@@ -161,9 +161,9 @@ class MediaController extends AbstractController
     /**
      * @Route(
      *     "/video/{key}",
-     *     requirements={"key" = ".+"},
+     *     requirements={"key": ".+"},
      *     name="ped_storage_video",
-     *     options={"i18n" = false}
+     *     options={"i18n": false}
      * )
      *
      * @throws StorageException
@@ -179,9 +179,9 @@ class MediaController extends AbstractController
     /**
      * @Route(
      *     "/audio/{key}",
-     *     requirements={"key" = ".+"},
+     *     requirements={"key": ".+"},
      *     name="ped_storage_audio",
-     *     options={"i18n" = false}
+     *     options={"i18n": false}
      * )
      *
      * @throws StorageException

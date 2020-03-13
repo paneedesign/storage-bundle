@@ -37,14 +37,14 @@ class Configuration implements ConfigurationInterface
                 ->ifTrue(function ($v) {
                     $requiredSettings = [];
 
-                    if (Configuration::AMAZON_S3_ADAPTER === $v['adapter']) {
+                    if (self::AMAZON_S3_ADAPTER === $v['adapter']) {
                         $requiredSettings[] = $v['adapter'];
                     }
 
                     foreach ($requiredSettings as $setting) {
                         if (
-                            !array_key_exists($setting, $v) ||
-                            (array_key_exists($setting, $v) && false === $v[$setting]['enabled'])
+                            !\array_key_exists($setting, $v) ||
+                            (\array_key_exists($setting, $v) && false === $v[$setting]['enabled'])
                         ) {
                             return true;
                         }

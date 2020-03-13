@@ -21,7 +21,7 @@ use PaneeDesign\StorageBundle\Entity\Traits\Timestampable\Timestampable;
  * @ORM\Table(name="media", uniqueConstraints={@ORM\UniqueConstraint(name="name_idx", columns={"filename"})})
  * @ORM\InheritanceType("SINGLE_TABLE")
  * @ORM\DiscriminatorColumn(name="discr", type="string")
- * @ORM\DiscriminatorMap({"media" = "Media"})
+ * @ORM\DiscriminatorMap({"media": "Media"})
  */
 abstract class Media
 {
@@ -60,7 +60,7 @@ abstract class Media
     protected $size = 0;
 
     /**
-     * @ORM\Column(name="is_public", type="boolean", options={"default" = false}))
+     * @ORM\Column(name="is_public", type="boolean", options={"default": false}))
      */
     protected $isPublic = false;
 
