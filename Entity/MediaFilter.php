@@ -60,10 +60,8 @@ class MediaFilter
      * Set filter.
      *
      * @param string $name
-     *
-     * @return MediaFilter
      */
-    public function setName($name)
+    public function setName($name): self
     {
         $this->name = $name;
 
@@ -82,10 +80,8 @@ class MediaFilter
 
     /**
      * Set image.
-     *
-     * @return MediaFilter
      */
-    public function setImage(Media $image)
+    public function setImage(Media $image): self
     {
         $this->image = $image;
 
@@ -106,10 +102,8 @@ class MediaFilter
      * Set url.
      *
      * @param string $url
-     *
-     * @return MediaFilter
      */
-    public function setUrl($url)
+    public function setUrl($url): self
     {
         $this->url = $url;
 

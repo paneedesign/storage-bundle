@@ -121,9 +121,9 @@ class MediaController extends AbstractController
                 //
                 //Cache generated with success
             } catch (NotLoadableException $e) {
-                throw new NotFoundHttpException(sprintf('Source image for path "%s" could not be found', $path));
+                throw new NotFoundHttpException(sprintf('Source image for path "%s" could not be found', $path), $e);
             } catch (NonExistingFilterException $e) {
-                throw new NotFoundHttpException(sprintf('Requested non-existing filter "%s"', $filter));
+                throw new NotFoundHttpException(sprintf('Requested non-existing filter "%s"', $filter), $e);
             } catch (\RuntimeException $e) {
                 $errorTemplate = 'Unable to create image for path "%s" and filter "%s". Message was "%s"';
                 throw new \RuntimeException(sprintf($errorTemplate, $path, $filter, $e->getMessage()), 0, $e);
@@ -211,10 +211,8 @@ class MediaController extends AbstractController
         if ($this->uploader->isInstanceOfAmazonS3() && null !== $this->resolver) {
             $this->uploader->setAwsS3Resolver($this->resolver);
 
-            if ($this->resolver instanceof AwsS3PublicUrlResolver) {
-                if (false === $media->isPublic()) {
-                    throw new AccessDeniedHttpException('Forbidden');
-                }
+            if ($this->resolver instanceof AwsS3PublicUrlResolver && false === $media->isPublic()) {
+                throw new AccessDeniedHttpException('Forbidden');
             }
         }
 

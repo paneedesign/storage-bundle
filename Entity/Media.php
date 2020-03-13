@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace PaneeDesign\StorageBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use PaneeDesign\StorageBundle\Entity\Traits\Timestampable\Timestampable;
 
@@ -60,7 +61,9 @@ abstract class Media
     protected $size = 0;
 
     /**
-     * @ORM\Column(name="is_public", type="boolean", options={"default": false}))
+     * @var bool
+     *
+     * @ORM\Column(name="is_public", type="boolean", options={"default": false})
      */
     protected $isPublic = false;
 
@@ -81,11 +84,6 @@ abstract class Media
      */
     protected $cropFilter;
 
-    /**
-     * Constructor.
-     *
-     * @throws \Exception
-     */
     public function __construct()
     {
         $this->filters = new ArrayCollection();
@@ -105,10 +103,8 @@ abstract class Media
      * Set key.
      *
      * @param string $key
-     *
-     * @return Media
      */
-    public function setKey($key)
+    public function setKey($key): self
     {
         $this->key = $key;
 
@@ -129,10 +125,8 @@ abstract class Media
      * Set path.
      *
      * @param string $path
-     *
-     * @return Media
      */
-    public function setPath($path)
+    public function setPath($path): self
     {
         $this->path = $path;
 
@@ -163,10 +157,8 @@ abstract class Media
      * Set type.
      *
      * @param string $type
-     *
-     * @return Media
      */
-    public function setType($type)
+    public function setType($type): self
     {
         $this->type = $type;
 
@@ -187,10 +179,8 @@ abstract class Media
      * Set file type.
      *
      * @param string $fileType
-     *
-     * @return Media
      */
-    public function setFileType($fileType)
+    public function setFileType($fileType): self
     {
         $this->fileType = $fileType;
 
@@ -211,10 +201,8 @@ abstract class Media
      * Set size.
      *
      * @param int $size
-     *
-     * @return Media
      */
-    public function setSize($size)
+    public function setSize($size): self
     {
         $this->size = $size;
 
@@ -231,36 +219,19 @@ abstract class Media
         return $this->size;
     }
 
-    /**
-     * Set if file is Public.
-     *
-     * @param string $isPublic
-     *
-     * @return Media
-     */
-    public function setIsPublic($isPublic)
+    public function setIsPublic(bool $isPublic): self
     {
         $this->isPublic = $isPublic;
 
         return $this;
     }
 
-    /**
-     * Get if file is Public.
-     *
-     * @return string
-     */
-    public function isPublic()
+    public function isPublic(): bool
     {
         return $this->isPublic;
     }
 
-    /**
-     * Add filter.
-     *
-     * @return Media
-     */
-    public function addFilter(MediaFilter $filter)
+    public function addFilter(MediaFilter $filter): self
     {
         $this->filters[] = $filter;
 
@@ -272,12 +243,10 @@ abstract class Media
      *
      * @param string $filterName
      * @param $url
-     *
-     * @return Media
      */
-    public function addFilterByName($filterName, $url)
+    public function addFilterByName($filterName, $url): self
     {
-        if (false === $this->hasFilter($filterName)) {
+        if (!$this->hasFilter($filterName)) {
             $filter = new MediaFilter();
             $filter->setImage($this);
             $filter->setName($filterName);
@@ -334,10 +303,8 @@ abstract class Media
 
     /**
      * Get filters.
-     *
-     * @return \Doctrine\Common\Collections\Collection
      */
-    public function getFilters()
+    public function getFilters(): Collection
     {
         return $this->filters;
     }

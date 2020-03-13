@@ -24,13 +24,7 @@ class Configuration implements ConfigurationInterface
     public function getConfigTreeBuilder()
     {
         $treeBuilder = new TreeBuilder('ped_storage');
-
-        if (method_exists($treeBuilder, 'getRootNode')) {
-            $rootNode = $treeBuilder->getRootNode();
-        } else {
-            // BC layer for symfony/config 4.1 and older
-            $rootNode = $treeBuilder->root('ped_storage');
-        }
+        $rootNode = $treeBuilder->getRootNode();
 
         $rootNode
             ->validate()
@@ -84,13 +78,7 @@ class Configuration implements ConfigurationInterface
     private function addAmazonS3Section()
     {
         $treeBuilder = new TreeBuilder(self::AMAZON_S3_ADAPTER);
-
-        if (method_exists($treeBuilder, 'getRootNode')) {
-            $node = $treeBuilder->getRootNode();
-        } else {
-            // BC layer for symfony/config 4.1 and older
-            $node = $treeBuilder->root(self::AMAZON_S3_ADAPTER);
-        }
+        $node = $treeBuilder->getRootNode();
 
         $node
             ->info('Section can be enabled to store media on Amazon S3')
@@ -130,13 +118,7 @@ class Configuration implements ConfigurationInterface
     private function addLocalSection()
     {
         $treeBuilder = new TreeBuilder(self::LOCAL_ADAPTER);
-
-        if (method_exists($treeBuilder, 'getRootNode')) {
-            $node = $treeBuilder->getRootNode();
-        } else {
-            // BC layer for symfony/config 4.1 and older
-            $node = $treeBuilder->root(self::LOCAL_ADAPTER);
-        }
+        $node = $treeBuilder->getRootNode();
 
         $node
             ->info('Section can be enabled to store media on local filesystem')

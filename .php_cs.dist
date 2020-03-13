@@ -1,5 +1,10 @@
 <?php
 
+$finder = PhpCsFixer\Finder::create()
+    ->in(__DIR__)
+    ->exclude('vendor')
+;
+
 return PhpCsFixer\Config::create()
     ->setRiskyAllowed(true)
     ->setRules([
@@ -34,4 +39,5 @@ return PhpCsFixer\Config::create()
         'array_syntax' => ['syntax' => 'short'],
         'phpdoc_types_order' => ['null_adjustment' => 'always_last'],
     ])
+    ->setFinder($finder)
 ;

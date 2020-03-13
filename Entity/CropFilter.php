@@ -76,7 +76,7 @@ final class CropFilter
 
     public function __toString()
     {
-        return json_encode($this);
+        return json_encode($this, JSON_THROW_ON_ERROR);
     }
 
     public function setX1(int $x1)

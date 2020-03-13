@@ -23,9 +23,6 @@ trait TimestampableMethods
         return $this->createdAt;
     }
 
-    /**
-     * @return $this
-     */
     public function setCreatedAt(\DateTime $createdAt): self
     {
         $this->createdAt = $createdAt;
@@ -33,17 +30,11 @@ trait TimestampableMethods
         return $this;
     }
 
-    /**
-     * Returns updatedAt value.
-     */
     public function getUpdatedAt(): \DateTime
     {
         return $this->updatedAt;
     }
 
-    /**
-     * @return $this
-     */
     public function setUpdatedAt(\DateTime $updatedAt): self
     {
         $this->updatedAt = $updatedAt;

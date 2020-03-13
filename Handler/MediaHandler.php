@@ -13,6 +13,7 @@ use Gaufrette\Adapter\AwsS3 as AwsS3Adapter;
 use Gaufrette\Adapter\Local as LocalAdapter;
 use Gaufrette\Extras\Resolvable\ResolvableFilesystem;
 use Gaufrette\Extras\Resolvable\ResolverInterface;
+use Gaufrette\Extras\Resolvable\UnresolvableObjectException;
 use Gaufrette\Filesystem;
 use Liip\ImagineBundle\Imagine\Cache\CacheManager;
 use PaneeDesign\StorageBundle\Entity\Media;
@@ -264,7 +265,7 @@ class MediaHandler
 
     public function removeAllowedMimeType(string $allowedMimeType): void
     {
-        if ($index = false === array_search($allowedMimeType, $this->allowedMimeTypes)) {
+        if ($index = !\in_array($allowedMimeType, $this->allowedMimeTypes, true)) {
             unset($this->allowedMimeTypes[$index]);
         }
     }
@@ -282,7 +283,7 @@ class MediaHandler
         $mimeType = $file->getMimeType();
 
         // Check if the file's mime type is in the list of allowed mime types.
-        if (false === \in_array($mimeType, $this->getAllowedMimeTypes())) {
+        if (!\in_array($mimeType, $this->getAllowedMimeTypes())) {
             throw new \InvalidArgumentException(sprintf('Files of type %s are not allowed.', $mimeType));
         }
 
@@ -342,7 +343,7 @@ class MediaHandler
     }
 
     /**
-     * @throws \Gaufrette\Extras\Resolvable\UnresolvableObjectException
+     * @throws UnresolvableObjectException
      *
      * @return bool|string
      */
@@ -357,10 +358,8 @@ class MediaHandler
             if ($adapter->exists($fullKey)) {
                 $toReturn = $this->localEndpoint . '/' . $fullKey;
             }
-        } else {
-            if ($this->filesystem->has($fullKey)) {
-                $toReturn = $this->filesystem->resolve($fullKey);
-            }
+        } elseif ($this->filesystem->has($fullKey)) {
+            $toReturn = $this->filesystem->resolve($fullKey);
         }
 
         return $toReturn;
@@ -452,13 +451,12 @@ class MediaHandler
     private function getSubPathById(int $id): string
     {
         $numericPath = ceil($id / 100);
-        $stringPath = str_replace(
+
+        return str_replace(
             ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0'],
             ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'l'],
             (string) $numericPath
         );
-
-        return $stringPath;
     }
 
     /**
