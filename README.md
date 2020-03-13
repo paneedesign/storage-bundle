@@ -1,30 +1,17 @@
-Pane e Design - Storage Bundle
-==============================
+<h1 align="center">Welcome to PED Storage Bundle 👋</h1>
+<p>
+  <img alt="Version" src="https://img.shields.io/badge/version-v6.0.0-blue.svg?cacheSeconds=2592000" />
+  <a href="#" target="_blank">
+    <img alt="License: MIT" src="https://img.shields.io/badge/License-MIT-yellow.svg" />
+  </a>
+</p>
 
-Storage management for Symfony3 projects.
+A Symfony bundle that provide tools to handle media storage locally or on S3.
 
-Installation
-============
+## Installation
 
 Step 1: Download the Bundle
 ---------------------------
-
-Pane&Design repository is private so, add to `composer.json` this `vcs`
-
-```json
-    "repositories" : [
-        ...
-        {
-            "type" : "vcs",
-            "url" : "git@bitbucket.org:paneedesign/storage-bundle.git"
-        }
-    ],
-    ...
-    "require": {
-        ...
-        "paneedesign/storage-bundle": "^4.0"   
-    }
-```
 
 Open a command console, enter your project directory and execute the
 following command to download the latest stable version of this bundle:
@@ -72,34 +59,44 @@ class AppKernel extends Kernel
 Step 3: Configurations
 ----------------------
 
-Copy parameters
+Add to `.env`
 
-```
-// app/config/parameters.yml.dist
-parameters:
-    ...
-    storage_amazon_s3_key:         ~
-    storage_amazon_s3_secret:      ~
-    storage_amazon_s3_region:      eu-west-1
-    storage_amazon_s3_endpoint:    'https://s3.amazonaws.com'
-    storage_amazon_s3_bucket_name: ~
-    storage_amazon_s3_directory:   uploads
-    storage_amazon_s3_expire_at:   +1 hour
-    storage_local_directory:       "%kernel.root_dir%/../web/uploads"
-    storage_local_endpoint:        /uploads
-    storage_amazon_s3_thumbs_prefix: thumbs
-    storage_local_thumbs_prefix: thumbs
-    storage_adapter:               local
-    #storage_adapter:              amazon
+```dotenv
+###> paneedesign/storage-bundle ###
+STORAGE_ADAPTER=local
+STORAGE_DIRECTORY=uploads
+STORAGE_THUMBS_PREFIX=thumbs
+STORAGE_LOCAL_ENDPOINT=/uploads
+###< paneedesign/storage-bundle ###
 ```
 
-Add configuration:
+or
+
+```dotenv
+###> paneedesign/storage-bundle ###
+STORAGE_ADAPTER=amazon_s3
+STORAGE_DIRECTORY=uploads
+STORAGE_THUMBS_PREFIX=thumbs
+STORAGE_AMAZON_S3_KEY=key
+STORAGE_AMAZON_S3_SECRET=secret
+STORAGE_AMAZON_S3_REGION=eu-west-2
+STORAGE_AMAZON_S3_ENDPOINT=https://s3.amazonaws.com
+STORAGE_AMAZON_S3_BUCKET_NAME=ped-local
+STORAGE_AMAZON_S3_EXPIRE_AT="+1 hour"
+###< paneedesign/storage-bundle ###
+```
+
+Copy under `config/packeges` following files: 
+
+* `config/packeges/ped_storage.yaml`
+
+and under `config/routes`:
+
+* `config/routes/ped_storage.yaml`
+
+Set into `config/packages/doctrine.yaml`
 
 ```yml
-//...
-imports:
-    - { resource: "@PedUserBundle/Resources/config/config.yml" }
-
 //...
 
 doctrine:
@@ -107,7 +104,11 @@ doctrine:
         types:
             enum_media_type: PaneeDesign\StorageBundle\DBAL\EnumMediaType
             enum_file_type: PaneeDesign\StorageBundle\DBAL\EnumFileType
-            
+```            
+
+and into `config/packages/ped_discriminator_map.yaml`
+
+```yml
 //...
 
 ped_discriminator_map:
@@ -119,183 +120,315 @@ ped_discriminator_map:
         ...
 ```
 
-Create a Controller with this route:
-
-```php
-/**
- * @Route(
- *     "/media/{key}",
- *     name="media",
- * )
- *
- * @param Request $request
- * @param string $key
- *
- * @return Response
- * @throws \Gaufrette\Extras\Resolvable\UnresolvableObjectException
- * @throws \Exception
- */
-public function mediaAction(Request $request, $key)
-{
-    $filter = $request->get('filter');
-
-    /* @var EntityRepository $repository */
-    $repository = $this->get('doctrine')
-        ->getRepository('AppBundle:Media');
-
-    /* @var Media $media*/
-    $media = $repository->findOneBy(['key' => $key]);
-
-    if ($media === null) {
-        throw $this->createNotFoundException('Mediakeynot found!');
-    }
-
-    if ($media->getFileType() !== EnumFileType::IMAGE) {
-        throw new \Exception("File type not handled!");
-    }
-
-    $service = $this->container->getParameter('ped_storage.uploader');
-    /* @var MediaHandler $uploader */
-    $uploader = $this->container->get($service);
-
-    $liipCacheManager = $this->get('liip_imagine.cache.manager');
-
-    if ($filter !== null) {
-        $path = $media->getFullKey();
-        if ($liipCacheManager->isStored($path, $filter)) {
-            $url = $liipCacheManager->resolve($path, $filter);
-        } else {
-            //Update here image filter
-            $liipServiceFilter = $this->get('liip_imagine.service.filter');
-            try {
-                $url = $liipServiceFilter->getUrlOfFilteredImage($path, $filter);
-                //Cache generated with success
-            } catch (NotLoadableException $e) {
-                throw new NotFoundHttpException(sprintf('Source image for path "%s" could not be found', $path));
-            } catch (NonExistingFilterException $e) {
-                throw new NotFoundHttpException(sprintf('Requested non-existing filter "%s"', $filter));
-            } catch (RuntimeException $e) {
-                $errorTemplate = 'Unable to create image for path "%s" and filter "%s". Message was "%s"';
-                throw new \RuntimeException(sprintf($errorTemplate, $path, $filter, $e->getMessage()), 0, $e);
-            }
-        }
-
-        $media->addFilterByName($filter, $url);
-        $em = $this->getDoctrine()->getManager();
-        $em->persist($media);
-        $em->flush();
-    } else {
-        $url = $uploader->getFullUrl($media->getFullKey());
-    }
-
-    return $this->redirect($url, 301);
-}
-```
-
 Step 4: Use
 -----------
 
-You can upload a picture using this snippets:
+You can store image or document and retrive full url of resource using this snippets:
 
 ```php
-/**
- * Upload Image
- *
- * @param Request $request
- * @param string $name Image field name
- * @param int $id Entity ID
- * @param string $type Entity Type
- * @return Media
- */
-protected function uploadImageAction(Request $request, $name, $id, $type)
-{  
-    $image   = $request->files->get($name);
-    $service = $this->getParameter('ped_storage.uploader');
-    
-    $uploader = $this->get($service)
-        ->setId($id)
-        ->setType($type)
-        ->setFileType(EnumFileType::IMAGE) //image, video, document
-        ->setGroupFolders(false);
-    
-    $uploader->save($image);
-    
-    //Save in DB
-    $media = new Media();
-    
-    $media->setKey($uploader->getKey());
-    $media->setPath($uploader->getFullKey(''));
-    $media->setFileType($uploader->getFileType());
-    
-    $media->setType(EnumMediaType::GALLERY);
-    $media->setSize($image->getSize());
+<?php
 
-    $em = $this->getDoctrine()->getManager();
-    $em->persist($media);
-    $em->flush();
-}
-```
+declare(strict_types=1);
 
-and retrive full url by using this function that can also be a Twig Filter:
+namespace App\Handler;
 
+use App\Entity\Media;
+use Gaufrette\Extras\Resolvable\UnresolvableObjectException;
+use PaneeDesign\StorageBundle\DBAL\EnumFileType;
+use PaneeDesign\StorageBundle\DBAL\EnumMediaType;
+use PaneeDesign\StorageBundle\Entity\Media as PedMedia;
+use PaneeDesign\StorageBundle\Handler\MediaHandler;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Symfony\Component\Routing\RouterInterface;
 
-```php
-/**
- * @param Media $image
- * @param string $filter
- *
- * @return bool|string
- * @throws \Gaufrette\Extras\Resolvable\UnresolvableObjectException
- */
-public function getMediaUrl(Media $image, $filter = null)
+class StorageHandler
 {
-    if ($filter !== null) {
-        if ($image->hasFilter($filter)) {
-            return $image->getUrl($filter);
-        } else {
-            return $this->router->generate(
-                'media',
-                [
-                    'key'    => $image->getKey(),
-                    'filter' => $filter,
-                ]
-            );
+    /**
+     * @var RouterInterface
+     */
+    protected $router;
+    /**
+     * @var MediaHandler
+     */
+    private $mediaHandler;
+
+    /**
+     * MediaManager constructor.
+     *
+     * @param MediaHandler    $mediaHandler
+     * @param RouterInterface $router
+     */
+    public function __construct(MediaHandler $mediaHandler, RouterInterface $router)
+    {
+        $this->mediaHandler = $mediaHandler;
+        $this->router = $router;
+    }
+
+    /**
+     * @param PedMedia    $media
+     * @param string|null $filter
+     *
+     * @return string
+     */
+    public function generateAbsoluteUri(PedMedia $media, ?string $filter = null)
+    {
+        $url = '';
+
+        try {
+            if (null !== $filter) {
+                if ($media->hasFilter($filter)) {
+                    $url = $media->getUrl($filter);
+                } else {
+                    $url = $this->router->generate('ped_storage_image', [
+                        'key' => $media->getKey(),
+                        'filter' => $filter,
+                    ]);
+                }
+            } else {
+                $url = $this->mediaHandler->getFullUrl($media->getFullKey());
+            }
+        } catch (UnresolvableObjectException $e) {
+        } catch (\Exception $e) {
         }
-    } else {
-        $service = $this->container->getParameter('ped_storage.uploader');
+
+        return $url ?: '';
+    }
+
+    /**
+     * @param int           $entityId
+     * @param string        $type
+     * @param UploadedFile  $media
+     * @param PedMedia|null $image
+     * @param string|null   $mediaType
+     *
+     * @throws \Exception
+     *
+     * @return Media
+     */
+    public function storeImage(
+        int $entityId,
+        string $type,
+        UploadedFile $media,
+        ?PedMedia $image = null,
+        ?string $mediaType = EnumMediaType::PROFILE
+    ): Media {
+        $hasPublicAccess = false;
+        $allowedMimeTypes = [
+            'image/jpeg',
+            'image/png',
+            'image/gif',
+        ];
+
+        $uploader = $this->getUploader($entityId, $type, EnumFileType::IMAGE, $hasPublicAccess, $allowedMimeTypes);
+
+        if (null === $image) {
+            $image = new Media();
+            $image->setType($mediaType);
+        } else {
+            $image->clearFilters();
+            $uploader->remove($image);
+        }
+
+        $uploader->save($media);
+
+        $image = new Media();
+        $image->setKey($uploader->getKey());
+        $image->setPath($uploader->getFullKey(''));
+        $image->setFileType($uploader->getFileType());
+        $image->setSize($media->getSize());
+        $image->setIsPublic($uploader->getHasPublicAccess());
+
+        return $image;
+    }
+
+    /**
+     * @param int           $entityId
+     * @param string        $type
+     * @param UploadedFile  $media
+     * @param PedMedia|null $document
+     * @param string|null   $mediaType
+     *
+     * @throws \Exception
+     *
+     * @return Media
+     */
+    public function storeDocument(
+        int $entityId,
+        string $type,
+        UploadedFile $media,
+        ?PedMedia $document = null,
+        ?string $mediaType = EnumMediaType::DOCUMENT
+    ): Media {
+        $hasPublicAccess = true;
+        $allowedMimeTypes = [
+            'image/jpeg',
+            'image/png',
+            'image/gif',
+            'application/pdf',
+        ];
+
+        $uploader = $this->getUploader($entityId, $type, EnumFileType::DOCUMENT, $hasPublicAccess, $allowedMimeTypes);
+
+        if (null === $document) {
+            $document = new Media();
+            $document->setType($mediaType);
+        } else {
+            $document->clearFilters();
+            $uploader->remove($document);
+        }
+
+        $uploader->save($media);
+
+        $document = new Media();
+        $document->setKey($uploader->getKey());
+        $document->setPath($uploader->getFullKey(''));
+        $document->setFileType($uploader->getFileType());
+        $document->setSize($media->getSize());
+        $document->setIsPublic($uploader->getHasPublicAccess());
+
+        return $document;
+    }
+
+    /**
+     * @param int    $entityId
+     * @param string $type
+     * @param string $fileType
+     * @param array  $allowedMimeTypes
+     * @param bool   $hasPublicAccess
+     *
+     * @return MediaHandler
+     */
+    private function getUploader(
+        int $entityId,
+        string $type,
+        string $fileType,
+        bool $hasPublicAccess,
+        array $allowedMimeTypes = []
+    ): MediaHandler {
         /* @var MediaHandler $uploader */
-        $uploader = $this->container->get($service);
-        $url = $uploader->getFullUrl($image->getFullKey());
-        return $url;
+        $uploader = $this->mediaHandler
+            ->setId($entityId)
+            ->setType($type)
+            ->setFileType($fileType)
+            ->setAllowedMimeTypes($allowedMimeTypes)
+            ->setHasPublicAccess($hasPublicAccess);
+
+        return $uploader;
     }
 }
 ```
 
+## Bonus
 
-Generate a pre-signed url to open private document. TODO: test and update this shippet 
-```php
-/**
- * Get full Document private url from S3
- *
- * @param $path
- * @param $type
- * @return string
- */
-protected function getAmazonDocumentUrl($key, $id, $type)
-{
-    //parameters.yml
-    //storage_adapter: amazon
-    
-    $service  = $this->getParameter('ped_storage.uploader');
-    $resolver = $this->get('ped_storage.amazon_presigned_url_resolver');
-    $uploader = $this->get($service)
-        ->setAwsS3Resolver($resolver)
-        ->setId($id)
-        ->setType($type);
+Resize:
+-------
 
-    // optionally set a mediaType (es. image, video, thumbnail, document)
-    $uploader->setFileType('document');
-      
-    return $uploader->getFullUrl($key);
-}
+Required: 
+
+* filter
+
+In `config/packages/liip_imagine.yaml` define filter as:
+
+```yaml
+liip_imagine:
+    #filters
+    filter_sets:
+        # 1x1
+        icon_1-1:
+            quality: 75
+            filters:
+                relative_resize:
+                    heighten: 40
+                thumbnail:
+                    size: [40, 40]
+                    mode: outbound
+                    allow_upscale: true
+        small_1-1:
+            quality: 75
+            filters:
+                relative_resize:
+                    heighten: 400
+                thumbnail:
+                    size: [400, 400]
+                    mode: outbound
+                    allow_upscale: true
+        medium_1-1:
+            quality: 85
+            filters:
+                relative_resize:
+                    heighten: 800
+                thumbnail:
+                    size: [800, 800]
+                    mode: outbound
+                    allow_upscale: true
+        large_1-1:
+            quality: 90
+            filters:
+                relative_resize:
+                    heighten: 1200
+                thumbnail:
+                    size: [1200, 1200]
+                    mode: outbound
+                    allow_upscale: true
+        xlarge_1-1:
+            quality: 95
+            filters:
+                relative_resize:
+                    heighten: 1600
+                thumbnail:
+                    size: [1600, 1600]
+                    mode: outbound
+                    allow_upscale: true
 ```
+
+so when you call this url http://example.com/image/5dc350316d2ee.jpeg?filter=icon_1-1 you have a square image scaled to dimension 40x40px
+
+Crop:
+-----
+
+Required: 
+
+* filter
+* start-x
+* start-y
+* width
+* height
+
+when you call this url http://example.com/image/5dc350316d2ee.jpeg?filter=crop_medium_1-1&start-x=20&start-y=50&width=800&height=800 combine scale option of `medium_1-1` with crop info.
+
+So you have a crop of original image from point `[20,50]` to `[820,850]` (width and height equal 800px) and scale to 800x800px
+
+Rotate:
+------
+
+Required: 
+
+* filter
+* angle
+
+when you call this url http://example.com/image/5dc350316d2ee.jpeg?filter=rotate_medium_1-1&angle=90 combine scale option of `medium_1-1` with rotation angle.
+
+So original image is rotated of 90° and scaled to 800x800px
+
+## Authors
+
+👤 **Fabiano Roberto <fabiano.roberto@ped.technology>**
+
+* Twitter: [@dr_thief](https://twitter.com/dr_thief)
+* Github: [@fabianoroberto](https://github.com/fabianoroberto)
+
+👤 **Luigi Cardamone <luigi.cardamone@ped.technology>**
+
+* Twitter: [@CardamoneLuigi](https://twitter.com/CardamoneLuigi)
+* Github: [@LuigiCardamone](https://github.com/LuigiCardamone)
+
+## 🤝 Contributing
+
+Contributions, issues and feature requests are welcome!<br />Feel free to check [issues page](https://github.com/paneedesign/storage-bundle/issues).
+
+## Show your support
+
+Give a ⭐️ if this project helped you!
+
+***
+_This README was generated with ❤️ by [readme-md-generator](https://github.com/kefranabg/readme-md-generator)_

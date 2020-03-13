@@ -1,0 +1,29 @@
+parameters:
+    sets:
+        - 'code-quality'
+        - 'php71'
+        - 'php72'
+        - 'php73'
+        - 'symfony-code-quality'
+        - 'symfony-constructor-injection'
+        - 'symfony-phpunit'
+        - 'symfony41'
+        - 'symfony42'
+        - 'symfony43'
+        - 'symfony44'
+    exclude_paths:
+        - '*/Resources'
+        - '*/vendor'
+    exclude_rectors:
+        - 'Rector\Php74\Rector\FuncCall\ArraySpreadInsteadOfArrayMergeRector'
+        - 'Rector\Php74\Rector\Property\TypedPropertyRector'
+        - 'Rector\Php71\Rector\FuncCall\CountOnNullRector'
+        - 'Rector\TypeDeclaration\Rector\Property\CompleteVarDocTypePropertyRector'
+        - 'Rector\TypeDeclaration\Rector\FunctionLike\ReturnTypeDeclarationRector'
+        - 'Rector\Symfony\Rector\Console\ConsoleExecuteReturnIntRector'
+        - 'Rector\CodeQuality\Rector\If_\ExplicitBoolCompareRector'
+        - 'Rector\Core\Rector\Argument\ArgumentAdderRector'
+
+services:
+    Rector\TypeDeclaration\Rector\FunctionLike\ReturnTypeDeclarationRector: ~
+    Rector\TypeDeclaration\Rector\Property\CompleteVarDocTypePropertyRector: ~

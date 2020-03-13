@@ -1,0 +1,11 @@
+services:
+    ped_storage.uploader:
+        class: 'PaneeDesign\StorageBundle\Handler\MediaHandler'
+        arguments:
+            $filesystem: '@ped_storage.filesystem'
+            $liipCacheManager: '@liip_imagine.cache.manager'
+        calls:
+            -   method: setLocalEndpoint
+                arguments:
+                    - "%env(STORAGE_LOCAL_ENDPOINT)%"
+        public: true

@@ -1,26 +1,28 @@
 <?php
+
+declare(strict_types=1);
 /**
- * Created by PhpStorm.
- * User: luigi
+ * User: Luigi Cardamone <luigi.cardamone@ped.technology>
  * Date: 05/06/18
- * Time: 9.58
+ * Time: 9.58.
  */
 
 namespace PaneeDesign\StorageBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use PaneeDesign\StorageBundle\Entity\Traits\Timestampable\Timestampable;
 
 /**
- * Class MediaFilter
- * @package PaneeDesign\StorageBundle\Entity
+ * Class MediaFilter.
  *
- * @ORM\Entity()
- * @ORM\HasLifecycleCallbacks
+ * @ORM\Entity
  */
 class MediaFilter
 {
+    use Timestampable;
+
     /**
-     * @var integer
+     * @var int
      *
      * @ORM\Column(name="id", type="integer")
      * @ORM\Id
@@ -45,9 +47,9 @@ class MediaFilter
     private $url;
 
     /**
-     * Get id
+     * Get id.
      *
-     * @return integer
+     * @return int
      */
     public function getId()
     {
@@ -55,13 +57,11 @@ class MediaFilter
     }
 
     /**
-     * Set filter
+     * Set filter.
      *
      * @param string $name
-     *
-     * @return MediaFilter
      */
-    public function setName($name)
+    public function setName($name): self
     {
         $this->name = $name;
 
@@ -69,7 +69,7 @@ class MediaFilter
     }
 
     /**
-     * Get filter
+     * Get filter.
      *
      * @return string
      */
@@ -79,13 +79,9 @@ class MediaFilter
     }
 
     /**
-     * Set image
-     *
-     * @param Media $image
-     *
-     * @return MediaFilter
+     * Set image.
      */
-    public function setImage(Media $image)
+    public function setImage(Media $image): self
     {
         $this->image = $image;
 
@@ -93,7 +89,7 @@ class MediaFilter
     }
 
     /**
-     * Get image
+     * Get image.
      *
      * @return Media
      */
@@ -103,13 +99,11 @@ class MediaFilter
     }
 
     /**
-     * Set url
+     * Set url.
      *
      * @param string $url
-     *
-     * @return MediaFilter
      */
-    public function setUrl($url)
+    public function setUrl($url): self
     {
         $this->url = $url;
 
@@ -117,7 +111,7 @@ class MediaFilter
     }
 
     /**
-     * Get url
+     * Get url.
      *
      * @return string
      */

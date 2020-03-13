@@ -1,65 +1,94 @@
 {
     "name": "paneedesign/storage-bundle",
+    "description": "A Symfony bundle that provide tools to handle media storage locally or on S3.",
     "type": "symfony-bundle",
-    "description": "Storage management for Symfony3 projects.",
-    "keywords": ["storage", "aws", "filesystem", "gaufrette", "knp", "s3", "liip", "php"],
-    "homepage": "http://www.paneedesign.com/",
-    "license": "proprietary",
-    "authors": [{
-        "name": "Fabiano Roberto",
-        "email": "fabiano@paneedesign.com"
-    },{
-        "name": "Luigi Cardamone",
-        "email": "luigi@paneedesign.com"
-    }],
+    "keywords": ["storage", "aws", "file", "filesystem", "media", "gaufrette", "knp", "s3", "liip", "php"],
+    "homepage": "https://www.ped.company/",
+    "readme": "README.md",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Fabiano Roberto",
+            "email": "fabiano.roberto@ped.technology",
+            "role": "Senior Back-end Developer"
+        },
+        {
+            "name": "Luigi Cardamone",
+            "email": "luigi.cardamone@ped.technology",
+            "role": "Senior Back-end Developer"
+        },
+        {
+            "name":     "The contributors",
+            "homepage": "https://github.com/paneedesign/storage-bundle/contributors"
+        }
+    ],
+    "support": {
+        "email": "github@ped.technology",
+        "issues": "https://github.com/paneedesign/storage-bundle/issues"
+    },
     "require": {
-        "php": "^5.6|^7.0",
-        "symfony/framework-bundle": "^3.2",
+        "php": "^7.2.3",
+        "ext-exif": "*",
+        "ext-gd": "*",
+        "ext-json": "*",
+        "aws/aws-sdk-php": "^3.70",
+        "fresh/doctrine-enum-bundle": "^5.3|^6.5",
         "gaufrette/extras": "~0.1",
         "knplabs/gaufrette": "~0.5",
         "knplabs/knp-gaufrette-bundle": "~0.5",
-        "aws/aws-sdk-php": "^3.28",
-        "liip/imagine-bundle": "~2.0",
-        "fresh/doctrine-enum-bundle": "^5.0"
+        "liip/imagine-bundle": "~2.1",
+        "paneedesign/discriminator-map-bundle": "^1.0",
+        "symfony/console": "^3.4|^4.0|^5.0",
+        "symfony/flex": "^1.6",
+        "symfony/framework-bundle": "^3.4|^4.0|^5.0",
+        "symfony/twig-bundle": "^3.4|^4.0|^5.0",
+        "symfony/yaml": "^3.4|^4.0|^5.0"
     },
     "require-dev": {
-        "phpspec/phpspec": "^3.2",
-        "phpunit/phpunit": "^5.6",
-        "symfony/security-bundle": "^3.2",
-        "incenteev/composer-parameter-handler": "~2.0"
+        "friendsofphp/php-cs-fixer": "^2.14",
+        "phpmd/phpmd": "^2.6",
+        "rector/rector": "^0.7",
+        "squizlabs/php_codesniffer": "^3.4",
+        "symfony/filesystem": "^3.4|^4.0|^5.0"
     },
     "config": {
-        "bin-dir": "bin"
+        "preferred-install": {
+            "*": "dist"
+        },
+        "sort-packages": true
     },
     "autoload": {
-        "psr-4": { "PaneeDesign\\StorageBundle\\": "" },
-        "exclude-from-classmap": ["/Tests/"]
-    },
-    "minimum-stability": "dev",
-    "prefer-stable": true,
-    "repositories": [
-        {
-            "type": "path",
-            "url": "../../*/*"
+        "psr-4": {
+            "PaneeDesign\\StorageBundle\\": ""
         }
-    ],
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "PaneeDesign\\StorageBundle\\Tests\\": "tests/"
+        }
+    },
     "scripts": {
-        "symfony-scripts": [
-            "Incenteev\\ParameterHandler\\ScriptHandler::buildParameters"
+        "beautify": [
+            "./vendor/bin/php-cs-fixer fix --verbose --config=.php_cs.dist ."
         ],
-        "post-install-cmd": [
-            "@symfony-scripts"
+        "beautify-dry-run": [
+            "./vendor/bin/php-cs-fixer fix --diff --dry-run -v --config=.php_cs.dist ."
         ],
-        "post-update-cmd": [
-            "@symfony-scripts"
-        ]
+        "rector": [
+            "./vendor/bin/rector process */"
+        ],
+        "auto-scripts": {
+            "cache:clear": "symfony-cmd",
+            "assets:install %PUBLIC_DIR%": "symfony-cmd"
+        }
+    },
+    "conflict": {
+        "symfony/symfony": "*"
     },
     "extra": {
-        "branch-alias": {
-            "dev-master": "1.0-dev"
-        },
-        "incenteev-parameters": {
-            "file": "Resources/config/parameters.yml"
+        "symfony": {
+            "id": "01E11EZ1NB08P8APSACQYD5JYC",
+            "allow-contrib": "true"
         }
     }
 }

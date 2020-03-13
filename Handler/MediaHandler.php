@@ -1,24 +1,22 @@
 <?php
+
+declare(strict_types=1);
 /**
- * Created by PhpStorm.
- * User: fabianoroberto
+ * User: Fabiano Roberto <fabiano.roberto@ped.technology>
  * Date: 13/10/17
- * Time: 11:06
+ * Time: 11:06.
  */
 
 namespace PaneeDesign\StorageBundle\Handler;
 
-use Gaufrette\Extras\Resolvable\Resolver\AwsS3PresignedUrlResolver;
-use Gaufrette\Extras\Resolvable\Resolver\StaticUrlResolver;
-use Liip\ImagineBundle\Imagine\Cache\CacheManager;
-use PaneeDesign\StorageBundle\Entity\Media;
-
 use Gaufrette\Adapter\AwsS3 as AwsS3Adapter;
 use Gaufrette\Adapter\Local as LocalAdapter;
-use Gaufrette\Filesystem;
 use Gaufrette\Extras\Resolvable\ResolvableFilesystem;
-use Gaufrette\Extras\Resolvable\Resolver\AwsS3PublicUrlResolver;
-
+use Gaufrette\Extras\Resolvable\ResolverInterface;
+use Gaufrette\Extras\Resolvable\UnresolvableObjectException;
+use Gaufrette\Filesystem;
+use Liip\ImagineBundle\Imagine\Cache\CacheManager;
+use PaneeDesign\StorageBundle\Entity\Media;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 class MediaHandler
@@ -34,49 +32,42 @@ class MediaHandler
     private $liipCacheManager;
 
     /**
-     * Entity Id
+     * Entity Id.
      *
-     * @var integer
+     * @var int
      */
     private $id;
 
     /**
-     * Entity type name (es. customer, admin, owner)
+     * Entity type name (es. customer, admin, owner).
      *
      * @var string
      */
     private $type;
 
     /**
-     * Key to retrive storage file
+     * Key to retrive storage file.
      *
      * @var string
      */
     private $key;
 
     /**
-     * File Type (es. image, video, document)
+     * File Type (es. image, video, document).
      *
      * @var string
      */
     private $fileType;
 
     /**
-     * Set if the file will be stored with public access
+     * Set if the file will be stored with public access.
      *
-     * @var boolean
+     * @var bool
      */
     private $hasPublicAccess = false;
 
     /**
-     * Media information object
-     *
-     * @var Media\MediaInfo
-     */
-    private $mediaInfo = null;
-
-    /**
-     * Group folders using module id
+     * Group folders using module id.
      *
      * @var bool
      */
@@ -88,7 +79,7 @@ class MediaHandler
     private $localEndpoint;
 
     /**
-     * Allowed mime types
+     * Allowed mime types.
      *
      * @var array
      */
@@ -96,10 +87,6 @@ class MediaHandler
 
     /**
      * MediaHandler constructor.
-     *
-     * @param Filesystem $filesystem
-     * @param CacheManager $liipCacheManager
-     * @param array $allowedMimeTypes
      */
     public function __construct(Filesystem $filesystem, CacheManager $liipCacheManager, array $allowedMimeTypes = [])
     {
@@ -115,19 +102,30 @@ class MediaHandler
         $this->allowedMimeTypes = array_merge([
             'image/jpeg',
             'image/png',
-            'image/gif'
+            'image/gif',
         ], $allowedMimeTypes);
     }
 
-    /**
-     * @param AwsS3PublicUrlResolver|AwsS3PresignedUrlResolver|StaticUrlResolver $resolver
-     */
-    public function setAwsS3Resolver($resolver)
+    public function isInstanceOfAmazonS3()
+    {
+        $adapter = $this->filesystem->getAdapter();
+
+        return $adapter instanceof AwsS3Adapter;
+    }
+
+    public function isInstanceOfLocal()
+    {
+        $adapter = $this->filesystem->getAdapter();
+
+        return $adapter instanceof LocalAdapter;
+    }
+
+    public function setAwsS3Resolver(ResolverInterface $resolver): void
     {
         $adapter = $this->filesystem->getAdapter();
 
         if ($adapter instanceof AwsS3Adapter) {
-            $decorated  = new Filesystem($adapter);
+            $decorated = new Filesystem($adapter);
             $filesystem = new ResolvableFilesystem(
                 $decorated,
                 $resolver
@@ -140,81 +138,73 @@ class MediaHandler
     /**
      * @param string $localEndpoint
      */
-    public function setLocalEndpoint($localEndpoint)
+    public function setLocalEndpoint($localEndpoint): void
     {
         $this->localEndpoint = $localEndpoint;
     }
 
-    /**
-     * @return string
-     */
-    public function getLocalEndpoint()
+    public function getLocalEndpoint(): string
     {
         return $this->localEndpoint;
     }
 
     /**
      * @param $id
+     *
      * @return $this
      */
-    public function setId($id)
+    public function setId($id): self
     {
         $this->id = $id;
 
         return $this;
     }
 
-    /**
-     * @return int
-     */
-    public function getId()
+    public function getId(): int
     {
         return $this->id;
     }
 
     /**
      * @param $type
+     *
      * @return $this
      */
-    public function setType($type)
+    public function setType($type): self
     {
         $this->type = $type;
 
         return $this;
     }
 
-    /**
-     * @return string
-     */
-    public function getType()
+    public function getType(): string
     {
         return $this->type;
     }
 
     /**
      * @param $key
+     *
      * @return $this
      */
-    public function setKey($key)
+    public function setKey($key): self
     {
         $this->key = $key;
 
         return $this;
     }
 
-    /**
-     * @return string
-     */
-    public function getKey()
+    public function getKey(): string
     {
         return $this->key;
     }
 
     /**
      * @param $fileType
+     *
      * @return $this
      */
-    public function setFileType($fileType)
+    public function setFileType($fileType): self
     {
         $this->fileType = $fileType;
 
@@ -223,162 +213,30 @@ class MediaHandler
 
     /**
      * @param $hasPublicAccess
+     *
      * @return $this
      */
-    public function setHasPublicAccess($hasPublicAccess)
+    public function setHasPublicAccess($hasPublicAccess): self
     {
         $this->hasPublicAccess = $hasPublicAccess;
 
         return $this;
     }
 
-    /**
-     * @return boolean
-     */
-    public function getHasPublicAccess()
+    public function getHasPublicAccess(): bool
     {
         return $this->hasPublicAccess;
     }
 
-    /**
-     * @return string
-     */
-    public function getFileType()
+    public function getFileType(): string
     {
         return $this->fileType;
     }
 
     /**
-     * @param object|string $crop
-     * @param int $rotation
-     * @param int $priority
-     * @param string $key
-     * @param string $ext
-     * @param int $size
-     *
      * @return $this
      */
-    public function setCropInfo($crop = null, $rotation = null, $priority = 0, $key = '', $ext = '', $size = 0)
-    {
-        if ($crop !== null) {
-            if (is_object($crop)) {
-                $cropInfo = $crop;
-            } else {
-                $cropInfo = json_decode($crop);
-            }
-
-            $this->mediaInfo = new Media\CropInfo($cropInfo->x, $cropInfo->y);
-            $this->mediaInfo->setWidth($cropInfo->width);
-            $this->mediaInfo->setHeight($cropInfo->height);
-        }
-
-        if ($rotation !== null) {
-            $this->setRotation($rotation);
-        }
-
-        if ($priority > 0) {
-            $this->setPriority($priority);
-        }
-
-        if ($key !== '' && $ext !== '') {
-            $this->setName($key, $ext);
-        }
-
-        if ($size > 0) {
-            $this->setSize($size);
-        }
-
-        return $this;
-    }
-
-    /**
-     * @param $rotation
-     */
-    public function setRotation($rotation)
-    {
-        if ($this->mediaInfo instanceof Media\CropInfo === false) {
-            $this->mediaInfo = new Media\CropInfo();
-        }
-
-        $this->mediaInfo->setRotation($rotation);
-    }
-
-    /**
-     * @param int $priority
-     * @return $this
-     */
-    public function setPriority($priority)
-    {
-        if ($this->mediaInfo instanceof Media\CropInfo === false) {
-            $this->mediaInfo = new Media\CropInfo();
-        }
-
-        $this->mediaInfo->setPriority($priority);
-
-        return $this;
-    }
-
-    /**
-     * @param int $page
-     * @return $this
-     */
-    public function setDocumentInfo($page = 0)
-    {
-        if ($this->mediaInfo instanceof Media\DocumentInfo) {
-            $this->mediaInfo->setPage($page);
-        } else {
-            $this->mediaInfo = new Media\DocumentInfo($page);
-        }
-
-        return $this;
-    }
-
-    /**
-     * @param string $key
-     * @param string $ext
-     *
-     * @return $this
-     */
-    public function setName($key, $ext)
-    {
-        if ($this->mediaInfo instanceof Media\MediaInfo) {
-            $this->mediaInfo->setKey($key);
-            $this->mediaInfo->setExt($ext);
-        } else {
-            $this->mediaInfo = new Media\MediaInfo($key, $ext);
-        }
-
-        return $this;
-    }
-
-    /**
-     * @param int $size
-     * @return $this
-     */
-    public function setSize($size)
-    {
-        if ($this->mediaInfo instanceof Media\MediaInfo === false) {
-            $this->mediaInfo = new Media\MediaInfo();
-        }
-
-        $this->mediaInfo->setSize($size);
-
-        return $this;
-    }
-
-    /**
-     * @return array
-     */
-    public function getMediaInfo()
-    {
-        return $this->mediaInfo->toJSON();
-    }
-
-    /**
-     * @param $groupFolders
-     * @return $this
-     */
-    public function setGroupFolders($groupFolders)
+    public function setGroupFolders(bool $groupFolders): self
     {
         $this->groupFolders = $groupFolders;
 
@@ -386,10 +244,9 @@ class MediaHandler
     }
 
     /**
-     * @param array $allowedMimeTypes
      * @return MediaHandler
      */
-    public function setAllowedMimeTypes($allowedMimeTypes)
+    public function setAllowedMimeTypes(array $allowedMimeTypes): self
     {
         $this->allowedMimeTypes = $allowedMimeTypes;
 
@@ -397,49 +254,47 @@ class MediaHandler
     }
 
     /**
-     * @param string $allowedMimeType
      * @return MediaHandler
      */
-    public function addAllowedMimeType($allowedMimeType)
+    public function addAllowedMimeType(string $allowedMimeType): self
     {
         $this->allowedMimeTypes[] = $allowedMimeType;
 
         return $this;
     }
 
-    /**
-     * @param string $allowedMimeType
-     */
-    public function removeAllowedMimeType($allowedMimeType)
+    public function removeAllowedMimeType(string $allowedMimeType): void
     {
-        if ($index = array_search($allowedMimeType, $this->allowedMimeTypes) === false) {
+        if ($index = !\in_array($allowedMimeType, $this->allowedMimeTypes, true)) {
             unset($this->allowedMimeTypes[$index]);
         }
     }
 
-    /**
-     * @return array
-     */
-    public function getAllowedMimeTypes()
+    public function getAllowedMimeTypes(): array
     {
         return $this->allowedMimeTypes;
     }
 
     /**
-     * @param UploadedFile $file
      * @return MediaHandler
      */
-    public function save(UploadedFile $file)
+    public function save(UploadedFile $file): self
     {
-        $mimeType = $file->getClientMimeType();
+        $mimeType = $file->getMimeType();
 
         // Check if the file's mime type is in the list of allowed mime types.
-        if (!in_array($mimeType, $this->getAllowedMimeTypes())) {
-            throw new \InvalidArgumentException(sprintf('Files of type %s are not allowed.', $file->getClientMimeType()));
+        if (!\in_array($mimeType, $this->getAllowedMimeTypes())) {
+            throw new \InvalidArgumentException(sprintf('Files of type %s are not allowed.', $mimeType));
         }
 
-        $key  = uniqid();
-        $name = sprintf('%s.%s', $key, $file->guessClientExtension());
+        $ext = $file->guessExtension();
+
+        if (null === $ext) {
+            $ext = $file->getClientOriginalExtension();
+        }
+
+        $key = uniqid();
+        $name = sprintf('%s.%s', $key, $ext);
         $path = $this->getFullKey($name);
 
         /* @var AwsS3Adapter|LocalAdapter $adapter */
@@ -463,9 +318,6 @@ class MediaHandler
     }
 
     /**
-     * @param Media $source
-     * @param Media $dest
-     *
      * @return bool|int|string
      */
     public function copy(Media $source, Media $dest)
@@ -478,10 +330,7 @@ class MediaHandler
         return $adapter->write($dest->getFullKey(), $content);
     }
 
-    /**
-     * @param Media $media
-     */
-    public function remove(Media $media)
+    public function remove(Media $media): void
     {
         /* @var AwsS3Adapter|LocalAdapter $adapter */
         $adapter = $this->filesystem->getAdapter();
@@ -494,24 +343,11 @@ class MediaHandler
     }
 
     /**
-     * @deprecated
-     * @param string $key
-     */
-    public function removeThumbnails($key)
-    {
-        $fullKey = $this->getThumbnailFolder($key);
-
-        /* @var AwsS3Adapter|LocalAdapter $adapter */
-        $adapter = $this->filesystem->getAdapter();
-        @$adapter->delete($fullKey);
-    }
-
-    /**
-     * @param string $fullKey
+     * @throws UnresolvableObjectException
+     *
      * @return bool|string
-     * @throws \Gaufrette\Extras\Resolvable\UnresolvableObjectException
      */
-    public function getFullUrl($fullKey)
+    public function getFullUrl(string $fullKey)
     {
         $toReturn = false;
 
@@ -522,20 +358,25 @@ class MediaHandler
             if ($adapter->exists($fullKey)) {
                 $toReturn = $this->localEndpoint . '/' . $fullKey;
             }
-        } else {
-            if ($this->filesystem->has($fullKey)) {
-                $toReturn = $this->filesystem->resolve($fullKey);
-            }
+        } elseif ($this->filesystem->has($fullKey)) {
+            $toReturn = $this->filesystem->resolve($fullKey);
         }
 
         return $toReturn;
     }
 
     /**
-     * @param string $key
-     * @return int
+     * @return bool|false|string
      */
-    public function getSize($key)
+    public function getFileContent(string $fullKey)
+    {
+        /* @var AwsS3Adapter|LocalAdapter $adapter */
+        $adapter = $this->filesystem->getAdapter();
+
+        return $adapter->read($fullKey);
+    }
+
+    public function getSize(string $key): int
     {
         $fullKey = $this->getFullKey($key);
 
@@ -547,11 +388,12 @@ class MediaHandler
 
     /**
      * @param string $key
-     * @return string
      */
-    public function getFullKey($key)
+    public function getFullKey(?string $key = null): string
     {
-        $this->setKey($key);
+        if ($key) {
+            $this->setKey($key);
+        }
 
         $parts = [];
 
@@ -564,60 +406,31 @@ class MediaHandler
         }
 
         if ($this->id) {
+            $path = $this->id;
+
             if ($this->groupFolders) {
-                $parts[] = $this->getSubPathById($this->id);
-            } else {
-                $parts[] = $this->id;
+                $path = $this->getSubPathById($this->id);
             }
+
+            $parts[] = $path;
         }
 
         return $this->computeParts($parts, $key);
     }
 
     /**
-     * @param string $key
-     * @return string
-     */
-    private function getThumbnailFolder($key)
-    {
-        list($key) = explode('.', $key);
-
-        $parts = [];
-
-        if ($this->type) {
-            $parts[] = $this->type;
-        }
-
-        if ($this->fileType) {
-            $parts[] = 'thumbnail';
-        }
-
-        if ($this->id) {
-            if ($this->groupFolders) {
-                $parts[] = $this->getSubPathById($this->id);
-            } else {
-                $parts[] = $this->id;
-            }
-        }
-
-        return $this->computeParts($parts, $key);
-    }
-
-    /**
-     * @param array $parts
      * @param string $key
      * @param string $ext
-     * @return string
      */
-    private function computeParts($parts, $key = null, $ext = '')
+    private function computeParts(array $parts, ?string $key = null, ?string $ext = null): string
     {
-        if ($ext === '') {
-            $name = $key;
-        } else {
+        $name = $key;
+
+        if (null !== $ext) {
             $name = sprintf('%s.%s', $key, $ext);
         }
 
-        switch (count($parts)) {
+        switch (\count($parts)) {
             case 3:
                 $toReturn = sprintf('%s/%s/%s/%s', $parts[0], $parts[1], $parts[2], $name);
                 break;
@@ -635,29 +448,24 @@ class MediaHandler
         return $toReturn;
     }
 
-    /**
-     * @param int $id
-     * @return string
-     */
-    private function getSubPathById($id)
+    private function getSubPathById(int $id): string
     {
         $numericPath = ceil($id / 100);
-        $stringPath = str_replace(
+
+        return str_replace(
             ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0'],
             ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'l'],
-            strval($numericPath)
+            (string) $numericPath
         );
-        return $stringPath;
     }
 
     /**
      * Fix file rotation using exif data
-     * The file is modified only if needed
-     * @param UploadedFile $file
+     * The file is modified only if needed.
      */
-    private function fixFileRotation(UploadedFile $file)
+    private function fixFileRotation(UploadedFile $file): void
     {
-        if ($file->guessExtension() == 'jpeg') {
+        if ('jpeg' == $file->guessExtension()) {
             $toRotate = 0;
 
             $exif = @exif_read_data($file->getPathname());
@@ -675,7 +483,7 @@ class MediaHandler
                 }
             }
 
-            if ($toRotate != 0) {
+            if ($toRotate) {
                 $image = @imagecreatefromjpeg($file->getPathname());
 
                 if (!empty($image)) {
