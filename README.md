@@ -1,10 +1,6 @@
 <h1 align="center">Welcome to PED Storage Bundle 👋</h1>
-<p>
-  <img alt="Version" src="https://img.shields.io/badge/version-v6.0.0-blue.svg?cacheSeconds=2592000" />
-  <a href="#" target="_blank">
-    <img alt="License: MIT" src="https://img.shields.io/badge/License-MIT-yellow.svg" />
-  </a>
-</p>
+
+[![Latest Stable Version](https://poser.pugx.org/paneedesign/storage-bundle/v)](//packagist.org/packages/paneedesign/storage-bundle) [![Total Downloads](https://poser.pugx.org/paneedesign/storage-bundle/downloads)](//packagist.org/packages/paneedesign/storage-bundle) [![Latest Unstable Version](https://poser.pugx.org/paneedesign/storage-bundle/v/unstable)](//packagist.org/packages/paneedesign/storage-bundle) [![License](https://poser.pugx.org/paneedesign/storage-bundle/license)](//packagist.org/packages/paneedesign/storage-bundle)
 
 A Symfony bundle that provide tools to handle media storage locally or on S3.
 
