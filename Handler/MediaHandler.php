@@ -312,7 +312,7 @@ class MediaHandler
 
         $this->fixFileRotation($file);
 
-        $adapter->write($path, file_get_contents($file->getPathname()));
+        $adapter->write($path, new \GuzzleHttp\Psr7\Stream(fopen($file->getPathname(), 'r')));
 
         return $this;
     }
